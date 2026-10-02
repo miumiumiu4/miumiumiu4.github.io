@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>写真で総額 | ありがとうエアコンお掃除専門店</title>
+<meta name="description" content="登録なしで、エアコンの台数とオプションを選ぶだけで税込の総額が分かります。写真はブラウザの中だけに置きます。">
+<meta name="site:title" content="写真で総額">
+<meta name="site:page" content="quote">
+<meta name="site:needs" content="api">
+<meta name="site:scripts" content="menu-form,photos,pages/quote">
+
+<!--build:base-->
+<base href="https://miumiumiu4.github.io/">
+<!--/build:base-->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/site.css">
+<!--build:jsonld-->
+
+<!--/build:jsonld-->
+</head>
+<body>
+<!--build:header-->
+<a class="skip" href="#main">本文へ移動</a>
+<header class="site-h">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="トップへ">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="15" cy="19" r="12" fill="var(--brand)"/><circle cx="27" cy="8" r="5" fill="var(--sun)"/><circle cx="11" cy="15" r="3.2" fill="var(--brand-ink)" opacity=".85"/></svg>
+      <b data-store>ありがとうエアコンお掃除専門店</b>
+    </a>
+    <nav aria-label="サイトの案内">
+      <a href="price.html">料金</a>
+      <a href="quote.html">写真で総額</a>
+      <a href="records.html">作業の記録</a>
+      <a href="faq.html">よくある質問</a>
+      <a href="my.html">マイページ</a>
+      <a class="btn sm" href="book.html">予約する</a>
+    </nav>
+    <div class="a11y" role="group" aria-label="見やすさの設定">
+      <span>文字の大きさ</span>
+      <div class="seg" role="group" aria-label="文字の大きさ"><button type="button" data-fs-btn="0" aria-pressed="true">標準</button><button type="button" data-fs-btn="1" aria-pressed="false">大</button><button type="button" data-fs-btn="2" aria-pressed="false">特大</button></div>
+      <button type="button" class="tog" data-hc-btn aria-pressed="false">くっきり表示</button>
+    </div>
+  </div>
+</header>
+<!--/build:header-->
+<main id="main">
+
+<div class="wrap stack-lg">
+  <div class="page-h">
+    <p class="crumb"><a href="index.html">トップ</a> ＞ 写真で総額</p>
+    <h1>写真で総額を見る</h1>
+    <p class="muted">登録はいりません。お名前や住所も聞きません。</p>
+    <p class="caution"><b>写真の自動読み取りは準備中です。</b>選んでいただいた内容で総額を出します。</p>
+  </div>
+
+  <section class="card" aria-labelledby="h-q1">
+    <h2 id="h-q1">1. エアコンの写真（任意・3枚まで）</h2>
+    <p class="small muted">お持ちなら、えらんでください。写真は<b>このブラウザの中だけ</b>に置きます。ここでは送信しません。予約のときに、お店に送るかどうかをお聞きします。</p>
+    <div id="photos"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-q2">
+    <h2 id="h-q2">2. お願いしたい内容</h2>
+    <div id="menu" class="stack"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-q3" aria-live="polite" id="result-card">
+    <h2 id="h-q3">3. 総額（税込）</h2>
+    <div id="result"><p class="muted">メニューを選ぶと、ここに総額が出ます。</p></div>
+    <div class="acts no-print"><a class="btn" id="to-book" href="book.html" aria-disabled="true">この内容で、空いている日を見る</a></div>
+  </section>
+</div>
+
+</main>
+<!--build:footer-->
+<footer class="foot">
+  <div class="wrap">
+    <div><b data-store>ありがとうエアコンお掃除専門店</b></div>
+    <div>電話：<cfg-v data-cfg="PHONE">080-4177-2272</cfg-v>　営業時間：<cfg-v data-cfg="HOURS">電話受付 10:00〜18:00（土日休み）／作業・営業は年中無休</cfg-v>　メール：<cfg-v data-cfg="CONTACT_EMAIL">info@arigatouosouji.com</cfg-v></div>
+    <nav aria-label="フッターの案内"><a href="price.html">料金</a><a href="quote.html">写真で総額</a><a href="book.html">予約</a><a href="records.html">作業の記録</a><a href="faq.html">よくある質問</a><a href="ai.html">AI向け情報</a><a href="cancel.html">キャンセルの決まり</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシー</a><a href="tokushoho.html">特定商取引法に基づく表記</a></nav>
+    <p class="tiny">お客様のお名前・住所・電話・メールは、このお店の中だけで使います。ありがとうグループの本部やほかのお店には、番号と金額などの数字だけを渡します。</p>
+  </div>
+</footer>
+<!--/build:footer-->
+<!--build:scripts-->
+<script src="js/config.js"></script>
+<script src="js/prices.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/quote-local.js"></script>
+<script src="js/api.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/menu-form.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/pages/quote.js"></script>
+<!--/build:scripts-->
+</body>
+</html>

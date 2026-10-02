@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>予約 | ありがとうエアコンお掃除専門店</title>
+<meta name="description" content="空き枠のカレンダーから日時を選んで予約します。お名前や住所は、最後の「お客様の情報」でだけ入力します。">
+<meta name="site:title" content="予約">
+<meta name="site:page" content="book">
+<meta name="site:needs" content="api">
+<meta name="site:scripts" content="menu-form,photos,pages/book">
+
+<!--build:base-->
+<base href="https://miumiumiu4.github.io/">
+<!--/build:base-->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/site.css">
+<!--build:jsonld-->
+
+<!--/build:jsonld-->
+</head>
+<body>
+<!--build:header-->
+<a class="skip" href="#main">本文へ移動</a>
+<header class="site-h">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="トップへ">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="15" cy="19" r="12" fill="var(--brand)"/><circle cx="27" cy="8" r="5" fill="var(--sun)"/><circle cx="11" cy="15" r="3.2" fill="var(--brand-ink)" opacity=".85"/></svg>
+      <b data-store>ありがとうエアコンお掃除専門店</b>
+    </a>
+    <nav aria-label="サイトの案内">
+      <a href="price.html">料金</a>
+      <a href="quote.html">写真で総額</a>
+      <a href="records.html">作業の記録</a>
+      <a href="faq.html">よくある質問</a>
+      <a href="my.html">マイページ</a>
+      <a class="btn sm" href="book.html">予約する</a>
+    </nav>
+    <div class="a11y" role="group" aria-label="見やすさの設定">
+      <span>文字の大きさ</span>
+      <div class="seg" role="group" aria-label="文字の大きさ"><button type="button" data-fs-btn="0" aria-pressed="true">標準</button><button type="button" data-fs-btn="1" aria-pressed="false">大</button><button type="button" data-fs-btn="2" aria-pressed="false">特大</button></div>
+      <button type="button" class="tog" data-hc-btn aria-pressed="false">くっきり表示</button>
+    </div>
+  </div>
+</header>
+<!--/build:header-->
+<main id="main">
+
+<div class="wrap stack-lg">
+  <div class="page-h">
+    <p class="crumb"><a href="index.html">トップ</a> ＞ 予約</p>
+    <h1>予約</h1>
+    <p class="muted">エリア、内容、日時の順に選びます。お名前や住所は、最後の「お客様の情報」でだけ入力します。</p>
+  </div>
+  <noscript><p class="err">この予約ページは、JavaScript を使います。ブラウザの設定で JavaScript を有効にするか、お電話でご予約ください。</p></noscript>
+  <ol class="steps-bar" id="steps" aria-label="予約の進みぐあい">
+    <li>1 エリア</li><li>2 内容</li><li>3 日時</li><li>4 お客様の情報</li><li>5 確認</li>
+  </ol>
+  <div id="closed" class="caution" role="alert" hidden></div>
+  <div id="flash" aria-live="polite"></div>
+
+  <section class="card" data-step="1" aria-labelledby="h-s1">
+    <h2 id="h-s1" tabindex="-1">1. エリアをえらぶ</h2>
+    <div class="field"><label for="area">お住まいのエリア</label>
+      <select id="area">
+<!--build:areaoptions-->
+<option value="14101">横浜市鶴見区</option><option value="14102">横浜市神奈川区</option><option value="14103">横浜市西区</option><option value="14104">横浜市中区</option><option value="14105">横浜市南区</option><option value="14106">横浜市保土ケ谷区</option><option value="14107">横浜市磯子区</option><option value="14108">横浜市金沢区</option><option value="14109">横浜市港北区</option><option value="14110">横浜市戸塚区</option><option value="14111">横浜市港南区</option><option value="14112">横浜市旭区</option><option value="14113">横浜市緑区</option><option value="14114">横浜市瀬谷区</option><option value="14115">横浜市栄区</option><option value="14116">横浜市泉区</option><option value="14117">横浜市青葉区</option><option value="14118">横浜市都筑区</option>
+<!--/build:areaoptions-->
+      </select></div>
+    <div class="acts"><button class="btn" type="button" data-next>次へ：内容をえらぶ</button></div>
+  </section>
+
+  <section class="card" data-step="2" aria-labelledby="h-s2" hidden>
+    <h2 id="h-s2" tabindex="-1">2. お願いしたい内容</h2>
+    <div id="menu" class="stack"></div>
+    <div id="quote-box" aria-live="polite"></div>
+    <details><summary class="lab" style="min-height:44px;display:flex;align-items:center;cursor:pointer">見積りの写真を添える（任意）</summary>
+      <p class="small muted">写真は、予約が確定したあとに「送る」を選んだ時だけ、お店に送ります。</p><div id="photos"></div></details>
+    <div class="acts"><button class="btn ghost" type="button" data-prev>戻る</button><button class="btn" type="button" data-next>次へ：日時をえらぶ</button></div>
+  </section>
+
+  <section class="card" data-step="3" aria-labelledby="h-s3" hidden>
+    <h2 id="h-s3" tabindex="-1">3. 日時をえらぶ</h2>
+    <p class="legend"><span><b>○</b> 空きあり</span><span><b>△</b> その日の最後の1枠</span><span><b>×</b> 空きなし</span></p>
+    <div class="cal" id="cal" aria-busy="true"><p class="muted">空きを読みこんでいます…</p></div>
+    <p class="small muted" id="cal-note"></p>
+    <div id="picked" class="done" hidden aria-live="polite"></div>
+    <div id="quote-box2" aria-live="polite"></div>
+    <div class="acts"><button class="btn ghost" type="button" data-prev>戻る</button><button class="btn" type="button" data-next id="to4" disabled>次へ：お客様の情報</button></div>
+  </section>
+
+  <section class="card" data-step="4" aria-labelledby="h-s4" hidden>
+    <h2 id="h-s4" tabindex="-1">4. お客様の情報</h2>
+    <p class="note">ここで入力するお名前・電話・住所・メールは、このお店の中だけで使います。ご予約の連絡と、作業のために使い、ほかの目的には使いません。</p>
+    <form id="form" novalidate class="stack" autocomplete="on">
+      <fieldset><legend class="lab">お客様の種類</legend>
+        <label class="opt"><input type="radio" name="customerType" value="個人" checked> 個人（予約のあとにカードを登録<span class="tbd">仮</span>）</label>
+        <label class="opt"><input type="radio" name="customerType" value="法人"> 法人（不動産会社・大家さんなど：請求書払い<span class="tbd">仮</span>）</label></fieldset>
+      <div class="field"><label for="f-name">お名前 <span class="req">必須</span></label><input id="f-name" name="name" autocomplete="name" placeholder="例：山田 太郎" aria-describedby="e-name" required><p class="err" id="e-name" role="alert" hidden></p></div>
+      <div class="grid2">
+        <div class="field"><label for="f-phone">電話番号 <span class="req">必須</span></label><input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="例：09012345678" aria-describedby="e-phone" required><p class="err" id="e-phone" role="alert" hidden></p></div>
+        <div class="field"><label for="f-email">メールアドレス <span class="req">必須</span></label><input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="例：sample@example.com" aria-describedby="e-email" required><p class="err" id="e-email" role="alert" hidden></p></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label for="f-zip">郵便番号 <span class="req">必須</span></label><input id="f-zip" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="例：222-0000" aria-describedby="e-zip" required><p class="err" id="e-zip" role="alert" hidden></p></div>
+      </div>
+      <div class="field"><label for="f-address">作業する場所の住所 <span class="req">必須</span></label><input id="f-address" name="address" autocomplete="street-address" placeholder="例：横浜市港北区○○町1-2-3 ○○マンション101" aria-describedby="e-address" required><p class="err" id="e-address" role="alert" hidden></p></div>
+      <div class="field"><label for="f-note">お店へのメモ（任意）</label><textarea id="f-note" name="note" placeholder="例：駐車場はありません／インターホンを押してください"></textarea><span class="hint">クレジットカードの番号や暗証番号は、書かないでください。</span></div>
+      <div class="hp" aria-hidden="true"><label for="f-website">この欄は空のままにしてください</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <fieldset><legend class="lab">同意 <span class="req">必須</span></legend>
+        <label class="opt"><input type="checkbox" id="f-privacy"> <span><a href="privacy.html" target="_blank" rel="noopener">個人情報の取りあつかい</a>に同意します</span></label>
+        <label class="opt"><input type="checkbox" id="f-terms"> <span><a href="terms.html" target="_blank" rel="noopener">利用規約</a>と<a href="cancel.html" target="_blank" rel="noopener">キャンセルの決まり</a>に同意します</span></label>
+        <p class="err" id="e-agree" role="alert" hidden></p></fieldset>
+      <div class="acts"><button class="btn ghost" type="button" data-prev>戻る</button><button class="btn" type="submit">確認する</button></div>
+    </form>
+  </section>
+
+  <section class="card" data-step="5" aria-labelledby="h-s5" hidden>
+    <h2 id="h-s5" tabindex="-1">5. 内容の確認</h2>
+    <p class="note">まだ予約は確定していません。内容を確かめて、「予約を確定する」を押してください。</p>
+    <div id="confirm" class="stack"></div>
+    <label class="opt" id="photo-opt" hidden><input type="checkbox" id="send-photos"> <span>見積りの写真も、お店に送る（任意）</span></label>
+    <div id="submit-err" aria-live="assertive"></div>
+    <div class="acts"><button class="btn ghost" type="button" data-prev>戻って直す</button><button class="btn sun" type="button" id="submit">予約を確定する</button></div>
+  </section>
+
+  <section class="card ok" id="done" aria-labelledby="h-done" hidden>
+    <h2 id="h-done" tabindex="-1">ご予約を受け付けました</h2>
+    <div id="done-body" class="stack"></div>
+  </section>
+</div>
+
+</main>
+<!--build:footer-->
+<footer class="foot">
+  <div class="wrap">
+    <div><b data-store>ありがとうエアコンお掃除専門店</b></div>
+    <div>電話：<cfg-v data-cfg="PHONE">080-4177-2272</cfg-v>　営業時間：<cfg-v data-cfg="HOURS">電話受付 10:00〜18:00（土日休み）／作業・営業は年中無休</cfg-v>　メール：<cfg-v data-cfg="CONTACT_EMAIL">info@arigatouosouji.com</cfg-v></div>
+    <nav aria-label="フッターの案内"><a href="price.html">料金</a><a href="quote.html">写真で総額</a><a href="book.html">予約</a><a href="records.html">作業の記録</a><a href="faq.html">よくある質問</a><a href="ai.html">AI向け情報</a><a href="cancel.html">キャンセルの決まり</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシー</a><a href="tokushoho.html">特定商取引法に基づく表記</a></nav>
+    <p class="tiny">お客様のお名前・住所・電話・メールは、このお店の中だけで使います。ありがとうグループの本部やほかのお店には、番号と金額などの数字だけを渡します。</p>
+  </div>
+</footer>
+<!--/build:footer-->
+<!--build:scripts-->
+<script src="js/config.js"></script>
+<script src="js/prices.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/quote-local.js"></script>
+<script src="js/api.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/menu-form.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/pages/book.js"></script>
+<!--/build:scripts-->
+</body>
+</html>

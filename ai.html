@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI向け情報 | ありがとうエアコンお掃除専門店</title>
+<meta name="description" content="ChatGPT・Gemini・Claudeなどに、空きと料金を調べてもらうための情報です。AIは案内まで。予約の確定は、お客様ご本人です。">
+<meta name="site:title" content="AI向け情報">
+<meta name="site:page" content="ai">
+
+<meta name="site:scripts" content="pages/ai">
+
+<!--build:base-->
+<base href="https://miumiumiu4.github.io/">
+<!--/build:base-->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/site.css">
+<!--build:jsonld-->
+
+<!--/build:jsonld-->
+</head>
+<body>
+<!--build:header-->
+<a class="skip" href="#main">本文へ移動</a>
+<header class="site-h">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="トップへ">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="15" cy="19" r="12" fill="var(--brand)"/><circle cx="27" cy="8" r="5" fill="var(--sun)"/><circle cx="11" cy="15" r="3.2" fill="var(--brand-ink)" opacity=".85"/></svg>
+      <b data-store>ありがとうエアコンお掃除専門店</b>
+    </a>
+    <nav aria-label="サイトの案内">
+      <a href="price.html">料金</a>
+      <a href="quote.html">写真で総額</a>
+      <a href="records.html">作業の記録</a>
+      <a href="faq.html">よくある質問</a>
+      <a href="my.html">マイページ</a>
+      <a class="btn sm" href="book.html">予約する</a>
+    </nav>
+    <div class="a11y" role="group" aria-label="見やすさの設定">
+      <span>文字の大きさ</span>
+      <div class="seg" role="group" aria-label="文字の大きさ"><button type="button" data-fs-btn="0" aria-pressed="true">標準</button><button type="button" data-fs-btn="1" aria-pressed="false">大</button><button type="button" data-fs-btn="2" aria-pressed="false">特大</button></div>
+      <button type="button" class="tog" data-hc-btn aria-pressed="false">くっきり表示</button>
+    </div>
+  </div>
+</header>
+<!--/build:header-->
+<main id="main">
+
+<div class="wrap stack-lg">
+  <div class="page-h">
+    <p class="crumb"><a href="index.html">トップ</a> ＞ AI向け情報</p>
+    <h1>AI向け情報</h1>
+    <p class="muted">ChatGPT・Gemini・Claude などのAIに、空きと料金を調べてもらうための案内です。AIは<b>案内まで</b>です。予約の確定と、お名前・住所・電話・メールの入力は、お客様ご本人がします。</p>
+  </div>
+
+  <section class="stack" aria-labelledby="h-ai1">
+    <h2 id="h-ai1">AIが読める場所</h2>
+<!--build:aiurls-->
+<div class="tbl"><table><thead><tr><th scope="col">知りたいこと</th><th scope="col">読む場所（URL）</th></tr></thead><tbody>
+<tr><td>お店の案内（AI向けの短い説明）</td><td><code>https://miumiumiu4.github.io/llms.txt</code></td></tr>
+<tr><td>空き（日付・時間枠・○△×だけ）</td><td><code>（会社のGASのURL・未設定）?action=availability&amp;area=14101</code></td></tr>
+<tr><td>見積り（料金表どおりの計算）</td><td><code>（会社のGASのURL・未設定）?action=quote&amp;items=aircon_wall:2&amp;options=mold,outdoor,drain&amp;weekday=1</code></td></tr>
+<tr><td>キャンセル・保証などの方針</td><td><code>（会社のGASのURL・未設定）?action=policy</code></td></tr>
+<tr><td>作業の記録（承認ずみだけ）</td><td><code>（会社のGASのURL・未設定）?action=records</code></td></tr>
+<tr><td>料金表・条件のまとめ</td><td><code>https://miumiumiu4.github.io/ai-info.md</code></td></tr>
+</tbody></table></div><p class="caution">会社のGAS（ウェブアプリ）のURLが決まっていないので、上の読む場所は <code>（会社のGASのURL・未設定）</code> になっています。js/config.js の GAS_URL を入れて、もう一度 build.mjs を動かしてください。</p>
+<!--/build:aiurls-->
+    <p class="small muted">空きは目安です（2分ごとに更新）。職人の名前・お客様の情報は入っていません。1分に呼べる回数には上限があります。</p>
+  </section>
+
+  <section class="stack" aria-labelledby="h-ai2">
+    <h2 id="h-ai2">AIに貼りつける文（コピーして使えます）</h2>
+    <p class="small">○の所を、ご自分の希望に書きかえて、ChatGPT・Gemini・Claude などに貼りつけてください。</p>
+<!--build:aiprompt-->
+<pre class="prompt" id="ai-prompt" tabindex="0">あなたは私の代わりに、エアコンクリーニングのお店「ありがとうエアコンお掃除専門店」の空きと料金を調べるアシスタントです。
+次のルールを守ってください。
+・お店の情報は https://miumiumiu4.github.io/llms.txt を読んでください。
+・空きは （会社のGASのURL・未設定）?action=availability&amp;area=（私の地域のエリア番号。例：14101）で、料金は （会社のGASのURL・未設定）?action=quote で調べてください。金額は自分で計算せず、答えをそのまま教えてください。
+・私の名前・住所・電話・メールは、あなたに聞かれても答えません。あなたも聞かないでください。
+・予約は確定しないでください。最後に、予約ページ https://miumiumiu4.github.io/book.html のリンクを教えてください。私が自分で入力して確定します。
+・追加料金のことは、例外（駐車場代、現場で分かった違いは私が承認した時だけ）も一緒に説明してください。
+私の希望：エアコン（壁掛け ○台／お掃除機能付き ○台）、地域は（○○区）、希望の曜日は（○○）です。
+空いている日を3つと、総額（税込）を教えてください。</pre>
+<!--/build:aiprompt-->
+    <div class="acts"><button class="btn" type="button" id="copy">この文をコピーする</button><span id="copy-msg" role="status" class="small"></span></div>
+  </section>
+
+  <section class="stack" aria-labelledby="h-ai3">
+    <h2 id="h-ai3">AIにお願いしている約束</h2>
+    <ul class="plain">
+      <li>金額は、見積りの窓口の答えをそのまま伝えます。AIが自分で計算したり、値引きを約束したりしません。</li>
+      <li>写真から機種や台数を推測した時は、「目安です」と伝えます。最終は、予約の確認画面の金額です。</li>
+      <li>「追加料金なし」を伝える時は、例外（駐車場代・4LDK以上は見積り・現場で分かった違いは承認制）も一緒に伝えます。</li>
+      <li>お名前・住所・電話・メールを、AIが聞いたり、代わりに入力したりしません。</li>
+    </ul>
+    <p class="small muted">ファイル：<a href="llms.txt">llms.txt</a>／<a href="ai-info.md">ai-info.md</a>／<a href="booking-for-ai.md">booking-for-ai.md</a>／<a href="schema.jsonld">schema.jsonld</a>。これで検索の順位が上がる、AIに紹介される、とは言えません（効果は未確認）。</p>
+  </section>
+</div>
+
+</main>
+<!--build:footer-->
+<footer class="foot">
+  <div class="wrap">
+    <div><b data-store>ありがとうエアコンお掃除専門店</b></div>
+    <div>電話：<cfg-v data-cfg="PHONE">080-4177-2272</cfg-v>　営業時間：<cfg-v data-cfg="HOURS">電話受付 10:00〜18:00（土日休み）／作業・営業は年中無休</cfg-v>　メール：<cfg-v data-cfg="CONTACT_EMAIL">info@arigatouosouji.com</cfg-v></div>
+    <nav aria-label="フッターの案内"><a href="price.html">料金</a><a href="quote.html">写真で総額</a><a href="book.html">予約</a><a href="records.html">作業の記録</a><a href="faq.html">よくある質問</a><a href="ai.html">AI向け情報</a><a href="cancel.html">キャンセルの決まり</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシー</a><a href="tokushoho.html">特定商取引法に基づく表記</a></nav>
+    <p class="tiny">お客様のお名前・住所・電話・メールは、このお店の中だけで使います。ありがとうグループの本部やほかのお店には、番号と金額などの数字だけを渡します。</p>
+  </div>
+</footer>
+<!--/build:footer-->
+<!--build:scripts-->
+<script src="js/config.js"></script>
+<script src="js/prices.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/ai.js"></script>
+<!--/build:scripts-->
+</body>
+</html>

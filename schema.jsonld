@@ -1,0 +1,603 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://miumiumiu4.github.io/#business",
+      "name": "ありがとうエアコンお掃除専門店",
+      "description": "横浜市全域のエアコンクリーニングと、洗濯機・水回り・空室清掃のお店です。料金は税込の総額で、2台目以降も同じ金額です。",
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "横浜市"
+        }
+      ],
+      "url": "https://miumiumiu4.github.io/",
+      "telephone": "080-4177-2272",
+      "email": "info@arigatouosouji.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "JP",
+        "addressRegion": "神奈川県",
+        "addressLocality": "横浜市"
+      },
+      "priceRange": "7,900円〜",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "料金表（税込）",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "エアコンクリーニング 壁掛け",
+              "serviceType": "エアコンクリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "8900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "8900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "エアコンクリーニング お掃除機能付き",
+              "serviceType": "エアコンクリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "14900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "14900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "洗濯機クリーニング 縦型",
+              "serviceType": "洗濯機クリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "14900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "14900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "洗濯機クリーニング ドラム式",
+              "serviceType": "洗濯機クリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "22900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "22900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "浴室クリーニング",
+              "serviceType": "水回りクリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "14900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "14900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "キッチンクリーニング",
+              "serviceType": "水回りクリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "12900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "12900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "洗面所クリーニング",
+              "serviceType": "水回りクリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "7900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "7900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "トイレクリーニング",
+              "serviceType": "水回りクリーニング",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "7900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "7900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "空室清掃 1R・1K",
+              "serviceType": "空室清掃",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "21900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "21900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "空室清掃 1LDK・2DK",
+              "serviceType": "空室清掃",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "32900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "32900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "空室清掃 2LDK・3DK",
+              "serviceType": "空室清掃",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "44900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "44900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "空室清掃 3LDK",
+              "serviceType": "空室清掃",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "57900",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "57900",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "駐車場代は別です（実費）。2台目以降も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "空室清掃 4LDK以上",
+              "serviceType": "空室清掃",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "description": "見積りです（間取り・汚れを見て決めます）。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "3点セット（防カビ・室外機・ドレン）",
+              "serviceType": "エアコン",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "7000",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "7000",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "別々に頼むと9,500円。平日も同じ金額です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "防カビ（単品）",
+              "serviceType": "エアコン",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "3000",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "3000",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "平日（月〜金）は単品が無料です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "室外機（単品）",
+              "serviceType": "エアコン",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "4000",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "4000",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "単品の料金です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "ドレン（単品）",
+              "serviceType": "エアコン",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "2500",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "2500",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "単品の料金です。"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "トイレ掃除・お風呂の排水溝の掃除",
+              "serviceType": "無料サービス",
+              "provider": {
+                "@id": "https://miumiumiu4.github.io/#business"
+              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "横浜市"
+                }
+              ]
+            },
+            "priceCurrency": "JPY",
+            "price": "0",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "JPY",
+              "price": "0",
+              "valueAddedTaxIncluded": true
+            },
+            "description": "エアコン1台のご依頼から無料です。"
+          }
+        ]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "トイレ掃除は、本当に無料ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい。エアコンを1台以上ご依頼いただくと、トイレ掃除とお風呂の排水溝の掃除が無料です。口コミを書くことは、無料の条件ではありません。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "エアコンは、2台目からは安くなりますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "通常の料金では、2台目以降も1台目と同じ金額です。料金はすべて税込の総額で表示しています。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "当日に、追加料金がかかることはありますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ご案内した総額から、追加料金はいただきません。例外は3つです。駐車場代（実費・別）、4LDK以上の空室清掃（見積り）、そして、お申し込みと違う機種・台数・特殊な作業が現場で分かった場合です。この場合は、理由の写真をマイページでお見せして、お客様が「承認」を押した作業だけを追加します。承認がなければ、作業も請求もしません。見送っても、お申し込みの作業は行います。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "写真を送ると、機種や台数を自動で読み取ってくれますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "写真の自動読み取りは、準備中です。いまは、お客様が選んだ種類・台数・オプションから、料金表どおりに総額を出します。写真は、お客様のブラウザの中だけに置いて、予約のときに送るかどうかをお選びいただきます。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "キャンセル料はいくらですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "作業日の前々日までは無料、前日は料金の50%、当日は100%です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "日にちを変えたい時は？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "マイページから、空いている日を選んで変えられます。天気・渋滞・体調不良・職人の都合による変更は、いつでも無料です（仮）。それ以外は、キャンセルと同じ決まり（前々日まで無料・前日50%・当日100%）です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "作業のあとに、気になる点があった時は？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "作業後1週間は保証期間です。作業が原因の問題があった時は、無料でやり直しに伺います。保証書は、マイページから印刷できます。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "お支払いの方法は？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "個人のお客様は、予約が確定したあとにカードを登録していただき、作業が終わってからお支払いです（仮）。法人（不動産会社・大家さんなど）のお客様は、請求書払いです（仮）。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "駐車場代はかかりますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "駐車場がない場合は、近くのコインパーキングの実費を、別にいただきます。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "平日の防カビ無料は、祝日もですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "平日（月〜金）の予約では、防カビの単品が無料です。祝日を平日として扱うかどうかは、未決定です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "4LDK以上の空室清掃は、予約できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "4LDK以上は、間取りと汚れを見てお見積りします。インターネットの予約は使えませんので、お電話かメールでご相談ください。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "お名前や住所は、だれが見ますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "お名前・住所・電話・メールは、このお店の中だけで使います。担当の職人には、作業に必要な範囲だけを、作業日の前々日からお見せします。ありがとうグループの本部やほかのお店には、受付番号と金額などの数字だけを渡します。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "家族とマイページを共有できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "お客様ご本人が同意した方だけに、共有できます。見えるのは、予約の日時・保証書・設備カルテです。お支払いと金額は見えません。共有は、いつでも取り消せます。"
+          }
+        }
+      ]
+    }
+  ]
+}

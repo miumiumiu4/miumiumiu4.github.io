@@ -1,0 +1,26 @@
+# ありがとうエアコンお掃除専門店 の robots.txt（build.mjs が作ります）
+# 更新日：2026-10-02
+# robots.txt はドメインの一番上に置いた時だけ読まれます。GitHub Pages の「/リポジトリ名/」の下では読まれません（公開手順.md）。
+# 公開ページは読んでよい。マイページ・保証書・記録の1件ページは読まない。
+User-agent: *
+Allow: /
+Disallow: /my.html
+Disallow: /warranty.html
+Disallow: /record.html
+
+# AIのロボット（仮：はじめは「許可」。やめたい時は Allow: / を Disallow: / に変える。方針は三浦さんが決める・未決定）
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+Allow: /
+Disallow: /my.html
+Disallow: /warranty.html
+Disallow: /record.html
+
+# robots.txt は「お願い」で、鍵ではありません。個人情報のページは、1回きりのリンクを知らない人は開けない作りです。
+Sitemap: https://miumiumiu4.github.io/sitemap.xml

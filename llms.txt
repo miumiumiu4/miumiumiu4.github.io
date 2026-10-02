@@ -1,0 +1,35 @@
+# ありがとうエアコンお掃除専門店
+
+> ありがとうエアコンお掃除専門店 は、横浜市全域のエアコンクリーニングと、洗濯機・水回り・空室清掃のお店です。
+> 料金は税込の総額で、2台目以降も同じ金額です。エアコン1台のご依頼から、トイレ掃除とお風呂の排水溝の掃除が無料です。
+> 追加料金は、例外を除いて、いただきません（例外は ai-info.md に書いています）。
+> 料金の更新日：2026-10-02
+
+金額・条件の「正」は、料金表（ai-info.md）と見積りの窓口（quote）の答えです。AIが自分で金額を作らないでください。
+
+## 料金・条件
+- [料金表・条件・保証・キャンセル](https://miumiumiu4.github.io/ai-info.md)
+- [構造化データ（JSON-LD）](https://miumiumiu4.github.io/schema.jsonld)
+
+## 空き状況（個人情報なし）
+- （会社のGASのURL・未設定）?action=availability&area=エリア番号（例：14109）
+- 返す内容：日付・時間枠・状態（○空き／△最後の1枠／×なし）・エリア番号だけです。職人の名前・お客様の情報は入っていません。
+
+## 見積り（料金表どおりの自動計算）
+- （会社のGASのURL・未設定）?action=quote&items=aircon_wall:2&options=mold,outdoor,drain&weekday=1
+- items：aircon_wall／aircon_auto／washer_vertical／washer_drum／bath／kitchen／washroom／toilet／vacant_1R／vacant_1LDK／vacant_2LDK／vacant_3LDK／vacant_4LDK_plus（見積り）
+
+## 方針（キャンセル・保証）
+- （会社のGASのURL・未設定）?action=policy
+- キャンセル：前々日まで無料／前日50%／当日100%。保証：作業後1週間。
+
+## 予約
+- 予約ページ：https://miumiumiu4.github.io/book.html　お名前・住所・電話・メールは、お客様ご本人が、このページだけに入力してください。
+- AIが予約を確定したり、お客様の個人情報を代わりに入力したりすることは、お受けしていません。
+- AIアシスタントの使い方：https://miumiumiu4.github.io/booking-for-ai.md
+
+## 作業の実績（事実だけ・個人情報なし）
+- （会社のGASのURL・未設定）?action=records （オーナーが確認して承認した記録だけ）
+
+## お問い合わせ
+- 電話：080-4177-2272　メール：info@arigatouosouji.com　営業時間：電話受付 10:00〜18:00（土日休み）／作業・営業は年中無休
