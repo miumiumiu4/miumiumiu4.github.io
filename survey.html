@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>暮らしの困りごとアンケート | ありがとうエアコンお掃除専門店</title>
+<meta name="description" content="家のことで面倒だったこと・困ったことを教えてください。いただいた声から、みなさんの役に立つ仕組みを作ります。">
+<meta name="robots" content="noindex">
+<!--build:base-->
+<base href="https://miumiumiu4.github.io/">
+<!--/build:base-->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  .sv-q{display:grid;gap:.6rem}
+  .sv-q .req{font-size:.78rem;font-weight:700;color:var(--crit);border:1px solid var(--crit);border-radius:6px;padding:0 .4em;margin-left:.4em;vertical-align:.1em}
+  .sv-q .opt-ish{font-size:.78rem;color:var(--ink-2);margin-left:.4em}
+  .sv-q.bad .card{border-color:var(--crit);border-width:2px}
+  .sv-q .msg{color:var(--crit);font-weight:700;font-size:.92rem}
+  .sv-count{font-size:.85rem;color:var(--ink-2);text-align:right}
+  .sv-prog{position:sticky;top:0;z-index:5;background:var(--bg);padding:.5rem 0}
+  .sv-prog .bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+  .sv-prog .bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
+  .sv-top{display:grid;gap:.4rem;padding:0;margin:0;list-style:none}
+  .sv-top li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.2rem .8rem;align-items:center}
+  .sv-top .b{grid-column:1/-1;height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+  .sv-top .b i{display:block;height:100%;background:var(--sun)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">本文へ移動</a>
+<header class="site-h">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="トップへ">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="15" cy="19" r="12" fill="var(--brand)"/><circle cx="27" cy="8" r="5" fill="var(--sun)"/><circle cx="11" cy="15" r="3.2" fill="var(--brand-ink)" opacity=".85"/></svg>
+      <b data-store>ありがとうエアコンお掃除専門店</b>
+    </a>
+    <div class="a11y" role="group" aria-label="見やすさの設定">
+      <span>文字の大きさ</span>
+      <div class="seg" role="group" aria-label="文字の大きさ"><button type="button" data-fs-btn="0" aria-pressed="true">標準</button><button type="button" data-fs-btn="1" aria-pressed="false">大</button><button type="button" data-fs-btn="2" aria-pressed="false">特大</button></div>
+      <button type="button" class="tog" data-hc-btn aria-pressed="false">くっきり表示</button>
+    </div>
+  </div>
+</header>
+<main id="main">
+<div class="wrap stack-lg" style="max-width:44rem">
+  <div class="page-h">
+    <p class="eyebrow">アンケートのお願い（3〜5分）</p>
+    <h1>暮らしの「面倒だった」を教えてください</h1>
+    <p>いただいた声をもとに、みなさんの家のことがもっとラクになる仕組みを作ります。<br>答えてくださった方には、<b>集計結果のレポート</b>をお届けします。さらに抽選で<b id="sv-winners">100</b>名さまに<b>Amazonギフトカード<span id="sv-amount">500</span>円分</b>をお送りします。</p>
+  </div>
+
+  <div id="sv-state" aria-live="polite"></div>
+
+  <form id="sv-form" class="stack-lg" novalidate hidden>
+    <div class="sv-prog" aria-hidden="true"><div class="bar"><i id="sv-bar"></i></div></div>
+    <div id="sv-qs" class="stack-lg"></div>
+
+    <div class="sv-q" data-q="email">
+      <div class="card">
+        <label class="lab" for="sv-email">メールアドレス<span class="req">必須</span></label>
+        <p class="hint small muted">当選したときのギフトカードと、結果レポートのお届けに使います。お名前や住所はうかがいません。</p>
+        <input id="sv-email" type="email" inputmode="email" autocomplete="email" maxlength="254" required>
+        <p class="msg" hidden></p>
+      </div>
+    </div>
+
+    <div class="sv-q" data-q="agree">
+      <div class="card">
+        <details>
+          <summary><b>応募のきまり</b>（タップで開く）</summary>
+          <ul class="small" style="padding-left:1.2em;margin-top:.5rem">
+            <li>応募できるのは、1人1回です。しめきりまでは、同じLINEまたは同じメールアドレスで答えなおすと、上書きされます。</li>
+            <li>しめきり：<span id="sv-deadline"><span class="tbd">未決定</span></span>。しめきり後に抽選し、<span id="sv-notice-days">14</span>日以内に、当選・落選にかかわらず全員に結果をお知らせします。</li>
+            <li>当選の判定は抽選で行います。回答の上手・下手では選びません。ただし、空欄に近い回答・同じ人による重複・機械的な回答は抽選の対象外です。</li>
+            <li>ギフトカードは、ご登録のメールアドレスにお送りします。</li>
+            <li>回答は、サービスの開発と改善にだけ使います。メールアドレスとLINEの情報は、当店の予約の記録と照らし合わせて、より役立つ提案をするために使います。ほかの会社には渡しません。</li>
+            <li>本キャンペーンは <span data-store>ありがとうエアコンお掃除専門店</span>（エイムポイント合同会社）による提供です。Amazon.co.jp および Amazonジャパン合同会社とは関係ありません。Amazon、Amazon.co.jp およびそのロゴは Amazon.com, Inc. またはその関連会社の商標です。</li>
+          </ul>
+        </details>
+        <label class="opt"><input id="sv-agree" type="checkbox" required> <span>応募のきまりと<a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意します</span></label>
+        <p class="msg" hidden></p>
+      </div>
+    </div>
+
+    <div id="sv-err" aria-live="assertive"></div>
+    <button class="btn sun wide" type="submit" id="sv-submit">回答を送る</button>
+  </form>
+
+  <section id="sv-done" class="stack" hidden tabindex="-1">
+    <div class="done"><b>ありがとうございました。回答を受けつけました。</b><br><span id="sv-done-sub"></span></div>
+    <div class="card">
+      <h2 style="font-size:1.2rem">いま集まっている「困った」ランキング</h2>
+      <p class="small muted" id="sv-total"></p>
+      <ol class="sv-top" id="sv-top"></ol>
+      <p class="small muted">しめきり後の完全版レポートは、メール（LINEで答えた方はLINE）でお届けします。</p>
+    </div>
+    <p class="small muted">答えなおしたい時は、しめきりまでに同じ方法でもう一度開いてください。前の回答が上書きされます。</p>
+  </section>
+</div>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div><b data-store>ありがとうエアコンお掃除専門店</b>（エイムポイント合同会社）</div>
+    <div>お問い合わせ：<cfg-v data-cfg="CONTACT_EMAIL">info@arigatouosouji.com</cfg-v></div>
+    <nav aria-label="フッターの案内"><a href="privacy.html">プライバシー</a><a href="terms.html">利用規約</a><a href="tokushoho.html">特定商取引法に基づく表記</a></nav>
+  </div>
+</footer>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js" charset="utf-8"></script>
+<script src="js/config.js"></script>
+<script src="js/survey-config.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/survey.js"></script>
+</body>
+</html>
