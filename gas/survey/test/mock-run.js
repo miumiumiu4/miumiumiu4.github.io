@@ -5,7 +5,7 @@ const G=require('path').join(__dirname,'..')+'/';
 function Sheet(name){this.name=name;this.d=[];}
 Sheet.prototype={
  getLastRow(){return this.d.length},getLastColumn(){return Math.max(0,...this.d.map(r=>r.length))},
- appendRow(r){this.d.push(r.slice())},setFrozenRows(){},clearContents(){this.d=[]},
+ appendRow(r){this.d.push(r.slice())},getParent(){return SS},deleteRows(a,n){this.d.splice(a-1,n)},setFrozenRows(){},clearContents(){this.d=[]},
  getDataRange(){return this.getRange(1,1,this.d.length,this.getLastColumn())},
  getRange(r,c,nr=1,nc=1){const s=this;return{
   getValues(){const o=[];for(let i=0;i<nr;i++){const row=[];for(let j=0;j<nc;j++){const v=(s.d[r-1+i]||[])[c-1+j];row.push(v===undefined?'':v)}o.push(row)}return o},
@@ -54,10 +54,17 @@ r=post({...base,email:'not-mail',requestId:'r10'});console.log('10 bad mail', r.
 console.log('stats', JSON.stringify(r.stats||ctx.stats_('c1')));
 const R=sheets['R_c1'].d; console.log(R[0].join('|'));R.slice(1).forEach(x=>console.log([x[2],x[3],x[4],x[5],x[6],x[7],x[9],x[10],x[11],x[13]].join(' | ')));
 console.log('HUB');sheets.customers.d.forEach(x=>console.log(x.slice(0,3).concat(x[5]).join(' | ')));
-// 予約と照合
-sheets['予約']=new Sheet('予約');sheets['予約'].d=[['予約番号','メール','作業日'],['B1','A@example.com','2025-07-01'],['B2','a@example.com','2026-07-01'],['B3','f@example.com','2026-08-01']];
-ctx.hourly();console.log('HUB after link');sheets.customers.d.forEach(x=>console.log([x[1],x[6],x[8]&&x[8].toISOString?x[8].toISOString().slice(0,10):x[8],x[9]].join(' | ')));
-sheets['分析_c1'].d.forEach(x=>console.log('A', x.slice(0,7).join(' | ')));
+// 予約と照合（2つの表：見出し1行目の表と、2行目に英語キーがある表。テスト用アドレスは外す）
+props.BOOKING_SOURCES=JSON.stringify([
+ {name:'キャンペーン',sheetId:'x',tab:'予約',headerRow:1,email:'メール',date:['作業確定日','受付日時'],id:'受付番号'},
+ {name:'C000',sheetId:'x',tab:'予約台帳',headerRow:2,email:'email',date:['date'],id:'jobId'},
+ {name:'こわれた表',sheetId:'x',tab:'ない',email:'メール'}]);
+props.BOOKING_EXCLUDE='owner@example.com';
+sheets['予約']=new Sheet('予約');sheets['予約'].d=[['受付番号','受付日時','メール','作業確定日'],['R0701-001','2025/07/01 9:00','A@example.com',''],['R0923-001','2026/09/23 0:02','a@example.com','2026/09/30(水)'],['R0924-001','2026/09/24 1:00','owner@example.com','']];
+sheets['予約台帳']=new Sheet('予約台帳');sheets['予約台帳'].d=[['受付番号（自動）','作業日','メール'],['jobId','date','email'],['C000-1',new Date(2026,9,10),'f@example.com'],['C000-2','2026-10-12','a@example.com']];
+ctx.hourly();console.log('HUB after link');sheets.customers.d.forEach(x=>console.log([x[1],x[6],x[8]&&x[8].toISOString?x[8].toISOString().slice(0,10):x[8],x[9],x[11]].join(' | ')));
+sheets['分析_c1'].d.forEach(x=>console.log('A', x.slice(0,8).join(' | ')));
+sheets['照合の記録'].d.forEach(x=>console.log('LOG', x.slice(1).join(' | ')));
 // 抽選
 props.DEADLINE='2000-01-01';
 ctx.drawWinners();

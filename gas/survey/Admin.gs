@@ -50,11 +50,11 @@ function buildAnalysis() {
   var hub = hubSheet_(), hv = hub.getLastRow() >= 2 ? hub.getRange(2, 1, hub.getLastRow() - 1, HUB_HEADERS.length).getValues() : [];
   var byKey = {}; hv.forEach(function (r) { byKey[r[0]] = r; });
   var qCols = head.slice(FIXED_HEADERS.length);
-  var outHead = ['回答ID', '顧客キー', '状態', '経路', 'お客さまの種類', '予約回数', '最後の予約日'].concat(qCols);
+  var outHead = ['回答ID', '顧客キー', '状態', '経路', 'お客さまの種類', '予約回数', '最後の予約日', '予約のあった表'].concat(qCols);
   var out = vals.map(function (r) {
     var h = byKey[r[3]] || [], n = Number(h[6]) || 0;
     var seg = n === 0 ? 'まだ予約なし' : n === 1 ? '1回利用' : 'リピーター';
-    return [r[2], r[3], r[9], r[6], seg, n, h[8] || ''].concat(r.slice(FIXED_HEADERS.length));
+    return [r[2], r[3], r[9], r[6], seg, n, h[8] || '', h[11] || ''].concat(r.slice(FIXED_HEADERS.length));
   });
   var sh = ss.getSheetByName('分析_' + campaign) || ss.insertSheet('分析_' + campaign);
   sh.clearContents();
