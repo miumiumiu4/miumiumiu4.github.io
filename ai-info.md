@@ -1,6 +1,6 @@
 # ありがとうエアコンお掃除専門店　お店の情報シート（人もAIも読めます）
 
-料金の更新日：2026-10-02（この表の金額は、見積りの窓口 （会社のGASのURL・未設定）?action=quote と同じ数字です）
+料金の更新日：2026-10-02（この表の金額は、見積りの窓口 https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=quote と同じ数字です）
 このファイルは build.mjs が js/config.js と data/prices.json から作ります。直接書きかえないでください。
 
 ## 1. お店

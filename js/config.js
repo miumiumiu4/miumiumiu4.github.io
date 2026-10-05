@@ -39,7 +39,7 @@ window.SITE_CONFIG = {
   INVOICE_NO: "T7020003007001",           // 適格請求書発行事業者の登録番号（なければ空でよい）
   HOLIDAY_RULE: "「平日として扱う」と決めています。月〜金にあたる祝日も、防カビの単品は無料です。作業は祝日も通常どおり営業していて、お休みなのは電話受付だけです",         // 祝日を「平日」として扱うか（未決定）
 
-  GAS_URL: "",   // 空＝デモ表示（予約は入らない）。スタッフとシフトが入ったら、本部(C000)の会社GASのURL（HANDOFF.md に記録）を入れて更新する
+  GAS_URL: "https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec",   // 空＝デモ表示（予約は入らない）。スタッフとシフトが入ったら、本部(C000)の会社GASのURL（HANDOFF.md に記録）を入れて更新する
   SITE_URL: "https://miumiumiu4.github.io",             // 公開したURL（最後の / なし）
   SHOW_LOGIN: false,
   LOGIN_URL: ""

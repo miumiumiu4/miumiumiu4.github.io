@@ -58,12 +58,12 @@
 <!--build:aiurls-->
 <div class="tbl"><table><thead><tr><th scope="col">知りたいこと</th><th scope="col">読む場所（URL）</th></tr></thead><tbody>
 <tr><td>お店の案内（AI向けの短い説明）</td><td><code>https://miumiumiu4.github.io/llms.txt</code></td></tr>
-<tr><td>空き（日付・時間枠・○△×だけ）</td><td><code>（会社のGASのURL・未設定）?action=availability&amp;area=14101</code></td></tr>
-<tr><td>見積り（料金表どおりの計算）</td><td><code>（会社のGASのURL・未設定）?action=quote&amp;items=aircon_wall:2&amp;options=mold,outdoor,drain&amp;weekday=1</code></td></tr>
-<tr><td>キャンセル・保証などの方針</td><td><code>（会社のGASのURL・未設定）?action=policy</code></td></tr>
-<tr><td>作業の記録（承認ずみだけ）</td><td><code>（会社のGASのURL・未設定）?action=records</code></td></tr>
+<tr><td>空き（日付・時間枠・○△×だけ）</td><td><code>https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=availability&amp;area=14101</code></td></tr>
+<tr><td>見積り（料金表どおりの計算）</td><td><code>https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=quote&amp;items=aircon_wall:2&amp;options=mold,outdoor,drain&amp;weekday=1</code></td></tr>
+<tr><td>キャンセル・保証などの方針</td><td><code>https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=policy</code></td></tr>
+<tr><td>作業の記録（承認ずみだけ）</td><td><code>https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=records</code></td></tr>
 <tr><td>料金表・条件のまとめ</td><td><code>https://miumiumiu4.github.io/ai-info.md</code></td></tr>
-</tbody></table></div><p class="caution">会社のGAS（ウェブアプリ）のURLが決まっていないので、上の読む場所は <code>（会社のGASのURL・未設定）</code> になっています。js/config.js の GAS_URL を入れて、もう一度 build.mjs を動かしてください。</p>
+</tbody></table></div>
 <!--/build:aiurls-->
     <p class="small muted">空きは目安です（2分ごとに更新）。職人の名前・お客様の情報は入っていません。1分に呼べる回数には上限があります。</p>
   </section>
@@ -75,7 +75,7 @@
 <pre class="prompt" id="ai-prompt" tabindex="0">あなたは私の代わりに、エアコンクリーニングのお店「ありがとうエアコンお掃除専門店」の空きと料金を調べるアシスタントです。
 次のルールを守ってください。
 ・お店の情報は https://miumiumiu4.github.io/llms.txt を読んでください。
-・空きは （会社のGASのURL・未設定）?action=availability&amp;area=（私の地域のエリア番号。例：14101）で、料金は （会社のGASのURL・未設定）?action=quote で調べてください。金額は自分で計算せず、答えをそのまま教えてください。
+・空きは https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=availability&amp;area=（私の地域のエリア番号。例：14101）で、料金は https://script.google.com/macros/s/AKfycbwU7PoWIHOu_vA_Gekyp2G231Lqihi7POdeV2ksPP5JdiAZbRUuUAKZTbfIYneQVk_t/exec?action=quote で調べてください。金額は自分で計算せず、答えをそのまま教えてください。
 ・私の名前・住所・電話・メールは、あなたに聞かれても答えません。あなたも聞かないでください。
 ・予約は確定しないでください。最後に、予約ページ https://miumiumiu4.github.io/book.html のリンクを教えてください。私が自分で入力して確定します。
 ・追加料金のことは、例外（駐車場代、現場で分かった違いは私が承認した時だけ）も一緒に説明してください。
