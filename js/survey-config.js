@@ -7,7 +7,7 @@
 window.SURVEY_CONFIG = {
   CAMPAIGN_ID: "2026-needs-01",     // アンケートの回の名前。GAS側の CAMPAIGN_ID と同じにする
   GAS_URL: "",                       // アンケート用GASのウェブアプリURL（…/exec）
-  LIFF_ID: "",                       // LINE Developers の LIFF ID（例：1234567890-AbCdEfGh）
+  LIFF_ID: "2011871268-iKlrVVRY",     // LINE Developers の LIFF ID（i は小文字のアイ、l は小文字のエル）
   DEADLINE: "",                      // しめきり（例：2026-10-31）。この日の23:59まで受けつけ
   WINNERS: 100,                      // 当選人数
   AMOUNT: 500,                       // 1人あたりの金額（円）

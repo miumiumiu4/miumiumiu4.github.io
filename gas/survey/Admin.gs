@@ -30,6 +30,9 @@ function onOpen() {
 function setupAll() {
   var p = PropertiesService.getScriptProperties();
   if (!p.getProperty('LINK_SECRET')) p.setProperty('LINK_SECRET', Utilities.getUuid() + Utilities.getUuid());
+  var id = SpreadsheetApp.getActiveSpreadsheet().getId();   // ウェブアプリからも確実に同じシートを使うように記録
+  if (!p.getProperty('SURVEY_SHEET_ID')) p.setProperty('SURVEY_SHEET_ID', id);
+  if (!p.getProperty('HUB_SHEET_ID')) p.setProperty('HUB_SHEET_ID', id);
   ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'hourly') ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('hourly').timeBased().everyHours(1).create();
   toast_('準備ができました。1時間ごとに予約データと照合します。');

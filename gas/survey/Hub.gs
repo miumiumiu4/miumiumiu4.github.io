@@ -20,7 +20,27 @@
 var HUB_SHEET = 'customers';
 var HUB_HEADERS = ['顧客キー', 'メール(正規化)', 'LINEユーザーID', '最初に見た日時', '最後に見た日時', '経路', '予約回数', '最初の予約日', '最後の予約日', '予約番号(最新)', '照合日時'];
 
-function prop_(k, d) { var v = PropertiesService.getScriptProperties().getProperty(k); return v === null || v === '' ? (d === undefined ? '' : d) : v; }
+/**
+ * 設定の読み方：スクリプトプロパティ → なければ下の既定値。
+ * 秘密でない値（チャネルIDなど）は既定値に書いておき、手で入れる設定を減らす。
+ * トークンなど秘密の値は、ここには絶対に書かない（スクリプトプロパティだけ）。
+ */
+var DEFAULTS = {
+  CAMPAIGN_ID: '2026-needs-01',
+  LINE_LOGIN_CHANNEL_ID: '2011871268',   // LINEログインチャネル（LIFF 2011871268-iKlrVVRY）
+  WINNERS: '100',
+  AMOUNT: '500',
+  SURVEY_PAGE_URL: 'https://miumiumiu4.github.io/survey.html',
+  FROM_NAME: 'ありがとうエアコンお掃除専門店'
+};
+function prop_(k, d) {
+  var v = PropertiesService.getScriptProperties().getProperty(k);
+  if (v !== null && v !== '') return v;
+  if (DEFAULTS[k] !== undefined) return DEFAULTS[k];
+  // 回答・顧客ハブの置き場所：指定がなければ、このGASがついているスプレッドシート
+  if (k === 'SURVEY_SHEET_ID' || k === 'HUB_SHEET_ID') { var ss = SpreadsheetApp.getActiveSpreadsheet(); if (ss) return ss.getId(); }
+  return d === undefined ? '' : d;
+}
 
 /** メールの表記ゆれをそろえる（全角→半角・前後の空白・大文字小文字） */
 function normEmail(s) {

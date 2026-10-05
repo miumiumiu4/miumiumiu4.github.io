@@ -18,43 +18,34 @@ LINEの友だち 1万人 ──（LINEで開く）──┐
 
 ## 準備（はじめの1回だけ）
 
-### 1. スプレッドシートとGAS
-1. 新しいスプレッドシートを作ります（例：「アンケート_2026」）。
-2. 「拡張機能 → Apps Script」を開きます。このフォルダの `Hub.gs` `Survey.gs` `Admin.gs` をそれぞれ同じ名前で貼りつけます。「プロジェクトの設定 → appsscript.json を表示」をオンにして、`appsscript.json` も貼りつけます。
-3. 「プロジェクトの設定 → スクリプト プロパティ」に、次の項目を入れます。
+### 済んでいること（2026-10-05）
+- LINE：プロバイダー「ありがとうエアコンお掃除専門店」、Messaging API の Channel ID `2003862021`、LINEログインのチャネルID `2011871268`（公開済み）、LIFF ID `2011871268-iKlrVVRY`（LIFF URL `https://liff.line.me/2011871268-iKlrVVRY`）
+- `js/survey-config.js` に LIFF ID を記入
+- GAS の既定値（`Hub.gs` の `DEFAULTS`）に、回の名前・LINEログインのチャネルID・当選人数・金額を記入
+- 回答用スプレッドシート「暮らしの困りごとアンケート（回答と顧客ハブ）」を作成：https://docs.google.com/spreadsheets/d/1QRD0XwYZ0srH0cCEau9nsB2ao12eZGs7lSnwQ6gGuko/edit
+
+### 残りの手順
+1. 上のスプレッドシートを開き、「拡張機能 → Apps Script」を開く。
+2. 「コード.gs」の中身を全部消して、`まとめて貼る.gs` を丸ごと貼りつけ、保存する。（`appsscript.json` は貼らなくてよい）
+3. 関数の一覧から `setupAll` を選んで「実行」→ 権限を許可する。シートのID・署名の鍵・1時間ごとの照合が自動で入る。
+4. 「デプロイ → 新しいデプロイ → ウェブアプリ」。実行するユーザー＝自分、アクセスできるユーザー＝全員。表示された URL（…/exec）を Claude に渡す（`js/survey-config.js` の `GAS_URL` に入れる）。
+5. 「プロジェクトの設定 → スクリプト プロパティ」に、手で入れるのは次だけ：
 
 | プロパティ | 入れるもの |
 |---|---|
-| `SURVEY_SHEET_ID` / `HUB_SHEET_ID` | このスプレッドシートのID（URLの `/d/` と `/edit` の間）。両方とも同じでかまいません |
-| `CAMPAIGN_ID` | `2026-needs-01`（`js/survey-config.js` と同じにする） |
-| `DEADLINE` | しめきり（例：`2026-10-31`） |
-| `WINNERS` / `AMOUNT` | `100` / `500` |
+| `LINE_MESSAGING_TOKEN` | LINE Developers の Messaging API チャネル（2003862021）→「チャネルアクセストークン（長期）」。**秘密。ここにだけ貼る** |
 | `BOOKING_SHEET_ID` / `BOOKING_SHEET_NAME` | 予約のスプレッドシートのIDとシート名 |
-| `BOOKING_EMAIL_HEADER` / `BOOKING_DATE_HEADER` / `BOOKING_ID_HEADER` | 予約シートの見出し名（既定は「メール」「作業日」「予約番号」） |
-| `LINE_LOGIN_CHANNEL_ID` | 下の手順2で作るLINEログインチャネルの「チャネルID」 |
-| `LINE_MESSAGING_TOKEN` | 公式LINEの Messaging API の「チャネルアクセストークン（長期）」 |
-| `REPORT_URL` | 結果レポートのURL（できてから入れればよい） |
+| `BOOKING_EMAIL_HEADER` / `BOOKING_DATE_HEADER` / `BOOKING_ID_HEADER` | 予約シートの見出しが「メール」「作業日」「予約番号」でない時だけ |
+| `DEADLINE` | 配信日が決まったら、その14日後（例：`2026-10-31`） |
 
-4. 「デプロイ → 新しいデプロイ → ウェブアプリ」を選びます。実行するユーザーは「自分」、アクセスできるユーザーは「全員」にします。表示されたURL（…/exec）を `js/survey-config.js` の `GAS_URL` に入れます。
-5. スプレッドシートを開きなおすと「アンケート管理」メニューが出ます。「1. はじめの準備」を1回動かします（署名の鍵と、1時間ごとの照合を作ります）。
+6. LINEログインチャネルの「チャネル基本設定 →リンクされたLINE公式アカウント」で公式アカウントを選ぶ（友だち追加の案内が出るようになる）。
 
-### 2. LINE Developers（15分）
-1. **LINE Official Account Manager → 設定 → Messaging API** で「Messaging APIを利用する」をオンにします。そのときに選んだ**プロバイダー**を覚えておきます。
-2. [LINE Developers](https://developers.line.biz/console/) で、**手順1と同じプロバイダー**の中に「LINEログイン」チャネルを新しく作ります。
-   - 同じプロバイダーにしないと、アンケートのLINE IDと公式LINEのIDが別物になり、LINEでお知らせを送れません。
-3. 作ったチャネルの「LIFF」タブ → 追加を開き、次のように設定します。
-   - サイズ：Full
-   - エンドポイントURL：`https://miumiumiu4.github.io/survey.html`
-   - Scope：`openid` だけにチェックを入れます（プロフィールやメールの権限はいりません）
-   - 友だち追加オプション：On（Normal）
-4. できた **LIFF ID** を `js/survey-config.js` の `LIFF_ID` に入れます。「チャネル基本設定」の**チャネルID**は、GASの `LINE_LOGIN_CHANNEL_ID` に入れます。
-5. チャネルを「公開済み」にします（開発中のままだと、管理者しか開けません）。
-6. 公式LINEで配るリンクは `https://liff.line.me/<LIFF ID>` です。
+### メールのリスト
+1. 「アンケート管理 → 2. メール用リンクを作る」を1回動かすと、`mail_list` シートができる。
+2. B列にメールアドレスを貼って、もう一度動かす。C列に1人ずつ別のリンクができる。
+3. メール配信ツールの差しこみで、C列のリンクを送る。
 
-### 3. メールのリスト
-1. 「アンケート管理 → 2. メール用リンクを作る」を1回動かすと、`mail_list` シートができます。
-2. B列にメールアドレスを貼って、もう一度動かします。C列に1人ずつ別のリンクができます。
-3. メール配信ツールの差しこみで、C列のリンクを送ります。リンクには署名がついています。このリンクから答えた人は「メールリストの何番の人か」を、GASが確かめて記録します。
+> 個人の Gmail（@gmail.com）で動かすと、GASから送れるメールは1日100通まで。当選メール（100通）は1日で送れるが、メールで答えた人への結果のお知らせは、メール配信ツールで送るほうが早い。
 
 ## しめきり後
 1. `R_<回>` シートで、「状態」が **要確認** の行を見て「有効」か「無効」に直します。要確認になるのは、白紙に近い回答・30〜40秒以内に送られた回答・ほかと同じ文の回答です。**回答の上手・下手では判定しません。**
