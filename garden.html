@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<title>ほのぼのの庭</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B7%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --sky1:#cfe9f2; --sky2:#f4f0dc;
+  --grass:#a9d18e; --grass2:#93c27a;
+  --soil:#9a6b47; --soil2:#7d5537;
+  --ink:#4a3b2f; --sub:#8a7562;
+  --card:#fffaf0; --line:#e6d8c3;
+  --accent:#e98a6b; --accent2:#f3b38f;
+  --leaf:#5e9a4a; --leaf2:#7cb663;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background:linear-gradient(var(--sky1),var(--sky2) 160px,var(--grass) 160px,var(--grass2));
+  color:var(--ink);
+  font-family:"Hiragino Maru Gothic ProN","Kosugi Maru","M PLUS Rounded 1c","Hiragino Sans","Noto Sans JP",sans-serif;
+  overflow-x:hidden;
+}
+.app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:12px 16px calc(16px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-size:20px;margin:0;letter-spacing:.08em}
+.coins{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:bold;white-space:nowrap}
+.sky{position:relative;height:110px}
+.sun{position:absolute;right:18px;top:14px;width:46px;height:46px;border-radius:50%;background:#ffe39a;box-shadow:0 0 0 8px #fff3c766}
+.cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9;animation:drift 60s linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud.c1{width:70px;height:22px;top:30px;left:-80px}
+.cloud.c1::before{width:30px;height:30px;left:12px;top:-14px}
+.cloud.c1::after{width:24px;height:24px;left:34px;top:-9px}
+.cloud.c2{width:54px;height:18px;top:66px;left:-80px;animation-duration:85s;animation-delay:-40s}
+.cloud.c2::before{width:24px;height:24px;left:10px;top:-11px}
+.cloud.c2::after{width:18px;height:18px;left:26px;top:-7px}
+@keyframes drift{to{transform:translateX(700px)}}
+.garden{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px;
+  padding:6px 4px 10px;
+}
+.plot{
+  position:relative;aspect-ratio:1/1.15;border:none;padding:0;background:none;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font:inherit;color:inherit;
+}
+.plot .soil{
+  position:absolute;left:4%;right:4%;bottom:6%;height:30%;
+  background:radial-gradient(ellipse at 50% 35%,var(--soil),var(--soil2));
+  border-radius:50%;box-shadow:inset 0 -4px 0 #0002;
+}
+.plot.empty .soil::after{
+  content:"＋";position:absolute;inset:0;display:grid;place-items:center;color:#fff9;font-size:20px;font-weight:bold;
+}
+.plot svg.plant{position:absolute;left:0;right:0;bottom:16%;margin:auto;width:92%;height:82%;overflow:visible}
+.plot.bloom svg.plant{animation:sway 4s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+.plot.bloom::before{
+  content:"";position:absolute;top:2%;left:50%;width:70%;height:50%;transform:translateX(-50%);
+  background:radial-gradient(circle,#fff8 0,#fff0 70%);pointer-events:none;
+}
+.bar{position:absolute;bottom:0;left:16%;right:16%;height:6px;background:#0002;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:#fff;border-radius:4px}
+.ready{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:11px;background:var(--card);border-radius:999px;padding:1px 8px;white-space:nowrap;border:1px solid var(--line)}
+.plot:active{transform:scale(.97)}
+.visitor{
+  position:absolute;right:-6%;bottom:2%;font-size:34px;line-height:1;cursor:pointer;z-index:2;
+  animation:hopin .7s ease-out, bob 2.4s ease-in-out .7s infinite;
+  filter:drop-shadow(0 2px 0 #0002);background:none;border:none;padding:0;
+}
+.visitor .gift{position:absolute;top:-14px;right:-6px;font-size:16px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes hopin{0%{transform:translate(60px,-30px) scale(.6);opacity:0}60%{transform:translate(0,-10px)}100%{transform:none;opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto;padding-top:12px}
+nav button,.btn{
+  font:inherit;font-weight:bold;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:16px;
+  padding:12px 6px;cursor:pointer;box-shadow:0 3px 0 var(--line);
+}
+nav button:active,.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.btn.primary{background:var(--accent);border-color:#d0735a;color:#fff;box-shadow:0 3px 0 #c06850}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{font-size:12px;color:#5b4b3c;text-align:center;margin:4px 0 0;min-height:1.4em}
+/* sheet */
+.veil{position:fixed;inset:0;background:#3a2b2066;display:none;align-items:flex-end;justify-content:center;z-index:10}
+.veil.on{display:flex}
+.sheet{
+  background:var(--card);width:100%;max-width:560px;max-height:82vh;overflow:auto;border-radius:22px 22px 0 0;
+  padding:18px 16px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease-out;
+}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet h2{margin:0 0 4px;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+.sheet .close{font:inherit;background:none;border:none;font-size:22px;cursor:pointer;color:var(--sub);padding:4px 8px}
+.sheet p.lead{margin:0 0 12px;color:var(--sub);font-size:13px}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:14px;padding:8px 10px;background:#fff}
+.row .ico{width:48px;height:48px;flex:none}
+.row .ico svg{width:100%;height:100%}
+.row .txt{flex:1;min-width:0}
+.row .txt b{display:block}
+.row .txt small{color:var(--sub)}
+.row .btn{padding:8px 12px;white-space:nowrap}
+.tabs{display:flex;gap:6px;margin:6px 0 12px}
+.tabs button{flex:1;font:inherit;padding:8px;border-radius:12px;border:2px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}
+.tabs button.on{background:var(--accent2);border-color:var(--accent2);font-weight:bold}
+.dex{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dex .cell{border:2px solid var(--line);border-radius:14px;background:#fff;padding:8px 4px;text-align:center;font-size:12px}
+.dex .cell .pic{height:60px;display:grid;place-items:center;font-size:40px}
+.dex .cell .pic svg{height:60px;width:60px}
+.dex .cell.unknown .pic{filter:brightness(0) opacity(.18)}
+.dex .cell small{display:block;color:var(--sub);font-size:10.5px;margin-top:2px;line-height:1.35}
+.progress{font-size:13px;color:var(--sub);margin-bottom:8px}
+.toast{
+  position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:#4a3b2fee;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:20;
+  pointer-events:none;opacity:0;transition:opacity .25s;max-width:calc(100% - 32px);text-align:center;
+}
+.toast.on{opacity:1}
+.float{position:fixed;font-weight:bold;color:#c0612f;pointer-events:none;z-index:15;animation:float 1.1s ease-out forwards;text-shadow:0 1px 0 #fff}
+@keyframes float{to{transform:translateY(-50px);opacity:0}}
+.letter{text-align:center;padding:8px 0 4px}
+.letter .big{font-size:40px}
+.letter ul{list-style:none;padding:0;margin:12px 0;text-align:left;display:inline-block}
+.letter li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🌷 ほのぼのの庭</h1>
+    <div class="coins">🪙 <span id="coins">0</span></div>
+  </header>
+  <div class="sky" aria-hidden="true"><div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div></div>
+  <main class="garden" id="garden"></main>
+  <p class="hint" id="hint"></p>
+  <nav>
+    <button id="btnSeeds">🌱 たね</button>
+    <button id="btnShop">🏠 たね屋</button>
+    <button id="btnDex">📖 図鑑</button>
+  </nav>
+</div>
+
+<div class="veil" id="veil"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+
+// ---- データ ----
+// grow: 育つ秒数 / price: たね代 / sell: 収穫で得るコイン
+const FLOWERS = [
+  {id:'dandelion', name:'たんぽぽ',   grow:60,    price:5,   sell:8,    shape:'round', n:16, color:'#ffd84d', center:'#f2b52c', r:15, note:'道ばたで元気に咲く花。'},
+  {id:'tulip',     name:'チューリップ', grow:180,   price:12,  sell:20,   shape:'tulip', color:'#f2788a', note:'春の庭の主役。'},
+  {id:'cosmos',    name:'コスモス',   grow:600,   price:25,  sell:45,   shape:'round', n:8,  color:'#f5a8cf', center:'#f7d354', r:17, note:'風にゆれる秋桜。'},
+  {id:'sunflower', name:'ひまわり',   grow:1800,  price:50,  sell:100,  shape:'sun',   color:'#ffc93c', center:'#7a4b25', note:'いつもお日さまの方を向いている。'},
+  {id:'lavender',  name:'ラベンダー', grow:3600,  price:80,  sell:170,  shape:'spike', color:'#a48bd6', note:'やさしい香りがただよう。'},
+  {id:'hydrangea', name:'あじさい',   grow:10800, price:150, sell:340,  shape:'cluster', color:'#8fb2ea', color2:'#c4a3e6', note:'雨の日がよく似合う。'},
+  {id:'evening',   name:'つきみそう', grow:7200,  price:0,   sell:500,  shape:'round', n:4,  color:'#fff6c9', center:'#f3dc6e', r:18, rare:true, note:'夜にひっそり咲く。お客さんからもらえる。'},
+  {id:'goldrose',  name:'きんいろバラ', grow:21600, price:0,  sell:1200, shape:'rose',  color:'#f4c542', rare:true, note:'めったに見られない金色のバラ。'},
+];
+const F = Object.fromEntries(FLOWERS.map(f => [f.id, f]));
+
+// likes: 咲いていると来てくれる花（'any3' は花が3つ以上咲いているとき）
+const ANIMALS = [
+  {id:'sparrow',  emoji:'🐦', name:'すずめ',     likes:'dandelion', note:'朝いちばんにやってくる。'},
+  {id:'rabbit',   emoji:'🐇', name:'うさぎ',     likes:'tulip',     note:'もぐもぐしながら庭をながめる。'},
+  {id:'butterfly',emoji:'🦋', name:'ちょうちょ', likes:'cosmos',    note:'花から花へひらひら。'},
+  {id:'squirrel', emoji:'🐿️', name:'りす',       likes:'sunflower', note:'ひまわりの種が大好物。'},
+  {id:'bee',      emoji:'🐝', name:'みつばち',   likes:'lavender',  note:'せっせとみつを集めている。'},
+  {id:'frog',     emoji:'🐸', name:'かえる',     likes:'hydrangea', note:'あじさいの葉の上がお気に入り。'},
+  {id:'cat',      emoji:'🐈', name:'ねこ',       likes:'any3',      note:'にぎやかな庭でひなたぼっこ。'},
+  {id:'hedgehog', emoji:'🦔', name:'はりねずみ', likes:'evening',   note:'夜の花のそばで丸くなる。'},
+  {id:'owl',      emoji:'🦉', name:'ふくろう',   likes:'goldrose',  note:'森の物知り。金色のものに目がない。'},
+];
+const A = Object.fromEntries(ANIMALS.map(a => [a.id, a]));
+
+const PLOTS = 6;
+const MAX_VISITORS = 2;
+const SAVE_KEY = 'honobono-garden-v1';
+
+// ---- セーブ ----
+function fresh(){
+  return {
+    coins: 20,
+    seeds: {dandelion: 3},
+    plots: Array(PLOTS).fill(null),   // {sp, at}
+    visitors: [],                      // {a, plot}
+    nextVisit: Date.now() + 30000,
+    dex: {f:{}, a:{}},
+    lastSeen: Date.now(),
+  };
+}
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(s && Array.isArray(s.plots)) return Object.assign(fresh(), s);
+  }catch(e){}
+  return fresh();
+}
+let S = load();
+function save(){
+  S.lastSeen = Date.now();
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+// ---- 成長 ----
+function progress(p, now = Date.now()){
+  return Math.min(1, (now - p.at) / (F[p.sp].grow * 1000));
+}
+function stageOf(t){ return t >= 1 ? 3 : t >= .45 ? 2 : t >= .1 ? 1 : 0; }
+function fmt(sec){
+  sec = Math.max(0, Math.ceil(sec));
+  if(sec < 60) return sec + '秒';
+  if(sec < 3600) return Math.ceil(sec / 60) + '分';
+  const h = Math.floor(sec / 3600), m = Math.ceil((sec % 3600) / 60);
+  return h + '時間' + (m ? m + '分' : '');
+}
+
+// ---- 絵（SVG） ----
+function leaves(h){
+  const y = 120 - h * .45;
+  return `<path d="M50 ${y} q-22 -4 -26 -18 q18 -2 26 18z" fill="var(--leaf2)"/>
+          <path d="M50 ${y+8} q22 -4 26 -18 q-18 -2 -26 18z" fill="var(--leaf)"/>`;
+}
+function stem(h){ return `<path d="M50 120 V${120-h}" stroke="var(--leaf)" stroke-width="4" stroke-linecap="round"/>`; }
+function head(f, cx, cy){
+  switch(f.shape){
+    case 'round': {
+      let s = '';
+      for(let i = 0; i < f.n; i++){
+        const a = 360 / f.n * i;
+        s += `<ellipse cx="${cx}" cy="${cy - f.r*.62}" rx="${f.n > 10 ? 4 : f.n === 4 ? 11 : 7}" ry="${f.r*.62}" fill="${f.color}" stroke="#0001" transform="rotate(${a} ${cx} ${cy})"/>`;
+      }
+      return s + `<circle cx="${cx}" cy="${cy}" r="${f.r*.32}" fill="${f.center}"/>`;
+    }
+    case 'sun': {
+      let s = '';
+      for(let i = 0; i < 18; i++) s += `<ellipse cx="${cx}" cy="${cy-17}" rx="5" ry="11" fill="${f.color}" stroke="#0001" transform="rotate(${20*i} ${cx} ${cy})"/>`;
+      return s + `<circle cx="${cx}" cy="${cy}" r="11" fill="${f.center}"/><circle cx="${cx}" cy="${cy}" r="11" fill="url(#dots)" opacity=".35"/>`;
+    }
+    case 'tulip':
+      return `<path d="M${cx-15} ${cy-12} q0 26 15 26 q15 0 15 -26 l-7 9 l-8 -13 l-8 13z" fill="${f.color}"/>
+              <path d="M${cx-8} ${cy-3} l8 -13 l8 13 q-8 10 -16 0z" fill="#fff3"/>`;
+    case 'spike': {
+      let s = '';
+      for(let i = 0; i < 7; i++){
+        const y = cy + 18 - i * 6;
+        s += `<circle cx="${cx-4}" cy="${y}" r="4.5" fill="${f.color}"/><circle cx="${cx+4}" cy="${y-3}" r="4.5" fill="${f.color}" opacity=".85"/>`;
+      }
+      return s;
+    }
+    case 'cluster': {
+      let s = `<circle cx="${cx}" cy="${cy}" r="22" fill="${f.color2}" opacity=".5"/>`;
+      const pts = [[0,0],[-12,-6],[12,-6],[-14,8],[14,8],[0,-14],[0,13],[-6,4],[7,3]];
+      pts.forEach(([dx,dy], i) => {
+        const c = i % 2 ? f.color : f.color2, x = cx+dx, y = cy+dy;
+        s += `<g fill="${c}"><circle cx="${x-3}" cy="${y}" r="3.6"/><circle cx="${x+3}" cy="${y}" r="3.6"/><circle cx="${x}" cy="${y-3}" r="3.6"/><circle cx="${x}" cy="${y+3}" r="3.6"/></g><circle cx="${x}" cy="${y}" r="1.4" fill="#fff"/>`;
+      });
+      return s;
+    }
+    case 'rose':
+      return `<circle cx="${cx}" cy="${cy}" r="18" fill="${f.color}"/>
+              <path d="M${cx-12} ${cy} a12 12 0 1 1 12 12 a8 8 0 1 1 -8 -8 a4 4 0 1 1 4 4" fill="none" stroke="#c9952a" stroke-width="2.5"/>
+              <circle cx="${cx+10}" cy="${cy-12}" r="2" fill="#fff"/><circle cx="${cx-14}" cy="${cy-14}" r="1.5" fill="#fff"/>`;
+  }
+}
+function plantSVG(f, stage, cls = 'plant', vb = '0 0 100 120'){
+  let body = '';
+  if(stage === 0){
+    body = `<ellipse cx="50" cy="118" rx="14" ry="5" fill="var(--soil2)"/><circle cx="46" cy="115" r="2.5" fill="#e8d3a0"/><circle cx="54" cy="116" r="2" fill="#e8d3a0"/>`;
+  }else if(stage === 1){
+    body = `<path d="M50 120 V100" stroke="var(--leaf)" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M50 102 q-14 -2 -16 -12 q12 0 16 12z" fill="var(--leaf2)"/>
+            <path d="M50 102 q14 -2 16 -12 q-12 0 -16 12z" fill="var(--leaf)"/>`;
+  }else if(stage === 2){
+    const h = 58;
+    body = stem(h) + leaves(h) + `<ellipse cx="50" cy="${120-h-6}" rx="7" ry="11" fill="${f.color}"/><path d="M43 ${120-h} q7 -10 14 0" fill="var(--leaf)"/>`;
+  }else{
+    const h = f.shape === 'spike' ? 64 : 70;
+    body = stem(h) + leaves(h) + head(f, 50, 120 - h - 8);
+  }
+  return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">
+    <defs><pattern id="dots" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#000"/></pattern></defs>${body}</svg>`;
+}
+function flowerIcon(f){ return plantSVG(f, 3, 'icon', '10 20 80 100'); }
+
+// ---- 画面 ----
+const $ = id => document.getElementById(id);
+const garden = $('garden');
+const cache = [];
+
+function plotKey(i, now){
+  const p = S.plots[i], v = S.visitors.find(v => v.plot === i);
+  return (p ? p.sp + stageOf(progress(p, now)) : 'empty') + (v ? v.a : '');
+}
+function renderPlot(i, now){
+  let el = garden.children[i];
+  if(!el){
+    el = document.createElement('button');
+    el.className = 'plot';
+    el.addEventListener('click', () => tapPlot(i));
+    garden.appendChild(el);
+  }
+  const p = S.plots[i];
+  const key = plotKey(i, now);
+  if(cache[i] !== key){
+    cache[i] = key;
+    const v = S.visitors.find(v => v.plot === i);
+    let html = '<div class="soil"></div>';
+    if(p) html += plantSVG(F[p.sp], stageOf(progress(p, now)));
+    html += '<div class="status"></div>';
+    if(v) html += `<span class="visitor" data-v="${v.a}" role="button" aria-label="${A[v.a].name}">${A[v.a].emoji}<span class="gift">🎁</span></span>`;
+    el.innerHTML = html;
+    el.className = 'plot ' + (!p ? 'empty' : progress(p, now) >= 1 ? 'bloom' : 'growing');
+    el.setAttribute('aria-label', !p ? 'あいている花だん' : F[p.sp].name);
+    const vEl = el.querySelector('.visitor');
+    if(vEl) vEl.addEventListener('click', e => { e.stopPropagation(); greet(i, e); });
+  }
+  const st = el.querySelector('.status');
+  if(p){
+    const t = progress(p, now);
+    st.innerHTML = t >= 1 ? '<span class="ready">さいた！</span>' : `<div class="bar"><i style="width:${(t*100).toFixed(1)}%"></i></div>`;
+  }else st.innerHTML = '';
+}
+function render(){
+  const now = Date.now();
+  for(let i = 0; i < PLOTS; i++) renderPlot(i, now);
+  $('coins').textContent = S.coins;
+  const seedsTotal = Object.values(S.seeds).reduce((a, b) => a + b, 0);
+  const empty = S.plots.filter(p => !p).length;
+  const bloomed = S.plots.filter(p => p && progress(p, now) >= 1).length;
+  $('hint').textContent =
+    S.visitors.length ? 'お客さんが来ています。タップしてあいさつしよう' :
+    bloomed ? '咲いた花をタップして収穫しよう' :
+    empty && seedsTotal ? 'あいている花だんをタップして、たねをまこう' :
+    empty && !seedsTotal ? 'たね屋でたねを買おう' :
+    '花が育つのをのんびり待とう（閉じても育ちます）';
+}
+
+// ---- 操作 ----
+function tapPlot(i){
+  const p = S.plots[i];
+  if(!p){ openSeedPicker(i); return; }
+  const t = progress(p);
+  if(t < 1){
+    toast(`${F[p.sp].name}：あと ${fmt(F[p.sp].grow * (1 - t))}`);
+    return;
+  }
+  harvest(i);
+}
+function harvest(i){
+  const f = F[S.plots[i].sp];
+  const first = !S.dex.f[f.id];
+  S.dex.f[f.id] = (S.dex.f[f.id] || 0) + 1;
+  S.coins += f.sell;
+  S.plots[i] = null;
+  floatText(garden.children[i], `+${f.sell}`);
+  let msg = `${f.name}を収穫！ 🪙+${f.sell}`;
+  // たまにたねが取れる
+  if(Math.random() < .3){
+    S.seeds[f.id] = (S.seeds[f.id] || 0) + 1;
+    msg += ` たねも1つ取れた`;
+  }
+  if(first){
+    msg = `📖 図鑑に「${f.name}」を登録！ ` + msg;
+    const next = FLOWERS[FLOWERS.indexOf(f) + 1];
+    if(next && !next.rare) msg += `（たね屋に${next.name}が入荷）`;
+  }
+  toast(msg);
+  save(); render();
+}
+function plant(i, sp){
+  if(!S.seeds[sp]) return;
+  S.seeds[sp]--;
+  if(!S.seeds[sp]) delete S.seeds[sp];
+  S.plots[i] = {sp, at: Date.now()};
+  closeSheet();
+  save(); render();
+  toast(`${F[sp].name}のたねをまいた。${fmt(F[sp].grow)}で咲くよ`);
+}
+function greet(i, e){
+  const idx = S.visitors.findIndex(v => v.plot === i);
+  if(idx < 0) return;
+  const a = A[S.visitors[idx].a];
+  S.visitors.splice(idx, 1);
+  const first = !S.dex.a[a.id];
+  S.dex.a[a.id] = (S.dex.a[a.id] || 0) + 1;
+
+  // おみやげ
+  const fav = F[a.likes];
+  const base = fav ? fav.sell : 60;
+  const coins = Math.round(base * (0.4 + Math.random() * 0.5)) + 5;
+  S.coins += coins;
+  let gift = `🪙${coins}`;
+  const r = Math.random();
+  let seed = null;
+  if(r < .04) seed = 'goldrose';
+  else if(r < .16) seed = 'evening';
+  else if(r < .45) seed = fav ? fav.id : FLOWERS[Math.floor(Math.random() * 6)].id;
+  if(seed){ S.seeds[seed] = (S.seeds[seed] || 0) + 1; gift += ` と ${F[seed].name}のたね`; }
+  floatText(e.currentTarget, `+${coins}`);
+  toast((first ? `📖 図鑑に「${a.name}」を登録！ ` : '') + `${a.emoji} ${a.name}から ${gift} をもらった`);
+  save(); render();
+}
+
+// ---- お客さん ----
+function candidates(now){
+  const blooming = S.plots.map((p, i) => p && progress(p, now) >= 1 ? {sp: p.sp, i} : null).filter(Boolean);
+  const taken = new Set(S.visitors.map(v => v.plot));
+  const here = new Set(S.visitors.map(v => v.a));
+  const out = [];
+  for(const a of ANIMALS){
+    if(here.has(a.id)) continue;
+    if(a.likes === 'any3'){
+      if(blooming.length >= 3){
+        const spot = blooming.find(b => !taken.has(b.i));
+        if(spot) out.push({a: a.id, plot: spot.i});
+      }
+    }else{
+      const spot = blooming.find(b => b.sp === a.likes && !taken.has(b.i));
+      if(spot) out.push({a: a.id, plot: spot.i});
+    }
+  }
+  return out;
+}
+function visitTick(now){
+  let arrived = [];
+  while(now >= S.nextVisit && S.visitors.length < MAX_VISITORS){
+    const c = candidates(now);
+    if(!c.length) break;
+    const pick = c[Math.floor(Math.random() * c.length)];
+    S.visitors.push(pick);
+    arrived.push(pick.a);
+    S.nextVisit = Math.max(S.nextVisit, now - 3600000) + (40 + Math.random() * 80) * 1000;
+  }
+  if(now >= S.nextVisit && S.visitors.length >= MAX_VISITORS) S.nextVisit = now + 30000;
+  if(now >= S.nextVisit && !candidates(now).length) S.nextVisit = now + 20000;
+  // 花を収穫して居場所がなくなったお客さんは、別の咲いている花へ移るか帰る
+  S.visitors = S.visitors.filter(v => {
+    const p = S.plots[v.plot];
+    if(p && progress(p, now) >= 1) return true;
+    const alt = S.plots.findIndex((q, i) => q && progress(q, now) >= 1 && !S.visitors.some(o => o.plot === i));
+    if(alt >= 0){ v.plot = alt; return true; }
+    return false;
+  });
+  return arrived;
+}
+
+// ---- シート ----
+const veil = $('veil'), sheet = $('sheet');
+veil.addEventListener('click', e => { if(e.target === veil) closeSheet(); });
+function openSheet(html){ sheet.innerHTML = html; veil.classList.add('on'); sheet.querySelector('.close')?.addEventListener('click', closeSheet); }
+function closeSheet(){ veil.classList.remove('on'); }
+const head2 = t => `<h2>${t}<button class="close" aria-label="とじる">✕</button></h2>`;
+
+function seedRows(label){
+  const owned = FLOWERS.filter(f => S.seeds[f.id]);
+  if(!owned.length) return '<p class="lead">たねを持っていません。たね屋で買えます。</p><button class="btn primary" id="goShop" style="width:100%">たね屋へ</button>';
+  return '<div class="list">' + owned.map(f => `
+    <div class="row"><div class="ico">${flowerIcon(f)}</div>
+      <div class="txt"><b>${f.name} ×${S.seeds[f.id]}</b><small>${fmt(f.grow)}で咲く・収穫 🪙${f.sell}</small></div>
+      ${label ? `<button class="btn primary" data-sp="${f.id}">${label}</button>` : ''}
+    </div>`).join('') + '</div>';
+}
+function openSeedPicker(i){
+  openSheet(head2('どのたねをまく？') + seedRows('まく'));
+  sheet.querySelectorAll('[data-sp]').forEach(b => b.addEventListener('click', () => plant(i, b.dataset.sp)));
+  $('goShop')?.addEventListener('click', openShop);
+}
+function openSeeds(){
+  openSheet(head2('もっているたね') + '<p class="lead">あいている花だんをタップするとまけます。</p>' + seedRows(''));
+  $('goShop')?.addEventListener('click', openShop);
+}
+function isUnlocked(f){
+  const i = FLOWERS.indexOf(f);
+  return i === 0 || !!S.dex.f[FLOWERS[i - 1].id];
+}
+function openShop(){
+  const rows = FLOWERS.filter(f => !f.rare).map(f => {
+    if(!isUnlocked(f)){
+      const prev = FLOWERS[FLOWERS.indexOf(f) - 1];
+      return `<div class="row" style="opacity:.6"><div class="ico" style="filter:brightness(0) opacity(.2)">${flowerIcon(f)}</div>
+        <div class="txt"><b>？？？</b><small>${prev.name}を収穫すると入荷</small></div></div>`;
+    }
+    return `<div class="row"><div class="ico">${flowerIcon(f)}</div>
+      <div class="txt"><b>${f.name}</b><small>${fmt(f.grow)}で咲く・収穫 🪙${f.sell}</small></div>
+      <button class="btn primary" data-buy="${f.id}" ${S.coins < f.price ? 'disabled' : ''}>🪙${f.price}</button></div>`;
+  }).join('');
+  openSheet(head2('たね屋') + `<p class="lead">もっているコイン：🪙${S.coins}</p><div class="list">${rows}</div>`);
+  sheet.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => {
+    const f = F[b.dataset.buy];
+    if(S.coins < f.price) return;
+    S.coins -= f.price;
+    S.seeds[f.id] = (S.seeds[f.id] || 0) + 1;
+    save(); render(); openShop();
+    toast(`${f.name}のたねを買った（${S.seeds[f.id]}こ）`);
+  }));
+}
+let dexTab = 'f';
+function openDex(){
+  const nf = FLOWERS.filter(f => S.dex.f[f.id]).length;
+  const na = ANIMALS.filter(a => S.dex.a[a.id]).length;
+  let grid;
+  if(dexTab === 'f'){
+    grid = FLOWERS.map(f => {
+      const n = S.dex.f[f.id];
+      return `<div class="cell ${n ? '' : 'unknown'}"><div class="pic">${flowerIcon(f)}</div>
+        <b>${n ? f.name : '？？？'}</b><small>${n ? `${f.note}<br>収穫 ${n}回` : (f.rare ? 'お客さんがたねをくれるかも' : 'まだ見たことがない')}</small></div>`;
+    }).join('');
+  }else{
+    grid = ANIMALS.map(a => {
+      const n = S.dex.a[a.id];
+      const hint = a.likes === 'any3' ? '花がたくさん咲いた庭が好きらしい' : `${S.dex.f[a.likes] ? F[a.likes].name : 'ある花'}が好きらしい`;
+      return `<div class="cell ${n ? '' : 'unknown'}"><div class="pic">${a.emoji}</div>
+        <b>${n ? a.name : '？？？'}</b><small>${n ? `${a.note}<br>来てくれた ${n}回` : hint}</small></div>`;
+    }).join('');
+  }
+  openSheet(head2('図鑑') + `
+    <div class="tabs"><button data-t="f" class="${dexTab === 'f' ? 'on' : ''}">🌼 花 ${nf}/${FLOWERS.length}</button>
+    <button data-t="a" class="${dexTab === 'a' ? 'on' : ''}">🐾 お客さん ${na}/${ANIMALS.length}</button></div>
+    <div class="dex">${grid}</div>`);
+  sheet.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', () => { dexTab = b.dataset.t; openDex(); }));
+}
+$('btnSeeds').addEventListener('click', openSeeds);
+$('btnShop').addEventListener('click', openShop);
+$('btnDex').addEventListener('click', openDex);
+
+// ---- 演出 ----
+let toastTimer;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2600);
+}
+function floatText(el, text){
+  if(!el) return;
+  const r = el.getBoundingClientRect();
+  const d = document.createElement('div');
+  d.className = 'float'; d.textContent = '🪙' + text;
+  d.style.left = (r.left + r.width / 2 - 20) + 'px'; d.style.top = (r.top + 10) + 'px';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 1200);
+}
+
+// ---- おかえり ----
+function welcomeBack(){
+  const now = Date.now();
+  const away = now - (S.lastSeen || now);
+  const bloomedAway = S.plots.filter(p => p && progress(p, now) >= 1 && progress(p, S.lastSeen) < 1).map(p => F[p.sp].name);
+  const arrived = visitTick(now);
+  if(away < 60000 || (!bloomedAway.length && !arrived.length)) return;
+  const items = [
+    ...bloomedAway.map(n => `<li>🌼 ${n}が咲きました</li>`),
+    ...arrived.map(a => `<li>${A[a].emoji} ${A[a].name}が遊びに来ています</li>`),
+  ].join('');
+  openSheet(head2('おかえりなさい') + `<div class="letter"><div class="big">✉️</div>
+    <div>${fmt(away / 1000)}ぶりの庭です</div><ul>${items}</ul>
+    <button class="btn primary" style="width:100%" id="okBack">庭を見る</button></div>`);
+  $('okBack').addEventListener('click', closeSheet);
+}
+
+// ---- 開始 ----
+welcomeBack();
+render();
+save();
+setInterval(() => {
+  const arrived = visitTick(Date.now());
+  if(arrived.length) toast(`${A[arrived[0]].emoji} ${A[arrived[0]].name}が遊びに来たよ`);
+  render();
+}, 1000);
+setInterval(save, 10000);
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden') save();
+  else { welcomeBack(); render(); }
+});
+})();
+</script>
+</body>
+</html>
