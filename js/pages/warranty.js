@@ -14,7 +14,7 @@
     box.innerHTML = '<div class="acts no-print" style="margin-bottom:1rem"><button type="button" class="btn" id="print">印刷する</button><a class="btn ghost" href="my.html">マイページへもどる</a></div>' +
       '<article class="warr" aria-labelledby="w-h"><h1 id="w-h">保 証 書</h1><p style="text-align:center">' + U.esc(v.shop) + (C.GROUP_NOTE ? "（" + U.esc(C.GROUP_NOTE) + "）" : "") + "</p>" +
       '<dl class="kv"><dt>保証書の番号</dt><dd class="num">W-' + U.esc(v.job.jobId) + "</dd>" + (v.job.customerLabel ? "<dt>お客様</dt><dd>" + U.esc(v.job.customerLabel) + "</dd>" : "") + "<dt>作業した場所</dt><dd>" + U.esc(v.job.city) + "</dd><dt>作業の日</dt><dd>" + U.esc(U.jpDateFull(w.workDate)) + "</dd><dt>作業の内容</dt><dd>" + U.esc((w.items || []).join("、")) +
-      "</dd><dt>保証の期間</dt><dd><b>" + U.esc(U.jpDateFull(w.workDate)) + "から" + U.esc(U.jpDateFull(w.until)) + "まで（作業後" + w.days + "日・1週間）</b></dd></dl>" +
+      "</dd><dt>保証の期間</dt><dd><b>" + U.esc(U.jpDateFull(w.workDate)) + "から" + U.esc(U.jpDateFull(w.until)) + "まで（作業後" + U.esc(w.days) + "日・1週間）</b></dd></dl>" +
       "<h2 style=\"font-size:1.1rem\">保証のお約束</h2><p>" + U.esc(wp.text) + "</p><h2 style=\"font-size:1.1rem\">対象外（仮）</h2><ul class=\"plain\">" + wp.excluded.map(function (x) { return "<li>" + U.esc(x) + "</li>"; }).join("") + "</ul>" +
       "<p>ご連絡先：電話 " + U.cfgHtml("PHONE") + "　メール " + U.cfgHtml("CONTACT_EMAIL") + "</p>" + (C.INVOICE_NO ? "<p class=\"small\">登録番号 " + U.esc(C.INVOICE_NO) + "</p>" : "") +
       '<p class="tiny">この保証書は、作業のあとに自動で作られた書類です。' + (v.demo ? "（デモ表示の見本です）" : "") + "</p></article>";

@@ -73,8 +73,8 @@
       slots.slice().sort(function (a, b) { return a.windowNo - b.windowNo; }).forEach(function (s) {
         var on = S.date === date && S.slotNo === s.windowNo, closed = s.status === "×";
         var word = s.status === "○" ? "空きあり" : s.status === "△" ? "その日の最後の1枠" : "空きなし";
-        html += '<button type="button" class="slot' + (s.status === "△" ? " few" : "") + '" data-date="' + date + '" data-no="' + s.windowNo + '" data-label="' + U.esc(s.label) + '"' + (closed ? " disabled" : ' aria-pressed="' + on + '"') +
-          ' aria-label="' + U.esc(U.jpDate(date) + " " + s.label + " " + word) + '"><span class="t">' + U.esc(SHORT(s.label)) + '</span><span class="s" aria-hidden="true">' + s.status + "</span></button>";
+        html += '<button type="button" class="slot' + (s.status === "△" ? " few" : "") + '" data-date="' + date + '" data-no="' + U.esc(s.windowNo) + '" data-label="' + U.esc(s.label) + '"' + (closed ? " disabled" : ' aria-pressed="' + on + '"') +
+          ' aria-label="' + U.esc(U.jpDate(date) + " " + s.label + " " + word) + '"><span class="t">' + U.esc(SHORT(s.label)) + '</span><span class="s" aria-hidden="true">' + U.esc(s.status) + "</span></button>";
       });
       html += "</div>";
     }
@@ -129,12 +129,12 @@
   /* ---------- 5. 確認 ---------- */
   function renderConfirm() {
     var q = S.quote, v = S.v, area = (C.AREAS || []).filter(function (a) { return a.code === S.area; })[0] || {};
-    var lines = q.breakdown.map(function (l) { return "<li><span>" + U.esc(l.label) + (l.qty > 1 ? " ×" + l.qty : "") + '</span><span class="num">' + (l.amount === 0 ? "無料" : U.yen(l.amount)) + "</span></li>"; }).join("");
+    var lines = q.breakdown.map(function (l) { return "<li><span>" + U.esc(l.label) + (l.qty > 1 ? " ×" + U.esc(l.qty) : "") + '</span><span class="num">' + (l.amount === 0 ? "無料" : U.yen(l.amount)) + "</span></li>"; }).join("");
     U.$("#confirm").innerHTML =
       '<dl class="kv"><dt>エリア</dt><dd>' + U.esc(area.label || "") + "</dd><dt>日時</dt><dd><b>" + U.esc(U.jpDate(S.date) + "　" + S.slotLabel) + "</b></dd><dt>お名前</dt><dd>" + U.esc(v.name) + "</dd><dt>電話</dt><dd>" + U.esc(v.phone) +
       "</dd><dt>メール</dt><dd>" + U.esc(v.email) + "</dd><dt>住所</dt><dd>" + U.esc(v.zip + "　" + v.address) + "</dd>" + (v.note ? "<dt>メモ</dt><dd>" + U.esc(v.note) + "</dd>" : "") +
       "<dt>お支払い</dt><dd>" + (v.customerType === "法人" ? "請求書払い（月末締め・翌月末払い）" : "予約のあとにカードを登録し、作業が終わってから決済") + ' <span class="tbd">仮</span></dd></dl>' +
-      '<ul class="lines">' + lines + '</ul><div class="total"><span>総額（税込）</span><b class="num" data-total="' + q.total + '">' + U.yen(q.total) + "</b></div>" +
+      '<ul class="lines">' + lines + '</ul><div class="total"><span>総額（税込）</span><b class="num" data-total="' + U.esc(q.total) + '">' + U.yen(q.total) + "</b></div>" +
       '<p class="small muted">' + U.esc(q.parkingNote) + "。キャンセルは、前々日まで無料・前日50%・当日100%です。追加料金なしの約束（例外は料金のページ）：" + U.esc(q.disclaimer) + "</p>";
     U.$("#photo-opt").hidden = Photos.count() === 0;
   }

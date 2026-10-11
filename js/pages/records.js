@@ -4,8 +4,8 @@
   var U = window.UI, box = U.$("#list");
   window.RecordView = {
     card: function (r) {
-      return '<article class="card"><h3>' + U.esc(r.title) + '</h3><dl class="kv"><dt>日付</dt><dd>' + U.esc(U.jpDateFull(r.date)) + "</dd><dt>場所</dt><dd>" + U.esc(r.areaLabel) + "（市区町村まで）</dd><dt>台数</dt><dd>" + (r.units ? r.units + "台" : "記録なし") +
-        "</dd><dt>所要時間</dt><dd>" + (r.minutes ? "約" + r.minutes + "分" : "記録なし") + '</dd></dl><a class="btn sm ghost" href="record.html?id=' + encodeURIComponent(r.logId) + '">この記録を見る</a></article>';
+      return '<article class="card"><h3>' + U.esc(r.title) + '</h3><dl class="kv"><dt>日付</dt><dd>' + U.esc(U.jpDateFull(r.date)) + "</dd><dt>場所</dt><dd>" + U.esc(r.areaLabel) + "（市区町村まで）</dd><dt>台数</dt><dd>" + (r.units ? U.esc(r.units) + "台" : "記録なし") +
+        "</dd><dt>所要時間</dt><dd>" + (r.minutes ? "約" + U.esc(r.minutes) + "分" : "記録なし") + '</dd></dl><a class="btn sm ghost" href="record.html?id=' + encodeURIComponent(r.logId) + '">この記録を見る</a></article>';
     }
   };
   Api.records().then(function (d) {

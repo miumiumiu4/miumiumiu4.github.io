@@ -39,12 +39,12 @@
     var j = V.job, t = V.today, h = '<section class="card ' + (t.isToday ? "sun" : "") + '" aria-labelledby="h-sched"><h2 id="h-sched">' + (t.isToday ? "今日の予定" : "ご予約") + "</h2>";
     h += "<p><b>" + (j.date ? U.esc(U.jpDate(j.date) + "　" + (j.slotLabel || "")) : "日時を調整中です") + "</b></p><p>" + U.esc(j.statusText || j.status) + "</p>";
     if (t.text) h += '<p id="today-text">' + U.esc(t.text) + "</p>";
-    if (j.units) h += '<p class="small muted">内容：' + j.units + "台" + (j.options ? "（" + U.esc(j.options) + "）" : "") + "</p>";
+    if (j.units) h += '<p class="small muted">内容：' + U.esc(j.units) + "台" + (j.options ? "（" + U.esc(j.options) + "）" : "") + "</p>";
     var d = t.delay;
     if (d) {
-      h += '<div class="card warn" role="group" aria-label="遅れのお知らせ"><h3>到着が遅れそうです</h3><p>約<b>' + d.minutesLate + "分</b>の遅れの見込みです。申し訳ありません。" + (d.etaFrom ? "<br>到着の目安：<b class=\"eta\">" + U.esc(d.etaFrom + "〜" + d.etaTo) + "</b>" : "") + "</p>";
+      h += '<div class="card warn" role="group" aria-label="遅れのお知らせ"><h3>到着が遅れそうです</h3><p>約<b>' + U.esc(d.minutesLate) + "分</b>の遅れの見込みです。申し訳ありません。" + (d.etaFrom ? "<br>到着の目安：<b class=\"eta\">" + U.esc(d.etaFrom + "〜" + d.etaTo) + "</b>" : "") + "</p>";
       if (d.choice) h += '<p class="done">お返事を受け付けました（' + U.esc(d.choice) + "）。</p>";
-      else if (d.options.length) h += '<div class="acts">' + d.options.map(function (o, i) { return '<button type="button" class="btn' + (i ? " ghost" : "") + '" data-delay="' + o.key + '">' + U.esc(o.label) + "</button>"; }).join("") + '</div><p class="tiny muted">どれを選んでも、料金はかかりません。<span class="tbd">仮</span></p>';
+      else if (d.options.length) h += '<div class="acts">' + d.options.map(function (o, i) { return '<button type="button" class="btn' + (i ? " ghost" : "") + '" data-delay="' + U.esc(o.key) + '">' + U.esc(o.label) + "</button>"; }).join("") + '</div><p class="tiny muted">どれを選んでも、料金はかかりません。<span class="tbd">仮</span></p>';
       h += "</div>";
     }
     if (owner && V.money) h += '<dl class="kv"><dt>お支払い予定</dt><dd><b class="num">' + U.yen(V.money.finalAmount) + "</b>" + (V.money.extraApprovedTotal ? "（承認した追加 " + U.yen(V.money.extraApprovedTotal) + " を含む）" : "") + "<br><span class=\"small muted\">作業が終わってから。追加料金は、承認した分だけです。</span></dd></dl>";
@@ -57,7 +57,7 @@
     h += ex.map(function (x) {
       var wait = x.status === "相談中";
       return '<div class="card' + (wait ? " sun" : "") + '" data-extra="' + U.esc(x.extraId) + '"><h3>' + U.yen(x.amount) + "（税込）　" + (wait ? '<span class="tbd" style="color:var(--ink);border-color:var(--ink)">お返事待ち</span>' : "<span>" + U.esc(x.status === "承認" ? "承認しました" : "見送りました") + "</span>") + "</h3><p>理由：" + U.esc(x.reason) + "</p>" +
-        (wait ? '<p class="small"><b>承認するまで、追加の作業も請求もしません。</b></p><div class="thumbs" data-photos></div><div class="acts"><button type="button" class="btn ghost" data-xphotos>理由の写真を見る（' + x.photoCount + '枚）</button><button type="button" class="btn" data-xdecide="承認">承認する（' + U.yen(x.amount) + 'を追加）</button><button type="button" class="btn ghost" data-xdecide="見送り">見送る（追加なしで進めます）</button></div>' : "") + "</div>";
+        (wait ? '<p class="small"><b>承認するまで、追加の作業も請求もしません。</b></p><div class="thumbs" data-photos></div><div class="acts"><button type="button" class="btn ghost" data-xphotos>理由の写真を見る（' + U.esc(x.photoCount) + '枚）</button><button type="button" class="btn" data-xdecide="承認">承認する（' + U.yen(x.amount) + 'を追加）</button><button type="button" class="btn ghost" data-xdecide="見送り">見送る（追加なしで進めます）</button></div>' : "") + "</div>";
     }).join("");
     return h + '<p>承認ずみの追加（合計）：<b class="num" id="extra-total">' + U.yen(V.money.extraApprovedTotal) + '</b>　<span class="small muted">承認するまで請求しません</span></p></section>';
   }
@@ -118,7 +118,8 @@
     if (ph) {
       var box = ph.closest("[data-extra]"), id = box.getAttribute("data-extra");
       Api.extraPhotos(Object.assign(who(), { extraId: id })).then(function (r) {
-        box.querySelector("[data-photos]").innerHTML = (r.photos || []).map(function (u, i) { return '<img src="' + U.esc(u) + '" alt="追加の相談の理由の写真 ' + (i + 1) + '">'; }).join("") || "<p>写真がありません。</p>";
+        // 写真は data:image/… だけ（よそのURLの画像は出さない。2026-10-11）
+        box.querySelector("[data-photos]").innerHTML = (r.photos || []).filter(function (u) { return /^data:image\//.test(String(u)); }).map(function (u, i) { return '<img src="' + U.esc(u) + '" alt="追加の相談の理由の写真 ' + (i + 1) + '">'; }).join("") || "<p>写真がありません。</p>";
       }, function (err) { say(err.message, "err"); });
       return;
     }
@@ -149,7 +150,7 @@
   U.$("#resend-form").addEventListener("submit", function (e) {
     e.preventDefault();
     var out = U.$("#resend-msg");
-    Api.mylink({ jobId: U.$("#r-job").value.trim(), email: U.$("#r-email").value.trim() }).then(function (r) { U.say(out, r.message, "done"); }, function (err) { U.say(out, err.message, "err"); });
+    Api.mylink({ jobId: U.$("#r-job").value.trim(), email: U.$("#r-email").value.trim(), website: (U.$("#r-hp") || {}).value || "" }).then(function (r) { U.say(out, r.message, "done"); }, function (err) { U.say(out, err.message, "err"); });
   });
 
   load();

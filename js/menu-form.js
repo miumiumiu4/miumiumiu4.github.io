@@ -83,9 +83,9 @@
     if (!q) { node.innerHTML = '<p class="muted">メニューを選ぶと、ここに総額が出ます。</p>'; return; }
     var lines = q.breakdown.map(function (l) {
       var free = l.amount === 0;
-      return "<li><span>" + U.esc(l.label) + (l.qty > 1 ? " ×" + l.qty : "") + (l.note ? '<br><span class="tiny muted">' + U.esc(l.note) + "</span>" : "") + '</span><span class="num ' + (free ? "free" : "") + '">' + (l.amount === null ? "お見積り" : free ? "無料" : U.yen(l.amount)) + "</span></li>";
+      return "<li><span>" + U.esc(l.label) + (l.qty > 1 ? " ×" + U.esc(l.qty) : "") + (l.note ? '<br><span class="tiny muted">' + U.esc(l.note) + "</span>" : "") + '</span><span class="num ' + (free ? "free" : "") + '">' + (l.amount === null ? "お見積り" : free ? "無料" : U.yen(l.amount)) + "</span></li>";
     }).join("");
-    node.innerHTML = '<ul class="lines">' + lines + '</ul><div class="total"><span>総額（税込）</span><b class="num" data-total="' + (q.total === null ? "" : q.total) + '">' + (q.total === null ? "お見積り" : U.yen(q.total)) + "</b></div>" +
+    node.innerHTML = '<ul class="lines">' + lines + '</ul><div class="total"><span>総額（税込）</span><b class="num" data-total="' + (q.total === null ? "" : U.esc(q.total)) + '">' + (q.total === null ? "お見積り" : U.yen(q.total)) + "</b></div>" +
       '<p class="small muted">' + U.esc(q.parkingNote) + "。" + (q.weekdayApplied ? "平日の料金で計算しています。" : "") + "</p>" +
       (q.notes && q.notes.length ? '<p class="note">' + q.notes.map(U.esc).join("<br>") + "</p>" : "") +
       '<div class="promise3"><span class="ic" aria-hidden="true">✓</span><div><h3>追加料金なしの約束</h3><p class="small">' + U.esc(q.noExtraFeePromise) + "</p></div></div>" +

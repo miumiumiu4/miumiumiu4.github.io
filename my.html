@@ -12,6 +12,8 @@
 
 <meta name="robots" content="noindex">
 <!--build:base-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
 <base href="https://miumiumiu4.github.io/">
 <!--/build:base-->
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -59,6 +61,7 @@
     <h2 id="h-resend">マイページのリンクを送ってもらう</h2>
     <p class="small muted">リンクは安全のため、1回きり・期限つきです。開けない時は、ご予約の受付番号と、ご予約の時のメールアドレスを入れてください。合っていれば、新しいリンクをメールでお送りします（合っていない時も、同じ答えを返します）。</p>
     <form id="resend-form" class="stack" novalidate>
+      <input type="text" id="r-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="sr">
       <div class="field"><label for="r-job">受付番号</label><input id="r-job" autocomplete="off" placeholder="例：C001-R261002-0001"></div>
       <div class="field"><label for="r-email">メールアドレス</label><input id="r-email" type="email" autocomplete="email" placeholder="例：sample@example.com"></div>
       <div class="acts"><button class="btn" type="submit">リンクを送ってもらう</button></div>

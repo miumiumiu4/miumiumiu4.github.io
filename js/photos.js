@@ -34,7 +34,7 @@
     function paint() {
       root.innerHTML = '<div class="photo-slots">' + LABELS.map(function (lab, i) {
         return '<div class="photo-slot"><b class="small">' + (i + 1) + ". " + U.esc(lab) + "</b>" +
-          (list[i] ? '<img src="' + list[i] + '" alt="選んだ写真：' + U.esc(lab) + '">' + '<button type="button" class="btn sm ghost" data-del="' + i + '">この写真をはずす</button>'
+          (list[i] && /^data:image\//.test(String(list[i])) ? '<img src="' + U.esc(list[i]) + '" alt="選んだ写真：' + U.esc(lab) + '">' + '<button type="button" class="btn sm ghost" data-del="' + i + '">この写真をはずす</button>'
             : '<label class="btn sm ghost" for="ph-' + i + '">写真をえらぶ（任意）</label><input class="sr" id="ph-' + i + '" type="file" accept="image/*" data-ph="' + i + '">') + "</div>";
       }).join("") + "</div>";
     }
