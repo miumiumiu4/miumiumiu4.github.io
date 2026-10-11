@@ -22,7 +22,7 @@ LINEの友だち 1万人 ──（LINEで開く）──┐
 - LINE：プロバイダー「ありがとうエアコンお掃除専門店」、Messaging API の Channel ID `2003862021`、LINEログインのチャネルID `2011871268`（公開済み）、LIFF ID `2011871268-iKlrVVRY`（LIFF URL `https://liff.line.me/2011871268-iKlrVVRY`）
 - `js/survey-config.js` に LIFF ID を記入
 - GAS の既定値（`Hub.gs` の `DEFAULTS`）に、回の名前・LINEログインのチャネルID・当選人数・金額を記入
-- 回答用スプレッドシート「暮らしの困りごとアンケート（回答と顧客ハブ）」を作成：https://docs.google.com/spreadsheets/d/1QRD0XwYZ0srH0cCEau9nsB2ao12eZGs7lSnwQ6gGuko/edit
+- 回答用スプレッドシート「暮らしの困りごとアンケート（回答と顧客ハブ）」を作成（三浦さんのGoogleドライブ。IDは公開のGitHubに書かないので、ドライブで名前を検索して開く）
 
 ### 残りの手順
 1. 上のスプレッドシートを開き、「拡張機能 → Apps Script」を開く。
