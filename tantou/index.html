@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>連絡先のご登録</title>
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  :root { --bg:#f6f8fa; --card:#fff; --text:#1f2328; --muted:#59636e; --line:#d1d9e0; --accent:#0a7cc4; --ok:#1a7f37; --ng:#cf222e; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0d1117; --card:#161b22; --text:#e6edf3; --muted:#9198a1; --line:#3d444d; --accent:#4aa8e8; --ok:#3fb950; --ng:#f85149; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; line-height:1.7; }
+  main { max-width:480px; margin:0 auto; padding:32px 16px 48px; }
+  h1 { font-size:1.4rem; margin:0 0 8px; }
+  p.lead { color:var(--muted); margin:0 0 24px; }
+  form { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; }
+  label { display:block; font-weight:600; margin:16px 0 6px; }
+  label:first-of-type { margin-top:0; }
+  .req { color:var(--ng); font-size:.8rem; margin-left:6px; }
+  input, textarea { width:100%; font:inherit; color:inherit; background:transparent; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  input:focus, textarea:focus { outline:2px solid var(--accent); outline-offset:1px; }
+  textarea { min-height:72px; resize:vertical; }
+  .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  button { width:100%; margin-top:20px; padding:12px; font:inherit; font-weight:700; color:#fff; background:var(--accent); border:0; border-radius:8px; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .msg { margin-top:16px; font-weight:600; min-height:1.5em; }
+  .msg.ok { color:var(--ok); } .msg.ng { color:var(--ng); }
+  small { display:block; color:var(--muted); margin-top:16px; font-size:.8rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>連絡先のご登録</h1>
+  <p class="lead">お仕事の受け渡しや完了のご連絡に使うメールアドレスを登録してください。同じアドレスで送り直すと、内容が上書きされます。</p>
+  <form id="f" novalidate>
+    <label for="name">お名前<span class="req">必須</span></label>
+    <input id="name" name="name" autocomplete="name" maxlength="50" required>
+
+    <label for="email">メールアドレス<span class="req">必須</span></label>
+    <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required>
+
+    <label for="memo">所属・メモ（任意）</label>
+    <textarea id="memo" name="memo" maxlength="300" placeholder="例：会計事務所、講師チーム など"></textarea>
+
+    <div class="hp" aria-hidden="true"><label for="website">website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+
+    <button id="btn" type="submit">登録する</button>
+    <div id="msg" class="msg" role="status" aria-live="polite"></div>
+    <small>ご登録いただいたアドレスは、業務連絡以外には使いません。</small>
+  </form>
+</main>
+<script src="config.js"></script>
+<script src="form.js"></script>
+</body>
+</html>
