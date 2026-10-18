@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>加盟面談メモ</title>
+<style>
+  :root { --bg:#F5F7FA; --card:#FFFFFF; --ink:#1B2433; --sub:#5B6676; --line:#D8DEE6; --navy:#1F3A5F; --accent:#E8833A; --sel:#EEF2F7; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12161C; --card:#1B222C; --ink:#E8ECF1; --sub:#9AA6B5; --line:#2E3846; --navy:#8FB3E0; --accent:#F0A060; --sel:#243142; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Hiragino Sans","Noto Sans JP",sans-serif; font-size:18px; line-height:1.75; }
+  main { max-width:680px; margin:0 auto; padding:24px 16px 60px; }
+  h1 { font-size:24px; color:var(--navy); margin:0 0 4px; }
+  h2 { font-size:19px; color:var(--navy); margin:0 0 4px; }
+  .lead, .hint, .note { color:var(--sub); }
+  .hint, .note { font-size:16px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:16px; }
+  .q { margin-top:20px; }
+  .t { display:block; font-weight:700; }
+  .say { display:block; color:var(--sub); font-size:16px; }
+  .req { color:#C94F6D; font-size:14px; margin-left:6px; font-weight:600; }
+  .opts { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .opts label { display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:8px; padding:8px 12px; cursor:pointer; }
+  .opts input { accent-color:var(--accent); width:20px; height:20px; }
+  .opts label:has(input:checked) { background:var(--sel); border-color:var(--navy); }
+  textarea, input[type=email], input[type=text], input[type=date], input[type=password] { width:100%; margin-top:8px; padding:12px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); font-size:18px; font-family:inherit; }
+  textarea { min-height:90px; }
+  button { margin-top:24px; width:100%; padding:16px; border:0; border-radius:10px; background:var(--accent); color:#fff; font-size:19px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.6; }
+  .err { color:#C94F6D; margin-top:8px; }
+  .ok { text-align:center; padding:32px 16px; }
+</style>
+</head>
+<body>
+<main>
+  <form id="f" novalidate>
+    <h1>加盟面談メモ</h1>
+    <p class="lead">面談中か面談のすぐあとに、担当が入力します。同じメールで送り直すと同じ行が上書きされます（空の欄は前の答えのまま）。結果が「保留」から変わったら、結果の欄だけ入れて送り直してください。</p>
+    <section id="qs"></section>
+    <section>
+      <div class="q"><label class="t" for="key">合言葉<span class="req">★</span></label>
+        <div class="hint">この端末に一度入れれば、次からは自動で入ります。</div>
+        <input type="password" id="key" autocomplete="off"></div>
+    </section>
+    <button type="submit" id="send">送る</button>
+    <div class="err" id="err" hidden></div>
+  </form>
+  <div class="ok" id="done" hidden>
+    <h1>送りました</h1>
+    <p>分析シートの「加盟アンケート」タブに入ります。</p>
+    <button type="button" id="again">次の人を入力する</button>
+  </div>
+</main>
+<script>
+window.RECEIVER_URL = 'https://script.google.com/macros/s/AKfycbxew3DGpZWIvoX6sCFxC5ce6sGwcN8a6dsrYP2f2qLAiWiR4iIdc7-uCmxZ1niSfaqb8w/exec';
+// say＝面談でそのまま聞ける言い方
+const Q = [
+  { h: '基本' },
+  { k: 'date', t: '面談日', type: 'date', req: true },
+  { k: 'staff', t: '担当', type: 'short', req: true, keep: true },
+  { k: 'mail', t: 'お相手のメールアドレス', type: 'email', req: true, hint: '分析シートのほかのタブとつなぐ目印です' },
+  { k: 'name', t: 'お相手の名前', type: 'short' },
+  { h: 'きっかけ' },
+  { k: 'source', t: '最初に知った場所', type: 'radio', o: ['YouTube', 'ショート', 'Instagram・Facebook広告', 'LINE', 'エバー講座のメール', '知り合いの紹介', '検索', 'その他'], say: '「うちを最初に知ったのはどこでしたか」' },
+  { k: 'trigger', t: '話を聞こうと思ったきっかけ', type: 'text', say: '「話を聞いてみようと思ったのは、何を見た時ですか」' },
+  { h: '比べているもの' },
+  { k: 'compare', t: '一緒に考えているもの（いくつでも）', type: 'check', o: ['ほかのFC本部', '一人で独立', '今の仕事を続ける', '副業のまま', '何とも比べていない'], say: '「ほかに考えている道はありますか」' },
+  { k: 'compare_good', t: '比べている所の良い点', type: 'text', say: '「そこのどこが良いと思いましたか」' },
+  { h: '決め手' },
+  { k: 'key1', t: '一番大事なこと', type: 'radio', o: ['稼げる金額', '仕事が途切れない（集客）', '技術を教えてもらえる', '仲間がいる', '三浦さんの考え方', '家族との時間', 'ブランド・信用', 'その他'], say: '「決めるとしたら、何が一番の理由になりそうですか」' },
+  { k: 'key2', t: '2番目に大事なこと', type: 'radio', o: ['稼げる金額', '仕事が途切れない（集客）', '技術を教えてもらえる', '仲間がいる', '三浦さんの考え方', '家族との時間', 'ブランド・信用', 'その他'] },
+  { k: 'liked', t: '一番響いたこと（本人の言葉で）', type: 'text', say: '「ここまでで一番いいなと思ったのは何ですか」' },
+  { h: '迷い' },
+  { k: 'worry', t: 'いちばんの引っかかり', type: 'radio', o: ['お金（加盟金・開業資金）', '家族の賛成', '自分にできるか', 'お客さんが来るか', '今の仕事を辞める時期', '本部を信じていいか', '特にない'], say: '「今ひとつ引っかかっていることは何ですか」' },
+  { k: 'solve', t: '何で解決したら進めるか', type: 'text', say: '「それがどうなったら、前に進めそうですか」' },
+  { k: 'fee', t: '加盟金330万円を聞いた時の反応', type: 'radio', o: ['思ったより安い', '妥当', '高いが中身次第', '高すぎる', 'まだ伝えていない'] },
+  { h: '時期と温度' },
+  { k: 'when', t: '始めたい時期', type: 'radio', o: ['1か月以内', '3か月以内', '半年以内', '1年以内', '未定'], say: '「始めるとしたら、いつ頃がいいですか」' },
+  { k: 'temp', t: '温度感（担当の見立て）', type: 'radio', o: ['A すぐ始めたい', 'B 前向きに検討', 'C 情報集め'] },
+  { h: '結果' },
+  { k: 'result', t: '結果', type: 'radio', o: ['加盟', '保留', '見送り', '次回もう一度面談'] },
+  { k: 'reason', t: '決めた／見送った本当の理由', type: 'text', hint: '本人が言った言葉をそのまま書くのがいちばん役に立ちます' },
+  { k: 'next', t: '次の約束', type: 'short', hint: '例：10/25 20時に家族と一緒にZoom' },
+  { k: 'memo', t: 'メモ', type: 'text' }
+];
+(function () {
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const store = { get: k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const html = [];
+  Q.forEach(q => {
+    if (q.h) { if (html.length) html.push('</section><section>'); html.push(`<h2>${esc(q.h)}</h2>`); return; }
+    const star = q.req ? '<span class="req">★</span>' : '';
+    const say = q.say ? `<span class="say">聞き方：${esc(q.say)}</span>` : '';
+    const hint = q.hint ? `<div class="hint">${esc(q.hint)}</div>` : '';
+    let body = '';
+    if (q.type === 'radio' || q.type === 'check') {
+      const t = q.type === 'radio' ? 'radio' : 'checkbox';
+      body = `<div class="opts">${q.o.map(o => `<label><input type="${t}" name="${q.k}" value="${esc(o)}">${esc(o)}</label>`).join('')}</div>`;
+      html.push(`<div class="q"><span class="t">${esc(q.t)}${star}</span>${say}${hint}${body}</div>`);
+      return;
+    }
+    if (q.type === 'text') body = `<textarea id="${q.k}" name="${q.k}" maxlength="2000"></textarea>`;
+    else body = `<input type="${q.type === 'short' ? 'text' : q.type}" id="${q.k}" name="${q.k}" maxlength="254">`;
+    html.push(`<div class="q"><label class="t" for="${q.k}">${esc(q.t)}${star}</label>${say}${hint}${body}</div>`);
+  });
+  document.getElementById('qs').innerHTML = html.join('');
+  const f = document.getElementById('f');
+  const reset = () => {
+    f.reset();
+    f.date.value = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+    f.staff.value = store.get('kamei_staff');
+    document.getElementById('key').value = store.get('kamei_key');
+  };
+  reset();
+  document.getElementById('again').addEventListener('click', () => {
+    reset(); f.hidden = false; document.getElementById('done').hidden = true; window.scrollTo(0, 0);
+  });
+  f.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const err = document.getElementById('err'), btn = document.getElementById('send');
+    const fd = new FormData(f);
+    const val = q => q.type === 'check' ? fd.getAll(q.k).join('、') : (fd.get(q.k) || '').toString().trim();
+    const qs = Q.filter(q => q.k);
+    const missing = qs.filter(q => q.req && !val(q));
+    const key = document.getElementById('key').value.trim();
+    if (missing.length || !key) { err.textContent = '★の欄を入れてください：' + missing.map(q => q.t).concat(key ? [] : ['合言葉']).join('／'); err.hidden = false; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val({ k: 'mail' }))) { err.textContent = 'メールアドレスを確かめてください。'; err.hidden = false; return; }
+    const p = new URLSearchParams();
+    p.set('type', 'kamei'); p.set('key', key);
+    qs.forEach(q => p.set(q.k, val(q)));
+    store.set('kamei_key', key); store.set('kamei_staff', val({ k: 'staff' }));
+    btn.disabled = true; btn.textContent = '送信しています…'; err.hidden = true;
+    try {
+      await fetch(window.RECEIVER_URL, { method: 'POST', mode: 'no-cors', body: p });
+      f.hidden = true; document.getElementById('done').hidden = false; window.scrollTo(0, 0);
+    } catch (e) {
+      err.textContent = '送信できませんでした。通信の状態を確かめて、もう一度お試しください。'; err.hidden = false;
+    }
+    btn.disabled = false; btn.textContent = '送る';
+  });
+})();
+</script>
+</body>
+</html>

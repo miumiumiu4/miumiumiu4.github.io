@@ -7,6 +7,7 @@ Allow: /
 Disallow: /my.html
 Disallow: /warranty.html
 Disallow: /record.html
+Disallow: /kamei-memo/
 
 # AIのロボット（仮：はじめは「許可」。やめたい時は Allow: / を Disallow: / に変える。方針は三浦さんが決める・未決定）
 User-agent: GPTBot
@@ -21,6 +22,7 @@ Allow: /
 Disallow: /my.html
 Disallow: /warranty.html
 Disallow: /record.html
+Disallow: /kamei-memo/
 
 # robots.txt は「お願い」で、鍵ではありません。個人情報のページは、1回きりのリンクを知らない人は開けない作りです。
 Sitemap: https://miumiumiu4.github.io/sitemap.xml
