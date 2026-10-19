@@ -8,6 +8,8 @@ var TAB = '診断';
 var HEAD = ['更新日時', 'メール', '名前', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', '合計', 'top', 'second', 'scene',
   'k1', 'k2', 'k3', 'k4', 'k5', 'k6', '送信済み', '送信日時', '今日の送信数', 'json'];
 var C = {}; HEAD.forEach(function (h, i) { C[h] = i + 1; });
+var HIST_TAB = '診断_履歴';   // 回ごとに1行（メール×回で上書き）。前回との比べに使う
+var HIST_HEAD = ['日時', 'メール', '回', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', '合計', 'top'];
 var KEEP_QUOTA = 10;      // 残りがこれを切ったら翌日に回す
 var PER_MAIL_DAY = 5;     // 同じメールに1日に送る上限（いたずら対策）
 
@@ -27,13 +29,15 @@ function doPost(e) {
     name: /%/.test(p.name || '') ? '' : String(p.name || '').trim().slice(0, 40),   // UTAGEの差し込み失敗（%name%）は空に
     scores: scores, top: r.top, second: r.second,
     scene: String(p.scene || '').trim().slice(0, 500),
-    kuse: kuse
+    kuse: kuse,
+    lesson: Math.max(0, Math.min(7, parseInt(p.lesson, 10) || 0))
   };
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
     var sh = sheet_();
     var now = new Date();
+    d.prev = history_(mail, d, now);
     var row = findRow_(sh, mail);
     var prev = row ? sh.getRange(row, 1, 1, HEAD.length).getValues()[0] : null;
     var vals = [now, mail, safe_(d.name)].concat(scores, [scores.reduce(function (a, b) { return a + b; }, 0),
@@ -105,6 +109,32 @@ function withUrls_(d, mail) {
   d.viewUrl = SHINDAN_PAGE + '?r=' + r;
   d.againUrl = SHINDAN_PAGE + '?mail=' + encodeURIComponent(mail);
   return d;
+}
+
+// 前回（同じメールの、今より前の回の一番新しい回。回が分からなければ最後に答えたもの）を探し、今回を履歴に書く
+function history_(mail, d, now) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sh = ss.getSheetByName(HIST_TAB);
+  if (!sh) {
+    sh = ss.insertSheet(HIST_TAB);
+    sh.getRange(1, 1, 1, HIST_HEAD.length).setValues([HIST_HEAD]).setFontWeight('bold');
+    sh.setFrozenRows(1);
+  }
+  var n = sh.getLastRow() - 1, mine = [];
+  if (n > 0) sh.getRange(2, 1, n, HIST_HEAD.length).getValues().forEach(function (v, i) {
+    if (String(v[1]).toLowerCase() === mail) mine.push({ row: i + 2, at: new Date(v[0]).getTime(), lesson: Number(v[2]) || 0, scores: v.slice(3, 12).map(Number) });
+  });
+  var others = mine.filter(function (m) { return !(d.lesson && m.lesson === d.lesson); });
+  var earlier = others.filter(function (m) { return d.lesson && m.lesson && m.lesson < d.lesson; });
+  var pick = null;
+  (earlier.length ? earlier : others).forEach(function (m) {
+    if (!pick || (earlier.length ? m.lesson > pick.lesson : m.at > pick.at)) pick = m;
+  });
+  var vals = [now, mail, d.lesson].concat(d.scores, [d.scores.reduce(function (a, b) { return a + b; }, 0), SHINDAN.types[d.top - 1].name]);
+  var same = mine.filter(function (m) { return m.lesson === d.lesson; })[0];
+  if (same) sh.getRange(same.row, 1, 1, vals.length).setValues([vals]);
+  else sh.appendRow(vals);
+  return pick ? { lesson: pick.lesson, scores: pick.scores } : null;
 }
 
 function sheet_() {

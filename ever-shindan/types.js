@@ -111,6 +111,12 @@ function shindanReport(d) {
   L.push('■ あなたの点数（印1つ＝1点、各3点満点）');
   T.forEach(function (t, i) { L.push(t.n + ' ' + t.name + ' ' + d.scores[i] + '点'); });
   L.push('合計 ' + total + '点（27点満点）', '');
+  var g = shindanGrowth(d);
+  if (g) {
+    L.push('■ ' + g.label + 'の診断からの変化');
+    g.rows.forEach(function (r) { L.push(r.name + ' ' + r.a + '点 → ' + r.b + '点'); });
+    L.push('合計 ' + g.ta + '点 → ' + g.tb + '点', g.msg, '');
+  }
   if (total <= 3) L.push(SHINDAN.low, '');
   L.push('■ 一番、あなたを止めているもの：「' + top.name + '」', top.what, '', '出やすい場面：' + top.scene, '', top.word, '');
   L.push('■ 2番目に強いもの：「' + second.name + '」', second.what, '');
@@ -137,6 +143,22 @@ function shindanReport(d) {
   return L.join('\n');
 }
 
+// 前回からの変化。d.prev = { lesson: 0〜7, scores: [9] }（無ければ null）
+function shindanLessonLabel(n) { return n ? '第' + n + '回のあと' : '前回'; }
+function shindanGrowth(d) {
+  if (!d.prev || !d.prev.scores || d.prev.scores.length !== 9) return null;
+  var T = SHINDAN.types, a = d.prev.scores, b = d.scores;
+  var sum = function (x) { return x.reduce(function (p, q) { return p + q; }, 0); };
+  var ta = sum(a), tb = sum(b), rows = [];
+  T.forEach(function (t, i) { if (a[i] !== b[i]) rows.push({ name: t.name, a: a[i], b: b[i] }); });
+  var best = rows.filter(function (r) { return r.b < r.a; }).sort(function (x, y) { return (y.a - y.b) - (x.a - x.b); })[0];
+  var msg;
+  if (tb < ta) msg = '止まり方の点数が、合計で' + (ta - tb) + '点下がりました。動いた証拠です。' + (best ? '特に「' + best.name + '」が' + best.a + '点から' + best.b + '点に下がっています。外し方が、もう体に入り始めています。' : '');
+  else if (tb > ta) msg = '点数が上がっていても大丈夫です。講座を見て自分の止まり方が見えてくると、前より正直に印が付くようになります。それも、前に進んだ証拠です。' + (best ? 'その中でも「' + best.name + '」は' + best.a + '点から' + best.b + '点に下がっています。' : '');
+  else msg = '合計は変わっていません。' + (best ? 'それでも「' + best.name + '」は' + best.a + '点から' + best.b + '点に下がっています。' : '') + '点数が同じでも、どこで止まるかに名前が付いていれば、外し方は見えてきます。';
+  return { label: shindanLessonLabel(d.prev.lesson), rows: rows, ta: ta, tb: tb, msg: msg };
+}
+
 // 次に見る回の「この前提で見ると、こう変わる」
 function shindanWatch(t) {
   return 'あなたは「' + t.name + '」が一番強く出ていたので、' + t.lesson.replace(/（.*）/, '') + 'は、' + t.watch + '見てください。\nそう見ると、' + t.gain + '。\n成果が出る人は、「自分ならどう使うか」を前提に見ています。ただ眺めるより、ずっと身につきます。';
@@ -149,11 +171,14 @@ function shindanSubject(d) {
 // 結果ページのURL（点数とクセだけを ?r= に詰める。名前と場面の文は転送されても見えないよう入れない）
 var SHINDAN_PAGE = 'https://miumiumiu4.github.io/ever-shindan/';
 function shindanPack(d) {
-  return JSON.stringify({ s: d.scores, t: d.top, u: d.second, k: d.kuse });
+  var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0 };
+  if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
+  return JSON.stringify(o);
 }
 function shindanUnpack(j) {
   var o = JSON.parse(j);
-  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], page: true };
+  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0,
+    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null, page: true };
 }
 
 // メール本文（HTML）。ページの結果表示にも使う。メールソフトでも崩れないよう、表と style 属性だけで組む。
@@ -185,6 +210,18 @@ function shindanReportHtml(d) {
   });
   o.push('</table>');
   o.push('<p style="margin:8px 0 0;font-size:14px;color:' + SUB + '">合計 ' + total + '点（27点満点）　<span style="color:' + ORANGE + '">■</span>一番　<span style="color:' + NAVY + '">■</span>2番目</p>');
+  var g = shindanGrowth(d);
+  if (g) {
+    o.push(H('■ ' + e(g.label) + 'の診断からの変化'));
+    var gr = g.rows.map(function (r) {
+      var down = r.b < r.a, c = down ? '#2E8B57' : SUB;
+      return '<tr><td style="padding:4px 0;font-size:15px">' + e(r.name) + '</td><td style="padding:4px 0;font-size:15px;text-align:right;white-space:nowrap">' + r.a + '点 <span style="color:' + c + '">' + (down ? '▼' : '▲') + '</span> <b style="color:' + c + '">' + r.b + '点</b></td></tr>';
+    }).join('');
+    var gd = g.tb < g.ta;
+    o.push(box(gd ? '#EEF8F1' : PALE, gd ? '#2E8B57' : NAVY,
+      '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:' + (gd ? '#2E8B57' : NAVY) + '">合計 ' + g.ta + '点 → ' + g.tb + '点</p>' +
+      (gr ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + gr + '</table>' : '') + P(e(g.msg), 'margin:0')));
+  }
   if (total <= 3) o.push('<div style="margin-top:16px">' + box(PALE, NAVY, P(e(SHINDAN.low), 'margin:0')) + '</div>');
   // 一番
   o.push(H('■ 一番、あなたを止めているもの'));

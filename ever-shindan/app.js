@@ -16,6 +16,7 @@ var QUESTIONS = [
 var TYPE_LABEL = ['他責', '理由探し（お金・時期）', '正解待ち', '抱え込み・自己流', '失敗恐怖', '完璧主義・先延ばし', '現状維持・ブレーキ', '自己否定・思い込み', '不安ループ'];
 var KUSE_B = ['思ったら動く', 'そのために今動く', '自分の確信で決める', '原因は自分の側にもある', '良くするシナリオを考える', '自分の価値観で決める'];
 var STORE = 'ever_shindan_v1';
+var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回との比べを画面に出す用
 
 (function () {
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
@@ -24,6 +25,18 @@ var STORE = 'ever_shindan_v1';
     set: function (v) { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch (e) {} }
   };
   var $ = function (id) { return document.getElementById(id); };
+  var hist = {
+    get: function () { try { return JSON.parse(localStorage.getItem(HIST) || '{}') || {}; } catch (e) { return {}; } },
+    set: function (v) { try { localStorage.setItem(HIST, JSON.stringify(v)); } catch (e) {} }
+  };
+  // 前回：回が分かるときはそれより前の回の一番新しいもの、分からないときは一番最後に答えたもの（GASと同じ決め方）
+  var findPrev = function (h, lesson) {
+    var ks = Object.keys(h).map(Number).filter(function (k) { return !(lesson && k === lesson); });
+    var earlier = ks.filter(function (k) { return lesson && k && k < lesson; });
+    var pick = earlier.length ? Math.max.apply(null, earlier)
+      : ks.reduce(function (m, k) { return m === null || h[k].at > h[m].at ? k : m; }, null);
+    return pick === null ? null : { lesson: pick, scores: h[pick].s };
+  };
   var f = $('f');
 
   // 27問（タイプの名前は出さない＝先入観なしで答えてもらう）
@@ -79,6 +92,8 @@ var STORE = 'ever_shindan_v1';
 
   // URL の ?mail=&name=（UTAGEの差し込み）。差し込まれていない %mail% は使わない。
   var qp = new URLSearchParams(location.search);
+  var LESSON = Math.max(0, Math.min(7, parseInt(qp.get('lesson'), 10) || 0));
+  if (LESSON) $('sub').textContent = '（第' + LESSON + '回のあとの診断）';
   var fromUrl = function (k) { var v = (qp.get(k) || '').trim(); return /%/.test(v) ? '' : v; };
 
   var restore = function (a) {
@@ -115,7 +130,10 @@ var STORE = 'ever_shindan_v1';
     var tieShown = !$('tieBox').hidden, tie = document.querySelector('input[name=tie]:checked');
     if (tieShown && !tie) { err.textContent = '点数が同じものがあります。一番自分を止めていると思うものを1つ選んでください。'; err.hidden = false; $('tieBox').scrollIntoView({ behavior: 'smooth' }); return; }
     var r = shindanRank(s, tie ? Number(tie.value) : 0);
-    var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse() };
+    var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON };
+    var h = hist.get();
+    d.prev = findPrev(h, LESSON);
+    h[LESSON] = { s: s, at: Date.now() }; hist.set(h);
     store.set({ mail: mail, name: d.name, scene: d.scene, kuse: d.kuse, tie: tie ? Number(tie.value) : 0,
       checked: Array.prototype.map.call(document.querySelectorAll('input[name=q]:checked'), function (c) { return c.value; }) });
     err.hidden = true;
@@ -129,7 +147,7 @@ var STORE = 'ever_shindan_v1';
     var p = new URLSearchParams();
     p.set('key', KEY); p.set('type', 'shindan'); p.set('mail', mail); p.set('name', d.name);
     p.set('scores', JSON.stringify(s)); p.set('top', String(tie ? Number(tie.value) : 0)); p.set('second', String(d.second));
-    p.set('scene', d.scene); p.set('kuse', JSON.stringify(d.kuse)); p.set('ua', navigator.userAgent.slice(0, 200));
+    p.set('scene', d.scene); p.set('kuse', JSON.stringify(d.kuse)); p.set('ua', navigator.userAgent.slice(0, 200)); p.set('lesson', String(LESSON));
     btn.disabled = true; btn.textContent = '送信しています…';
     fetch(RECEIVER_URL, { method: 'POST', mode: 'no-cors', body: p })
       .then(function () { show(true); })
