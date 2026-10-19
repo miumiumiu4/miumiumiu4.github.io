@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>止まり方診断シート</title>
+<style>
+  :root { --bg:#F5F7FA; --card:#FFFFFF; --ink:#1B2433; --sub:#5B6676; --line:#D8DEE6; --navy:#1F3A5F; --accent:#E8833A; --sel:#EEF2F7; --bar:#1F3A5F; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12161C; --card:#1B222C; --ink:#E8ECF1; --sub:#9AA6B5; --line:#2E3846; --navy:#8FB3E0; --accent:#F0A060; --sel:#243142; --bar:#8FB3E0; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Hiragino Sans","Noto Sans JP",sans-serif; font-size:18px; line-height:1.75; -webkit-text-size-adjust:100%; }
+  main { max-width:680px; margin:0 auto; padding:24px 16px 60px; }
+  h1 { font-size:24px; color:var(--navy); margin:0 0 8px; line-height:1.4; }
+  h2 { font-size:20px; color:var(--navy); margin:0 0 4px; }
+  h3 { font-size:18px; margin:0 0 8px; }
+  p { margin:8px 0; }
+  .lead, .hint { color:var(--sub); }
+  .hint { font-size:16px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:16px; }
+  .type { margin-top:20px; }
+  .type:first-of-type { margin-top:8px; }
+  .chk { display:flex; align-items:flex-start; gap:12px; border:1px solid var(--line); border-radius:10px; padding:12px; margin-top:8px; cursor:pointer; }
+  .chk input { flex:none; width:24px; height:24px; margin-top:3px; accent-color:var(--accent); }
+  .chk:has(input:checked) { background:var(--sel); border-color:var(--navy); }
+  .t { display:block; font-weight:700; }
+  .req { color:#C94F6D; font-size:14px; margin-left:6px; font-weight:600; }
+  input[type=email], input[type=text], textarea { width:100%; margin-top:8px; padding:12px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); font-size:18px; font-family:inherit; }
+  textarea { min-height:110px; }
+  .kuse { margin-top:20px; }
+  .ab { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:16px; color:var(--sub); }
+  .ab div:last-child { text-align:right; }
+  .opts { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:6px; }
+  .opts label { display:flex; align-items:center; justify-content:center; min-height:48px; border:1px solid var(--line); border-radius:8px; cursor:pointer; font-size:16px; text-align:center; }
+  .opts input { position:absolute; opacity:0; pointer-events:none; }
+  .opts label:has(input:checked) { background:var(--navy); border-color:var(--navy); color:var(--card); font-weight:700; }
+  .tie label { display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:8px; padding:12px; margin-top:8px; cursor:pointer; }
+  .tie input { width:22px; height:22px; accent-color:var(--accent); }
+  .tie label:has(input:checked) { background:var(--sel); border-color:var(--navy); }
+  button { margin-top:24px; width:100%; padding:16px; border:0; border-radius:10px; background:var(--accent); color:#fff; font-size:19px; font-weight:700; cursor:pointer; }
+  button.sub { background:transparent; color:var(--navy); border:1px solid var(--line); }
+  button:disabled { opacity:.6; }
+  .err { color:#C94F6D; margin-top:8px; }
+  .notice { background:var(--sel); border-radius:10px; padding:12px 14px; margin-top:12px; font-size:16px; }
+  .score { display:grid; grid-template-columns:11.5em 1fr 2.4em; align-items:center; gap:8px; margin:6px 0; font-size:16px; }
+  .score .bar { height:14px; border-radius:7px; background:var(--line); overflow:hidden; }
+  .score .bar i { display:block; height:100%; background:var(--bar); }
+  .score.top { font-weight:700; }
+  .res h2 { margin-top:4px; }
+  .label { font-size:15px; color:var(--sub); margin-top:14px; }
+  .pre { white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <form id="f" novalidate>
+    <h1>止まり方診断シート<br><span style="font-size:18px" id="sub">（エバー講座を見た方へ）</span></h1>
+    <p class="lead">考えこまず、最初に「そうかも」と思ったものに印を付けてください。</p>
+    <p class="lead">答えは三浦が面談や集客戦略会議の参考に読みます。正直に書くほど、この先の回が役に立ちます。</p>
+    <p class="hint">答えると、その場で結果が出て、同じ内容がメールでも届きます。回を見るたびに答えると、前回からの変化も分かります。</p>
+    <div class="notice" id="restored" hidden>前回の答えを入れてあります。そのまま直して、もう一度送れます。</div>
+
+    <section>
+      <div><label class="t" for="mail">メールアドレス<span class="req">必須</span></label>
+        <input type="email" id="mail" name="mail" autocomplete="email" inputmode="email" maxlength="254"></div>
+      <div style="margin-top:16px"><label class="t" for="name">お名前（任意）</label>
+        <input type="text" id="name" name="name" autocomplete="name" maxlength="40"></div>
+    </section>
+
+    <section>
+      <h2>1．当てはまるものに印</h2>
+      <p class="hint">印1つ＝1点。名前が付けば、外し方も見えてきます。</p>
+      <div id="qs"></div>
+    </section>
+
+    <section>
+      <h2>2．それが出てくるのは、どんな場面ですか？</h2>
+      <p class="hint">任意。思いついた場面を、そのままの言葉で。</p>
+      <textarea id="scene" name="scene" maxlength="500" placeholder="例：夜、一人で通帳を見ているとき"></textarea>
+    </section>
+
+    <section>
+      <h2>3．第2回　6つのクセ</h2>
+      <p class="hint">第2回をまだ見ていない方は飛ばしてOKです。クセに良い悪いはありません。自分がどちら寄りかを、正直に見てください。</p>
+      <div id="ks"></div>
+      <p class="hint" style="margin-top:14px">※ Aに寄っているところが、独立の前でブレーキになりやすいクセです（Aが悪いわけではありません）。</p>
+    </section>
+
+    <section id="tieBox" hidden>
+      <h2>一番自分を止めているのは？</h2>
+      <p class="hint">点数が同じものがあります。この中から、一番自分を止めていると思うものを1つ選んでください。</p>
+      <div class="tie" id="tie"></div>
+    </section>
+
+    <button type="submit" id="send">結果を見る</button>
+    <div class="err" id="err" hidden></div>
+  </form>
+
+  <div id="done" hidden>
+    <div id="res" style="margin:0 -8px"></div>
+    <div class="notice" id="mailNote">同じ内容をメールでもお送りします（届くまで数分〜、混んでいるときは翌日）。届かないときは、迷惑メールのフォルダも見てください。</div>
+    <button type="button" class="sub" id="again">答え直す</button>
+  </div>
+</main>
+<script src="types.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
