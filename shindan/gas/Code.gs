@@ -1,5 +1,5 @@
 // エバー診断レポート（止まり方診断シート＋第2回のクセ）
-// ページ miumiumiu4.github.io/ever-shindan/ → doPost で顧客ログ「診断」タブに1人1行（メールで上書き）
+// ページ miumiumiu4.github.io/shindan/ → doPost で顧客ログ「診断」タブに1人1行（メールで上書き）
 // メールは doPost では送らず、5分ごとのトリガー sendQueue が順番に送る（無料Gmailの1日100通内）。
 // 文の型は Types.gs（ページの types.js と同じ中身）。
 
