@@ -122,10 +122,91 @@ function shindanReport(d) {
   }
   L.push('■ 今日できる一歩', top.step, '');
   L.push('■ 次に見る回', top.lesson + 'で、この止まり方の外し方を話しています。', '');
-  L.push(SHINDAN.closing, '', '三浦公嗣（ありがとうグループ）');
+  L.push(SHINDAN.closing, '');
+  if (d.viewUrl) L.push('▼ 結果をグラフで見る', d.viewUrl, '');
+  L.push('三浦公嗣（ありがとうグループ）');
   return L.join('\n');
 }
 
 function shindanSubject(d) {
   return '【診断結果】あなたの止まり方は「' + SHINDAN.types[d.top - 1].name + '」でした';
+}
+
+// 結果ページのURL（答えを ?r= に詰める。サーバーに保存しなくても開ける）
+var SHINDAN_PAGE = 'https://miumiumiu4.github.io/ever-shindan/';
+function shindanPack(d) {
+  return JSON.stringify({ n: d.name || '', s: d.scores, t: d.top, u: d.second, c: d.scene || '', k: d.kuse });
+}
+function shindanUnpack(j) {
+  var o = JSON.parse(j);
+  return { name: o.n || '', scores: o.s, top: o.t, second: o.u, scene: o.c || '', kuse: o.k || ['', '', '', '', '', ''] };
+}
+
+// メール本文（HTML）。ページの結果表示にも使う。メールソフトでも崩れないよう、表と style 属性だけで組む。
+function shindanReportHtml(d) {
+  var T = SHINDAN.types;
+  var e = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var NAVY = '#1F3A5F', ORANGE = '#E8833A', SUB = '#5B6676', LINE = '#D8DEE6', PALE = '#F5F7FA', CREAM = '#FFF4EA';
+  var total = d.scores.reduce(function (a, b) { return a + b; }, 0);
+  var top = T[d.top - 1], second = T[d.second - 1];
+  var P = function (s, st) { return '<p style="margin:0 0 12px;font-size:16px;line-height:1.8;color:#1B2433;' + (st || '') + '">' + s + '</p>'; };
+  var H = function (s) { return '<p style="margin:28px 0 10px;font-size:14px;color:' + SUB + ';font-weight:bold;letter-spacing:.05em">' + s + '</p>'; };
+  var box = function (bg, border, inner) { return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:' + bg + ';border-left:6px solid ' + border + ';border-radius:8px"><tr><td style="padding:16px 18px">' + inner + '</td></tr></table>'; };
+  var o = [];
+  o.push('<div style="background:' + PALE + ';padding:16px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid ' + LINE + '"><tr><td style="padding:24px 20px;font-family:\'Hiragino Sans\',\'Noto Sans JP\',sans-serif">');
+  o.push('<p style="margin:0 0 4px;font-size:14px;color:' + SUB + '">止まり方診断シート　結果</p>');
+  o.push('<p style="margin:0 0 16px;font-size:22px;font-weight:bold;color:' + NAVY + ';line-height:1.5">あなたを一番止めているのは<br><span style="color:' + ORANGE + '">「' + e(top.name) + '」</span></p>');
+  o.push(P(e(d.name ? d.name + 'さん' : '診断シートにお答えいただいた方へ') + '<br>お答えいただき、ありがとうございます。この結果は、三浦が面談や集客戦略会議の参考に読ませていただきます。'));
+  // 点数の棒グラフ
+  o.push(H('■ あなたの点数（各3点満点）'));
+  o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px">');
+  T.forEach(function (t, i) {
+    var n = d.scores[i], isTop = i === d.top - 1, isSec = i === d.second - 1;
+    var color = isTop ? ORANGE : isSec ? NAVY : '#9AA6B5';
+    var cells = '';
+    for (var k = 0; k < 3; k++) cells += '<td width="33%" style="height:16px;background:' + (k < n ? color : '#EEF1F5') + ';border-right:3px solid #fff;border-radius:4px"></td>';
+    o.push('<tr><td style="padding:5px 8px 5px 0;white-space:nowrap;width:9em;' + (isTop || isSec ? 'font-weight:bold;color:' + color : 'color:#1B2433') + '">' + e(t.name) + '</td>' +
+      '<td style="padding:5px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' + cells + '</tr></table></td>' +
+      '<td style="padding:5px 0 5px 8px;width:2.5em;text-align:right;' + (isTop ? 'font-weight:bold;color:' + ORANGE : '') + '">' + n + '点</td></tr>');
+  });
+  o.push('</table>');
+  o.push('<p style="margin:8px 0 0;font-size:14px;color:' + SUB + '">合計 ' + total + '点（27点満点）　<span style="color:' + ORANGE + '">■</span>一番　<span style="color:' + NAVY + '">■</span>2番目</p>');
+  if (total <= 3) o.push('<div style="margin-top:16px">' + box(PALE, NAVY, P(e(SHINDAN.low), 'margin:0')) + '</div>');
+  // 一番
+  o.push(H('■ 一番、あなたを止めているもの'));
+  o.push(box(CREAM, ORANGE, '<p style="margin:0 0 8px;font-size:20px;font-weight:bold;color:' + ORANGE + '">「' + e(top.name) + '」</p>' + P(e(top.what)) +
+    P('<b>出やすい場面：</b>' + e(top.scene)) + P(e(top.word), 'margin:0')));
+  // 2番目
+  o.push(H('■ 2番目に強いもの'));
+  o.push(box(PALE, NAVY, '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:' + NAVY + '">「' + e(second.name) + '」</p>' + P(e(second.what), 'margin:0')));
+  // 場面
+  o.push(H('■ あなたが書いた「出てくる場面」'));
+  if (d.scene) o.push(P('<span style="display:inline-block;background:' + PALE + ';border-radius:6px;padding:8px 12px">「' + e(d.scene) + '」</span>') + P(e(SHINDAN.sceneYes)));
+  else o.push(P(e(SHINDAN.sceneNo)));
+  // クセ
+  if (d.kuse.some(function (k) { return !!k; })) {
+    var kt = shindanKuseTop(d.kuse);
+    o.push(H('■ 判断のクセ（第2回）'));
+    var dots = SHINDAN.kuse.map(function (k, i) {
+      var lv = d.kuse[i], pos = SHINDAN.kuseLevels.indexOf(lv), c = '';
+      for (var j = 0; j < 4; j++) c += '<td width="25%" style="text-align:center;font-size:18px;color:' + (j === pos ? (j < 2 ? ORANGE : NAVY) : LINE) + '">●</td>';
+      return '<tr><td style="padding:4px 6px 4px 0;font-size:13px;width:30%;text-align:right;color:' + (pos >= 0 && pos < 2 ? ORANGE : SUB) + '">' + e(k.name) + '</td><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' + (pos < 0 ? '<td style="text-align:center;font-size:13px;color:' + SUB + '">（未回答）</td>' : c) + '</tr></table></td><td style="padding:4px 0 4px 6px;font-size:13px;width:30%;color:' + SUB + '">' + e(['思ったら動く', 'そのために今動く', '自分の確信で決める', '原因は自分の側にもある', '良くするシナリオを考える', '自分の価値観で決める'][i]) + '</td></tr>';
+    }).join('');
+    o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td></td><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:11px;color:' + SUB + ';white-space:nowrap"><tr><td width="25%" align="center">A</td><td width="25%" align="center">やや<br>A</td><td width="25%" align="center">やや<br>B</td><td width="25%" align="center">B</td></tr></table></td><td></td></tr>' + dots + '</table>');
+    if (!kt.length) o.push('<div style="margin-top:12px">' + P(e(SHINDAN.kuseNone)) + '</div>');
+    else kt.slice(0, 2).forEach(function (x) {
+      o.push('<div style="margin-top:12px">' + box(CREAM, ORANGE, '<p style="margin:0 0 6px;font-weight:bold;color:' + ORANGE + '">' + e(SHINDAN.kuse[x.i].name) + '</p>' + P(e(SHINDAN.kuse[x.i].text), 'margin:0')) + '</div>');
+    });
+  }
+  // 今日の一歩
+  o.push(H('■ 今日できる一歩'));
+  o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + NAVY + ';border-radius:10px"><tr><td style="padding:18px 20px;color:#fff;font-size:17px;line-height:1.8;font-weight:bold">✔ ' + e(top.step) + '</td></tr></table>');
+  o.push(H('■ 次に見る回'));
+  o.push(P('<b style="color:' + NAVY + '">' + e(top.lesson) + '</b>で、この止まり方の外し方を話しています。'));
+  o.push('<div style="border-top:1px solid ' + LINE + ';margin-top:24px;padding-top:16px">' + P(e(SHINDAN.closing).replace(/\n/g, '<br>'), 'color:' + SUB + ';font-size:15px') + '</div>');
+  var btn = function (href, label, bg) { return '<a href="' + e(href) + '" style="display:inline-block;background:' + bg + ';color:#fff;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:10px;font-size:16px;margin:6px 4px">' + label + '</a>'; };
+  if (d.viewUrl || d.againUrl) o.push('<p style="text-align:center;margin:20px 0">' + (d.viewUrl ? btn(d.viewUrl, '結果をページで見る', NAVY) : '') + (d.againUrl ? btn(d.againUrl, '答え直す', ORANGE) : '') + '</p>');
+  o.push(P('三浦公嗣（ありがとうグループ）', 'margin:16px 0 0'));
+  o.push('</td></tr></table></div>');
+  return o.join('');
 }

@@ -95,29 +95,17 @@ var STORE = 'ever_shindan_v1';
   if (fromUrl('mail')) f.mail.value = fromUrl('mail');
   if (fromUrl('name') && !f.name.value) f.name.value = fromUrl('name');
 
-  var render = function (d) {
-    var T = SHINDAN.types, total = d.scores.reduce(function (a, b) { return a + b; }, 0);
-    var top = T[d.top - 1], sec = T[d.second - 1], o = [];
-    o.push('<h2>あなたの結果</h2>');
-    d.scores.forEach(function (n, i) {
-      o.push('<div class="score' + (i === d.top - 1 ? ' top' : '') + '"><span>' + (i + 1) + ' ' + esc(T[i].name) + '</span><span class="bar"><i style="width:' + (n / 3 * 100) + '%"></i></span><span>' + n + '点</span></div>');
-    });
-    o.push('<p class="hint">合計 ' + total + '点（27点満点）</p>');
-    if (total <= 3) o.push('<p>' + esc(SHINDAN.low) + '</p>');
-    o.push('<div class="label">一番、あなたを止めているもの</div><h2>「' + esc(top.name) + '」</h2><p>' + esc(top.what) + '</p><p>' + esc(top.word) + '</p>');
-    o.push('<div class="label">2番目に強いもの</div><h3>「' + esc(sec.name) + '」</h3><p>' + esc(sec.what) + '</p>');
-    var kt = shindanKuseTop(d.kuse);
-    if (d.kuse.some(function (k) { return !!k; })) {
-      o.push('<div class="label">判断のクセ（第2回）</div>');
-      if (!kt.length) o.push('<p>' + esc(SHINDAN.kuseNone) + '</p>');
-      else kt.slice(0, 2).forEach(function (x) { o.push('<h3>' + esc(SHINDAN.kuse[x.i].name) + '</h3><p>' + esc(SHINDAN.kuse[x.i].text) + '</p>'); });
-    }
-    o.push('<div class="label">今日できる一歩</div><p><b>' + esc(top.step) + '</b></p>');
-    o.push('<div class="label">次に見る回</div><p>' + esc(top.lesson) + 'で、この止まり方の外し方を話しています。</p>');
-    o.push('<p class="hint pre">' + esc(SHINDAN.closing) + '</p>');
-    $('res').innerHTML = o.join('');
+  // ?r= 付きで開いたとき（メールの「結果をページで見る」）は結果だけを出す
+  var b64decode = function (r) {
+    r = r.replace(/-/g, '+').replace(/_/g, '/'); while (r.length % 4) r += '=';
+    var bin = atob(r), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
   };
 
+  var render = function (d) {
+    $('res').innerHTML = shindanReportHtml(d);
+  };
   f.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var err = $('err'), btn = $('send');
@@ -147,6 +135,15 @@ var STORE = 'ever_shindan_v1';
       .then(function () { show(true); })
       .catch(function () { show(false); err.textContent = ''; });
   });
+
+  if (qp.get('r')) {
+    try {
+      var d0 = shindanUnpack(b64decode(qp.get('r')));
+      if (d0.scores && d0.scores.length === 9) {
+        render(d0); $('mailNote').hidden = true; f.hidden = true; $('done').hidden = false;
+      }
+    } catch (e) {}
+  }
 
   $('again').addEventListener('click', function () {
     f.hidden = false; $('done').hidden = true; window.scrollTo(0, 0);

@@ -66,9 +66,9 @@ function sendQueue() {
       var c = cnt.indexOf(today + ':') === 0 ? Number(cnt.split(':')[1]) : 0;
       if (c >= PER_MAIL_DAY) { sh.getRange(r, C['送信済み']).setValue('skip:上限'); continue; }
       try {
-        var d = JSON.parse(v[C['json'] - 1]);
+        var d = withUrls_(JSON.parse(v[C['json'] - 1]), v[C['メール'] - 1]);
         MailApp.sendEmail({
-          to: v[C['メール'] - 1], subject: shindanSubject(d), body: shindanReport(d),
+          to: v[C['メール'] - 1], subject: shindanSubject(d), body: shindanReport(d), htmlBody: shindanReportHtml(d),
           name: '三浦公嗣（ありがとうグループ）', replyTo: 'miumiumiu4@gmail.com'
         });
         sh.getRange(r, C['送信済み'], 1, 3).setValues([['済', new Date(), today + ':' + (c + 1)]]);
@@ -84,8 +84,8 @@ function doGet(e) {
   var p = (e && e.parameter) || {};
   if (p.t !== 'test' || p.k !== SHINDAN_KEY) return out_('ok');
   var scores = [3, 1, 0, 2, 3, 0, 1, 0, 2], r = shindanRank(scores, 5);
-  var d = { name: 'テスト', scores: scores, top: r.top, second: r.second, scene: '夜、一人で通帳を見ているとき', kuse: ['A', '', 'ややA', 'B', 'A', ''] };
-  MailApp.sendEmail({ to: TEST_MAIL, subject: '【見本】' + shindanSubject(d), body: shindanReport(d),
+  var d = withUrls_({ name: 'テスト', scores: scores, top: r.top, second: r.second, scene: '夜、一人で通帳を見ているとき', kuse: ['A', '', 'ややA', 'B', 'A', ''] }, TEST_MAIL);
+  MailApp.sendEmail({ to: TEST_MAIL, subject: '【見本】' + shindanSubject(d), body: shindanReport(d), htmlBody: shindanReportHtml(d),
     name: '三浦公嗣（ありがとうグループ）', replyTo: 'miumiumiu4@gmail.com' });
   return out_('sent');
 }
@@ -97,6 +97,14 @@ function setup() {
   });
   ScriptApp.newTrigger('sendQueue').timeBased().everyMinutes(5).create();
   sheet_();
+}
+
+// メールのボタン：結果ページ（答えを ?r= に詰める）と答え直し（メール入力済み）
+function withUrls_(d, mail) {
+  var r = Utilities.base64EncodeWebSafe(Utilities.newBlob(shindanPack(d)).getBytes()).replace(/=+$/, '');
+  d.viewUrl = SHINDAN_PAGE + '?r=' + r;
+  d.againUrl = SHINDAN_PAGE + '?mail=' + encodeURIComponent(mail);
+  return d;
 }
 
 function sheet_() {
