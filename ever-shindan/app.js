@@ -93,7 +93,19 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
   // URL の ?mail=&name=（UTAGEの差し込み）。差し込まれていない %mail% は使わない。
   var qp = new URLSearchParams(location.search);
   var LESSON = Math.max(0, Math.min(7, parseInt(qp.get('lesson'), 10) || 0));
-  if (LESSON) $('sub').textContent = '（第' + LESSON + '回のあとの診断）';
+  var SRC = (qp.get('src') || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 30);
+  if (LESSON) $('sub').textContent = '（第' + LESSON + '回のあと）';
+  // その回のふりかえり（できた・少し・まだ）
+  var LQ = SHINDAN.lessonQ[LESSON] || [];
+  if (LQ.length) {
+    $('lqBox').hidden = false;
+    $('lqTitle').textContent = '4．第' + LESSON + '回のふりかえり';
+    $('lq').innerHTML = LQ.map(function (q, i) {
+      return '<div class="kuse"><div class="t">' + esc(q) + '</div><div class="opts" style="grid-template-columns:repeat(3,1fr)">' +
+        SHINDAN.lessonA.map(function (a) { return '<label><input type="radio" name="lq' + i + '" value="' + a + '">' + a + '</label>'; }).join('') + '</div></div>';
+    }).join('');
+  }
+  var lqAns = function () { return LQ.map(function (q, i) { var c = document.querySelector('input[name=lq' + i + ']:checked'); return c ? c.value : ''; }); };
   var fromUrl = function (k) { var v = (qp.get(k) || '').trim(); return /%/.test(v) ? '' : v; };
 
   var restore = function (a) {
@@ -107,6 +119,12 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
   };
   var saved = store.get();
   restore(saved);
+  // 前に答えたことがあれば「成長チェック」として出す（前回の印入り、変わったところだけ直す）
+  if (saved && Object.keys(hist.get()).length) {
+    $('ttl').textContent = '成長チェック';
+    $('restored').textContent = '前回の印が入っています。今の自分に合わせて、変わったところだけ直してください。30秒ほどで終わります。答えると、前回からの変化がレポートで届きます。';
+    $('send').textContent = '前回との変化を見る';
+  }
   if (fromUrl('mail')) f.mail.value = fromUrl('mail');
   if (fromUrl('name') && !f.name.value) f.name.value = fromUrl('name');
 
@@ -130,7 +148,7 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var tieShown = !$('tieBox').hidden, tie = document.querySelector('input[name=tie]:checked');
     if (tieShown && !tie) { err.textContent = '点数が同じものがあります。一番自分を止めていると思うものを1つ選んでください。'; err.hidden = false; $('tieBox').scrollIntoView({ behavior: 'smooth' }); return; }
     var r = shindanRank(s, tie ? Number(tie.value) : 0);
-    var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON };
+    var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON, lq: lqAns() };
     var h = hist.get();
     d.prev = findPrev(h, LESSON);
     h[LESSON] = { s: s, at: Date.now() }; hist.set(h);
@@ -141,13 +159,13 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
       render(d);
       $('mailNote').hidden = !sent;
       f.hidden = true; $('done').hidden = false; window.scrollTo(0, 0);
-      btn.disabled = false; btn.textContent = '結果を見る';
+      btn.disabled = false; btn.textContent = $('ttl').textContent === '成長チェック' ? '前回との変化を見る' : '結果を見る';
     };
     if (!RECEIVER_URL) { show(false); return; }
     var p = new URLSearchParams();
     p.set('key', KEY); p.set('type', 'shindan'); p.set('mail', mail); p.set('name', d.name);
     p.set('scores', JSON.stringify(s)); p.set('top', String(tie ? Number(tie.value) : 0)); p.set('second', String(d.second));
-    p.set('scene', d.scene); p.set('kuse', JSON.stringify(d.kuse)); p.set('ua', navigator.userAgent.slice(0, 200)); p.set('lesson', String(LESSON));
+    p.set('scene', d.scene); p.set('kuse', JSON.stringify(d.kuse)); p.set('ua', navigator.userAgent.slice(0, 200)); p.set('lesson', String(LESSON)); p.set('lq', JSON.stringify(d.lq)); p.set('src', SRC);
     btn.disabled = true; btn.textContent = '送信しています…';
     fetch(RECEIVER_URL, { method: 'POST', mode: 'no-cors', body: p })
       .then(function () { show(true); })

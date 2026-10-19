@@ -78,6 +78,17 @@ var SHINDAN = {
     { n: 6, name: '前例やデータで決める', text: '外の物差しだけで決めると、結果も平均になります。データを見た上で、最後に決めるのは「自分は、何のためにそれをしたいのか」です。' }
   ],
   kuseLevels: ['A', 'ややA', 'ややB', 'B'],
+  // 各回のふりかえり（2回目からの成長チェックで、27問のあとに聞く）。有料回の中身は書かない。
+  lessonQ: {
+    1: ['1年後の将来像を、仮でも1行書けた', '「何のために独立したいか」を一言で言える'],
+    2: ['「〇〇のせいで」を「自分に変えられること」に言い換えられた', '「事実」と「自分でつけた意味づけ」を分けて考えられた', '6つのクセのうち、自分のA寄りを1つ言える'],
+    3: ['今の不安を、日付と数字の入った言葉にできた', '頭の中の「やめとけ」の声に、名前を付けられた', '「〜になったら」を「〜のために、今〇〇する」に言い換えられた'],
+    4: ['迷っていることを「今決める・足りない情報・いつ決める」に分けられた', '先延ばしにしていたことを、60%で1つ出せた'],
+    5: ['決めるときの自分の物差し（何のためにやるか）を言える', '調べる期限を、日付で決めた'],
+    6: ['技術・お金・集客・気持ちの相談先を書き出せた', '人に任せることを1つ決めた'],
+    7: ['1年後までの道のりを、1枚に書けた', '次の一歩を、いつやるか日付で決めた']
+  },
+  lessonA: ['できた', '少し', 'まだ'],
   closing: '1つだけの人は、ほとんどいません。たいてい2つか3つが重なっています。\n点数が高いこと自体は、悪いことではありません。名前が付けば、外し方も見えてきます。\n何度でも答え直せます。答えが変わったら、それは動いた証拠です。'
 };
 
@@ -116,6 +127,12 @@ function shindanReport(d) {
     L.push('■ ' + g.label + 'の診断からの変化');
     g.rows.forEach(function (r) { L.push(r.name + ' ' + r.a + '点 → ' + r.b + '点'); });
     L.push('合計 ' + g.ta + '点 → ' + g.tb + '点', g.msg, '');
+  }
+  var lr = shindanLessonReview(d);
+  if (lr) {
+    L.push('■ ' + lr.title);
+    lr.rows.forEach(function (r) { L.push('・' + r.q + '：' + r.a); });
+    L.push(lr.msg, '');
   }
   if (total <= 3) L.push(SHINDAN.low, '');
   L.push('■ 一番、あなたを止めているもの：「' + top.name + '」', top.what, '', '出やすい場面：' + top.scene, '', top.word, '');
@@ -159,6 +176,17 @@ function shindanGrowth(d) {
   return { label: shindanLessonLabel(d.prev.lesson), rows: rows, ta: ta, tb: tb, msg: msg };
 }
 
+// 回のふりかえり。d.lesson と d.lq（答え: できた/少し/まだ/''）から
+function shindanLessonReview(d) {
+  var qs = SHINDAN.lessonQ[d.lesson];
+  if (!qs || !d.lq || !d.lq.some(function (x) { return !!x; })) return null;
+  var rows = qs.map(function (q, i) { return { q: q, a: d.lq[i] || '（未回答）' }; });
+  var done = d.lq.filter(function (x) { return x === 'できた'; }).length;
+  var msg = done === qs.length ? '全部「できた」です。講座を、ただ見るだけでなく使っています。この調子です。'
+    : '「まだ」「少し」のものは、次の回までに1つだけ、やってみてください。1つできると、次の回の入り方が変わります。';
+  return { title: '第' + d.lesson + '回のふりかえり', rows: rows, msg: msg };
+}
+
 // 次に見る回の「この前提で見ると、こう変わる」
 function shindanWatch(t) {
   return 'あなたは「' + t.name + '」が一番強く出ていたので、' + t.lesson.replace(/（.*）/, '') + 'は、' + t.watch + '見てください。\nそう見ると、' + t.gain + '。\n成果が出る人は、「自分ならどう使うか」を前提に見ています。ただ眺めるより、ずっと身につきます。';
@@ -171,13 +199,13 @@ function shindanSubject(d) {
 // 結果ページのURL（点数とクセだけを ?r= に詰める。名前と場面の文は転送されても見えないよう入れない）
 var SHINDAN_PAGE = 'https://miumiumiu4.github.io/ever-shindan/';
 function shindanPack(d) {
-  var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0 };
+  var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [] };
   if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
   return JSON.stringify(o);
 }
 function shindanUnpack(j) {
   var o = JSON.parse(j);
-  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0,
+  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0, lq: o.q || [],
     prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null, page: true };
 }
 
@@ -221,6 +249,14 @@ function shindanReportHtml(d) {
     o.push(box(gd ? '#EEF8F1' : PALE, gd ? '#2E8B57' : NAVY,
       '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:' + (gd ? '#2E8B57' : NAVY) + '">合計 ' + g.ta + '点 → ' + g.tb + '点</p>' +
       (gr ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + gr + '</table>' : '') + P(e(g.msg), 'margin:0')));
+  }
+  var lr = shindanLessonReview(d);
+  if (lr) {
+    o.push(H('■ ' + e(lr.title)));
+    o.push(box(PALE, NAVY, '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + lr.rows.map(function (r) {
+      var c = r.a === 'できた' ? '#2E8B57' : r.a === '少し' ? ORANGE : SUB;
+      return '<tr><td style="padding:4px 8px 4px 0;font-size:15px;line-height:1.6">' + e(r.q) + '</td><td style="padding:4px 0;font-size:15px;white-space:nowrap;text-align:right;font-weight:bold;color:' + c + '">' + e(r.a) + '</td></tr>';
+    }).join('') + '</table>' + P(e(lr.msg), 'margin:0')));
   }
   if (total <= 3) o.push('<div style="margin-top:16px">' + box(PALE, NAVY, P(e(SHINDAN.low), 'margin:0')) + '</div>');
   // 一番

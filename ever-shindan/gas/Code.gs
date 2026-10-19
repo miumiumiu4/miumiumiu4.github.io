@@ -6,7 +6,7 @@
 // SHEET_ID（顧客ログ）・SHINDAN_KEY・TEST_MAIL は Secret.gs
 var TAB = '診断';
 var HEAD = ['更新日時', 'メール', '名前', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', '合計', 'top', 'second', 'scene',
-  'k1', 'k2', 'k3', 'k4', 'k5', 'k6', '送信済み', '送信日時', '今日の送信数', 'json'];
+  'k1', 'k2', 'k3', 'k4', 'k5', 'k6', '送信済み', '送信日時', '今日の送信数', 'json', '回', 'src'];
 var C = {}; HEAD.forEach(function (h, i) { C[h] = i + 1; });
 var HIST_TAB = '診断_履歴';   // 回ごとに1行（メール×回で上書き）。前回との比べに使う
 var HIST_HEAD = ['日時', 'メール', '回', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', '合計', 'top'];
@@ -32,6 +32,10 @@ function doPost(e) {
     kuse: kuse,
     lesson: Math.max(0, Math.min(7, parseInt(p.lesson, 10) || 0))
   };
+  var lq = [];
+  try { lq = JSON.parse(p.lq || '[]'); } catch (err) {}
+  d.lq = (SHINDAN.lessonQ[d.lesson] || []).map(function (q, i) { return SHINDAN.lessonA.indexOf(lq[i]) >= 0 ? lq[i] : ''; });
+  var src = String(p.src || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 30);
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
@@ -42,10 +46,10 @@ function doPost(e) {
     var prev = row ? sh.getRange(row, 1, 1, HEAD.length).getValues()[0] : null;
     var vals = [now, mail, safe_(d.name)].concat(scores, [scores.reduce(function (a, b) { return a + b; }, 0),
       SHINDAN.types[d.top - 1].name, SHINDAN.types[d.second - 1].name, safe_(d.scene)], kuse,
-      ['', prev ? prev[C['送信日時'] - 1] : '', prev ? prev[C['今日の送信数'] - 1] : '', JSON.stringify(d)]);
+      ['', prev ? prev[C['送信日時'] - 1] : '', prev ? prev[C['今日の送信数'] - 1] : '', JSON.stringify(d), d.lesson, src]);
     if (row) sh.getRange(row, 1, 1, vals.length).setValues([vals]);
     else sh.appendRow(vals);
-    event_(now, mail, d);
+    event_(now, mail, d, src);
   } finally { lock.releaseLock(); }
   return out_('ok');
 }
@@ -144,6 +148,8 @@ function sheet_() {
     sh = ss.insertSheet(TAB);
     sh.getRange(1, 1, 1, HEAD.length).setValues([HEAD]).setFontWeight('bold');
     sh.setFrozenRows(1);
+  } else if (sh.getLastColumn() < HEAD.length) {
+    sh.getRange(1, 1, 1, HEAD.length).setValues([HEAD]).setFontWeight('bold');   // 列を足したとき
   }
   return sh;
 }
@@ -156,10 +162,10 @@ function findRow_(sh, mail) {
 }
 
 // events タブは受け口GASと同じ8列：受信日時・種類・メール・名前・経路・登録日時・メモ・届いた中身
-function event_(now, mail, d) {
+function event_(now, mail, d, src) {
   var sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName('events');
   if (!sh) return;
-  sh.appendRow([now, 'shindan', mail, safe_(d.name), 'ever-shindan', '', SHINDAN.types[d.top - 1].name, JSON.stringify(d).slice(0, 45000)]);
+  sh.appendRow([now, 'shindan', mail, safe_(d.name), 'ever-shindan' + (src ? ':' + src : ''), '', SHINDAN.types[d.top - 1].name, JSON.stringify(d).slice(0, 45000)]);
 }
 
 // =,+,-,@ で始まる文字は数式として読まれないよう先頭に ' を付ける
