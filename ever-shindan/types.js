@@ -132,14 +132,14 @@ function shindanSubject(d) {
   return '【診断結果】あなたの止まり方は「' + SHINDAN.types[d.top - 1].name + '」でした';
 }
 
-// 結果ページのURL（答えを ?r= に詰める。サーバーに保存しなくても開ける）
+// 結果ページのURL（点数とクセだけを ?r= に詰める。名前と場面の文は転送されても見えないよう入れない）
 var SHINDAN_PAGE = 'https://miumiumiu4.github.io/ever-shindan/';
 function shindanPack(d) {
-  return JSON.stringify({ n: d.name || '', s: d.scores, t: d.top, u: d.second, c: d.scene || '', k: d.kuse });
+  return JSON.stringify({ s: d.scores, t: d.top, u: d.second, k: d.kuse });
 }
 function shindanUnpack(j) {
   var o = JSON.parse(j);
-  return { name: o.n || '', scores: o.s, top: o.t, second: o.u, scene: o.c || '', kuse: o.k || ['', '', '', '', '', ''] };
+  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], page: true };
 }
 
 // メール本文（HTML）。ページの結果表示にも使う。メールソフトでも崩れないよう、表と style 属性だけで組む。
@@ -180,8 +180,9 @@ function shindanReportHtml(d) {
   o.push(H('■ 2番目に強いもの'));
   o.push(box(PALE, NAVY, '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:' + NAVY + '">「' + e(second.name) + '」</p>' + P(e(second.what), 'margin:0')));
   // 場面
-  o.push(H('■ あなたが書いた「出てくる場面」'));
-  if (d.scene) o.push(P('<span style="display:inline-block;background:' + PALE + ';border-radius:6px;padding:8px 12px">「' + e(d.scene) + '」</span>') + P(e(SHINDAN.sceneYes)));
+  if (!d.page) o.push(H('■ あなたが書いた「出てくる場面」'));
+  if (d.page) {}
+  else if (d.scene) o.push(P('<span style="display:inline-block;background:' + PALE + ';border-radius:6px;padding:8px 12px">「' + e(d.scene) + '」</span>') + P(e(SHINDAN.sceneYes)));
   else o.push(P(e(SHINDAN.sceneNo)));
   // クセ
   if (d.kuse.some(function (k) { return !!k; })) {
