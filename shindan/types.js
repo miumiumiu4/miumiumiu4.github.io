@@ -197,7 +197,7 @@ function shindanSubject(d) {
 }
 
 // 結果ページのURL（点数とクセだけを ?r= に詰める。名前と場面の文は転送されても見えないよう入れない）
-var SHINDAN_PAGE = 'https://miumiumiu4.github.io/ever-shindan/';
+var SHINDAN_PAGE = 'https://miumiumiu4.github.io/shindan/';
 function shindanPack(d) {
   var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [] };
   if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
