@@ -1,5 +1,5 @@
 // 止まり方診断シート（第1〜3回）＋第2回のクセ。結果は画面に出し、GASへ送るとメールでも届く。
-var RECEIVER_URL = '';   // 「エバー診断レポート」GASのウェブアプリURL
+var RECEIVER_URL = 'https://script.google.com/macros/s/AKfycby_4K5TxwMAzKFZLKgMeM51CW87z2-ybD1RNwi0jJ1CqutRKUIC_nraiOQIBaG3NrVcog/exec';   // 「エバー診断レポート」GASのウェブアプリURL
 var KEY = 'shd-zoY_2xXtDpzjaZjk';
 // 原文：ワークシート_第1〜3回_無料公開 の止まり方診断シート
 var QUESTIONS = [
