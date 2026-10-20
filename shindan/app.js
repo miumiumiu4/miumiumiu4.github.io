@@ -1,4 +1,4 @@
-// 止まり方診断シート（第1〜3回）＋第2回のクセ。結果は画面に出し、GASへ送るとメールでも届く。
+// 止まり方診断シート（第1〜7回のあと、毎回）＋第2回のクセ＋各回のふりかえり＋成長スコアの記録。結果は画面に出し、GASへ送るとメールでも届く。
 var RECEIVER_URL = 'https://script.google.com/macros/s/AKfycby_4K5TxwMAzKFZLKgMeM51CW87z2-ybD1RNwi0jJ1CqutRKUIC_nraiOQIBaG3NrVcog/exec';   // 「エバー診断レポート」GASのウェブアプリURL
 var KEY = 'shd-zoY_2xXtDpzjaZjk';
 // 原文：ワークシート_第1〜3回_無料公開 の止まり方診断シート
@@ -151,11 +151,8 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON, lq: lqAns(), src: SRC };
     var h = hist.get();
     d.prev = findPrev(h, LESSON);
-    var lqDone = d.lq.filter(function (x) { return x === 'できた'; }).length;
-    h[LESSON] = { s: s, at: Date.now(), done: lqDone, n: d.lq.length }; hist.set(h);
-    var sum = function (x) { return x.reduce(function (a, b) { return a + b; }, 0); };
-    d.hist = Object.keys(h).map(Number).filter(function (k) { return k; })
-      .map(function (k) { return { lesson: k, total: sum(h[k].s), done: h[k].done || 0, n: h[k].n || 0 }; });
+    d.hist = Object.keys(h).map(function (k) { return { l: Number(k), s: h[k].s, q: h[k].q || [], k: h[k].k || [] }; });
+    h[LESSON] = { s: s, q: d.lq, k: d.kuse, at: Date.now() }; hist.set(h);
     store.set({ mail: mail, name: d.name, scene: d.scene, kuse: d.kuse, tie: tie ? Number(tie.value) : 0,
       checked: Array.prototype.map.call(document.querySelectorAll('input[name=q]:checked'), function (c) { return c.value; }) });
     err.hidden = true;

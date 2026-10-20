@@ -89,6 +89,32 @@ var SHINDAN = {
     7: ['1年後までの道のりを、1枚に書けた', '次の一歩を、いつやるか日付で決めた']
   },
   lessonA: ['できた', '少し', 'まだ'],
+  // ふりかえりの問いが、9つの止まり方のどれを外す練習か（types の n。0＝第2回の6つのクセ）
+  lessonQType: { 1: [7, 3], 2: [1, 8, 0], 3: [9, 5, 2], 4: [3, 6], 5: [3, 3], 6: [4, 4], 7: [7, 6] },
+  lessonTitle: { 1: 'エアコン清掃独立のリアル', 2: 'あなたが止まる「無意識のクセ」診断', 3: 'お金と時期の不安の正体', 4: '決める技術：正解を待たない',
+    5: '最初のお客様と実績のつくり方', 6: '一人で抱えない：任せる・相談する・仲間を持つ', 7: 'あなたの独立ロードマップを完成させる' },
+  // 次の回を見る前に、手元に用意しておくもの（次の回を受ける前提づくり）
+  nextPrep: {
+    2: '第1回の将来像の表（仮の1行でOK）',
+    3: '今回の結果の「一番」と、それが出てくる場面の1行',
+    4: '今の不安を、日付と数字の入った言葉にした1行',
+    5: '最初のお客様になってくれそうな人を1人（知り合い・近所・前の職場など）',
+    6: '今、一人で抱えていることを1つ',
+    7: 'これまでの成長スコアのグラフと、技術・お金・集客・気持ちの相談先のメモ'
+  },
+  // もう一度見る章（章の題名まで。第4〜7回は購入者向けの講座なので、無料の人には題名だけ出す）
+  chapters: {
+    '1-4': '不安と反対、そして将来像の表',
+    '2-1': '動けないのは、能力のせいではない', '2-2': '6つのクセ（前半）', '2-3': '6つのクセ（後半）', '2-4': '事実と意味づけ、そして9つの止まり方',
+    '3-1': '「やめとけ」の声の正体', '3-2': '防衛反応の扱い方', '3-3': 'お金の不安を分ける', '3-4': '時期の不安と、日付と数字の資金計画',
+    '4-1': '決めるのが怖いのは、当たり前', '4-2': '迷っていることは「3つの箱」に入れる', '4-3': '決めるのは、あなた自身', '4-4': '止めている意図を見つけて、回数を回す',
+    '6-1': '一人でやる限り、同じ天井が続く', '6-4': '相談先と、仲間と、役割'
+  },
+  // 9つの止まり方（types の順）ごとの、もう一度見る章2つ
+  typeAgain: [['2-1', '2-4'], ['3-3', '3-4'], ['4-2', '4-3'], ['6-1', '6-4'], ['3-1', '3-2'], ['4-4', '4-1'], ['1-4', '2-1'], ['2-4', '3-2'], ['3-4', '3-3']],
+  // 6つのクセ（kuse の順）ごと。①〜③は第2回2章、④〜⑥は第2回3章
+  kuseAgain: [['2-2', '4-2'], ['2-2', '3-3'], ['2-2', '4-3'], ['2-3'], ['2-3', '3-2'], ['2-3', '4-3']],
+  growthNote: '成長スコアは、止まり方の点数が下がるほど、ふりかえりで「できた」が増えるほど、6つのクセがB（動ける側）に寄るほど上がります（100点満点）。',
   closing: '1つだけの人は、ほとんどいません。たいてい2つか3つが重なっています。\n点数が高いこと自体は、悪いことではありません。名前が付けば、外し方も見えてきます。\n何度でも答え直せます。答えが変わったら、それは動いた証拠です。'
 };
 
@@ -126,19 +152,21 @@ function shindanReport(d) {
   if (g) {
     L.push('■ ' + g.label + 'の診断からの変化');
     g.rows.forEach(function (r) { L.push(r.name + ' ' + r.a + '点 → ' + r.b + '点'); });
-    L.push('合計 ' + g.ta + '点 → ' + g.tb + '点', g.msg, '');
-  }
-  var tr = shindanTrend(d);
-  if (tr) {
-    L.push('■ これまでの推移（止まり方の点数：低いほど動けている）');
-    tr.rows.forEach(function (x) { L.push('第' + x.lesson + '回のあと ' + x.total + '点' + (x.n ? '　ふりかえり「できた」' + x.done + '/' + x.n : '')); });
-    L.push(tr.msg, '');
+    L.push('合計 ' + g.ta + '点 → ' + g.tb + '点', g.msg);
+    shindanGrowthNotes(d).forEach(function (x) { L.push('・' + x); });
+    L.push('');
   }
   var lr = shindanLessonReview(d);
   if (lr) {
     L.push('■ ' + lr.title);
-    lr.rows.forEach(function (r) { L.push('・' + r.q + '：' + r.a); });
+    lr.rows.forEach(function (r) { L.push('・' + r.q + '：' + r.a + (r.link ? '\n　→ ' + r.link : '')); });
     L.push(lr.msg, '');
+  }
+  var sr = shindanSeries(d);
+  if (sr.length > 1) {
+    L.push('■ 成長の記録（成長スコア・100点満点）');
+    sr.forEach(function (x) { L.push(shindanLabelShort(x.l) + '　' + x.g + '点' + (x.now ? '（今回）' : '') + '　止まり方 ' + x.t + '点'); });
+    L.push(shindanSeriesMsg(sr), SHINDAN.growthNote, '');
   }
   if (total <= 3) L.push(SHINDAN.low, '');
   L.push('■ 一番、あなたを止めているもの：「' + top.name + '」', top.what, '', '出やすい場面：' + top.scene, '', top.word, '');
@@ -159,7 +187,15 @@ function shindanReport(d) {
     L.push('');
   }
   L.push('■ 今日できる一歩', top.step, '');
-  L.push('■ 次に見る回', top.lesson + 'で、この止まり方の外し方を話しています。', '', shindanWatch(top), '');
+  var nx = shindanNext(d);
+  if (nx) L.push('■ ' + nx.title, nx.prep, '', nx.watch, '');
+  else L.push('■ 次に見る回', top.lesson + 'で、この止まり方の外し方を話しています。', '', shindanWatch(top), '');
+  var ag = shindanAgain(d);
+  if (ag) {
+    L.push('■ ' + ag.title);
+    ag.rows.forEach(function (r) { L.push(r.name); r.lines.forEach(function (x) { L.push('　' + x); }); });
+    L.push(ag.foot, '');
+  }
   var mp = shindanMap(d);
   if (mp) {
     L.push('■ ' + mp.head, mp.lead, '');
@@ -193,23 +229,11 @@ function shindanGrowth(d) {
 function shindanLessonReview(d) {
   var qs = SHINDAN.lessonQ[d.lesson];
   if (!qs || !d.lq || !d.lq.some(function (x) { return !!x; })) return null;
-  var rows = qs.map(function (q, i) { return { q: q, a: d.lq[i] || '（未回答）' }; });
+  var rows = qs.map(function (q, i) { return { q: q, a: d.lq[i] || '（未回答）', link: shindanQLink(d, i) }; });
   var done = d.lq.filter(function (x) { return x === 'できた'; }).length;
   var msg = done === qs.length ? '全部「できた」です。講座を、ただ見るだけでなく使っています。この調子です。'
     : '「まだ」「少し」のものは、次の回までに1つだけ、やってみてください。1つできると、次の回の入り方が変わります。';
   return { title: '第' + d.lesson + '回のふりかえり', rows: rows, msg: msg };
-}
-
-// これまでの推移。d.hist = [{ lesson, total, done, n }]（今回を含む、回の順）
-function shindanTrend(d) {
-  var h = (d.hist || []).filter(function (x) { return x && x.lesson; });
-  if (h.length < 2) return null;
-  h = h.slice().sort(function (a, b) { return a.lesson - b.lesson; });
-  var first = h[0], last = h[h.length - 1];
-  var msg = last.total < first.total
-    ? '第' + first.lesson + '回のあとから、止まり方の点数が' + (first.total - last.total) + '点下がっています。回を重ねるごとに、動ける自分になってきています。'
-    : '点数が下がっていなくても、答え続けていること自体が前に進んでいる証拠です。どこで止まるかが見えていれば、外し方も見えてきます。';
-  return { rows: h, msg: msg };
 }
 
 // 成長の地図（無料の第1〜3回の途中の人・YouTubeから来た人に、次に答え直す楽しみを見せる）
@@ -240,6 +264,105 @@ function shindanWatch(t) {
   return 'あなたは「' + t.name + '」が一番強く出ていたので、' + t.lesson.replace(/（.*）/, '') + 'は、' + t.watch + '見てください。\nそう見ると、' + t.gain + '。\n成果が出る人は、「自分ならどう使うか」を前提に見ています。ただ眺めるより、ずっと身につきます。';
 }
 
+// 章の名前。'4-2' → 第4回 第2章「迷っていることは『3つの箱』に入れる」
+function shindanChap(k) {
+  var p = k.split('-');
+  return '第' + p[0] + '回 第' + p[1] + '章「' + SHINDAN.chapters[k].replace(/「/g, '『').replace(/」/g, '』') + '」';
+}
+// その章を、この人にどう書くか（無料の人に第4〜7回が当たるときは題名だけ）
+function shindanChapLine(d, k) {
+  var l = Number(k.split('-')[0]);
+  return shindanChap(k) + (Number(d.lesson || 0) < 4 && l >= 4 ? '（第4回からの講座で扱います）' : '');
+}
+// もう一度見る章（一番・2番目の止まり方と、A寄りのクセ上位2つ）
+function shindanAgain(d) {
+  var T = SHINDAN.types, rows = [], seen = {};
+  var add = function (name, keys) {
+    keys = keys.filter(function (k) { return !seen[name + k]; });
+    if (!keys.length) return;
+    keys.forEach(function (k) { seen[name + k] = 1; });
+    rows.push({ name: name, lines: keys.map(function (k) { return shindanChapLine(d, k); }) });
+  };
+  add('「' + T[d.top - 1].name + '」（一番）', SHINDAN.typeAgain[d.top - 1]);
+  if (d.second && d.second !== d.top) add('「' + T[d.second - 1].name + '」（2番目）', SHINDAN.typeAgain[d.second - 1].slice(0, 1));
+  shindanKuseTop(d.kuse || []).slice(0, 2).forEach(function (x) { add('クセ「' + SHINDAN.kuse[x.i].name + '」', SHINDAN.kuseAgain[x.i]); });
+  if (!rows.length) return null;
+  var paid = Number(d.lesson || 0) >= 4, first = !d.lesson;
+  return { title: first ? 'あなたに合う章' : 'もう一度見る章', rows: rows,
+    foot: paid ? '会員サイトのレッスンから、何度でも見られます。見直してから答え直すと、点数の動きが変わります。'
+      : first ? '講座を見るときは、この章で特に手を止めて見てください。' : '見直してから答え直すと、点数の動きが変わります。' };
+}
+// 前回からの変化を、項目ごとに一言で（下がった・上がった・同じ）
+function shindanGrowthNotes(d) {
+  if (!d.prev || !d.prev.scores || d.prev.scores.length !== 9) return [];
+  var T = SHINDAN.types, a = d.prev.scores, b = d.scores, out = [];
+  var chap = function (i) { var k = SHINDAN.typeAgain[i][0]; return Number(d.lesson || 0) < 4 && Number(k.split('-')[0]) >= 4 ? '' : shindanChap(k); };
+  var dn = [], up = [];
+  T.forEach(function (t, i) { if (b[i] < a[i]) dn.push(i); else if (b[i] > a[i]) up.push(i); });
+  if (dn.length) out.push('前回より下がった：' + dn.map(function (i) { return '「' + T[i].name + '」'; }).join('、') + '。ここは動いた証拠です。');
+  up.forEach(function (i) { var c = chap(i); out.push('前回より上がった：「' + T[i].name + '」。悪いことではありません。見えるようになった、ということです。' + (c ? c + 'をもう一度どうぞ。' : '')); });
+  if (!dn.length && !up.length) { var c = chap(d.top - 1); out.push('前回と同じ点数でした。変わらなかったことも、記録です。' + (c ? c + 'を、もう一度見てから答え直してみてください。' : '次の回を見てから、答え直してみてください。')); }
+  return out;
+}
+
+// ふりかえりの問い i が、どの止まり方を外す練習か（はじめと今の点数つき）
+function shindanQLink(d, i) {
+  var tag = (SHINDAN.lessonQType[d.lesson] || [])[i];
+  if (tag === undefined) return '';
+  if (tag === 0) {
+    var b = (d.kuse || []).filter(function (k) { return k === 'B' || k === 'ややB'; }).length;
+    return '6つのクセをB（動ける側）に寄せる練習。今、B寄りは6つ中' + b + 'つ';
+  }
+  var t = SHINDAN.types[tag - 1], sr = shindanSeries(d), first = sr[0];
+  var now = d.scores[tag - 1];
+  return '「' + t.name + '」を外す練習。' + (sr.length > 1 && first.s ? 'はじめ' + first.s[tag - 1] + '点 → 今' + now + '点' : '今' + now + '点（3点満点）');
+}
+
+// 成長スコア（0〜100）。止まり方の少なさ（50）・ふりかえり（30）・クセのB寄り（20）を、答えのあるものだけで重みづけ
+function shindanScore(e) {
+  var parts = [], w = [];
+  var t = e.s.reduce(function (a, b) { return a + Number(b); }, 0);
+  parts.push(1 - t / 27); w.push(50);
+  var qa = (e.q || []).filter(function (x) { return !!x; });
+  if (qa.length) { parts.push(qa.reduce(function (a, x) { return a + (x === 'できた' ? 1 : x === '少し' ? 0.5 : 0); }, 0) / qa.length); w.push(30); }
+  var ka = (e.k || []).filter(function (x) { return SHINDAN.kuseLevels.indexOf(x) >= 0; });
+  if (ka.length) { parts.push(ka.reduce(function (a, x) { return a + SHINDAN.kuseLevels.indexOf(x) / 3; }, 0) / ka.length); w.push(20); }
+  var sw = w.reduce(function (a, b) { return a + b; }, 0);
+  return Math.round(parts.reduce(function (a, p, i) { return a + p * w[i]; }, 0) / sw * 100);
+}
+
+// これまでの記録。d.hist = [{ l: 回, s: [9], q: [ふりかえり], k: [クセ] }]。今回の分を足して、回の順に並べる
+function shindanSeries(d) {
+  if (d.series) return d.series;
+  var list = (d.hist || []).filter(function (h) { return h && h.s && h.s.length === 9 && Number(h.l || 0) !== Number(d.lesson || 0); }).slice();
+  list.push({ l: d.lesson || 0, s: d.scores, q: d.lq || [], k: d.kuse || [], now: true });
+  list.sort(function (a, b) { return Number(a.l || 0) - Number(b.l || 0); });
+  return list.map(function (h) {
+    return { l: Number(h.l || 0), t: h.s.reduce(function (a, b) { return a + Number(b); }, 0), g: shindanScore(h), now: !!h.now, s: h.s.map(Number) };
+  });
+}
+function shindanLabelShort(l) { return l ? '第' + l + '回のあと' : 'はじめ'; }
+function shindanSeriesMsg(sr) {
+  var a = sr[0], b = sr[sr.length - 1], diff = b.g - a.g;
+  if (diff > 0) return shindanLabelShort(a.l) + 'から、成長スコアが' + diff + '点上がりました（' + a.g + '点 → ' + b.g + '点）。答えるたびに、動ける側に進んでいます。';
+  if (diff < 0) return '成長スコアが' + (-diff) + '点下がっています。講座で自分が見えてくると、前より正直に印が付くので、一度下がるのはよくあることです。次の回のあとに、もう一度答えてみてください。';
+  return 'スコアは同じです。点数が同じでも、ふりかえりで「できた」が1つ増えれば、次は上がります。';
+}
+
+// 次の回を受ける前提づくり（第1〜6回のあと）
+function shindanNext(d) {
+  var n = Number(d.lesson || 0);
+  if (n < 1 || n > 6) return null;
+  var top = SHINDAN.types[d.top - 1], nx = n + 1;
+  var match = top.lesson.indexOf('第' + nx + '回') >= 0;
+  return {
+    title: '次の第' + nx + '回「' + SHINDAN.lessonTitle[nx] + '」の前に',
+    prep: '見る前に、これを手元に用意してください：' + SHINDAN.nextPrep[nx] + '。用意してから見ると、話が「自分のこと」として入ってきます。',
+    watch: match ? 'あなたの一番「' + top.name + '」の外し方は、まさに第' + nx + '回で話しています。' + top.watch + '見てください。そう見ると、' + top.gain + '。'
+      : 'あなたの一番「' + top.name + '」を頭に置いて、' + top.watch + '見てください。第' + nx + '回のあとにもう一度答えると、この点数がどう変わったかが成長スコアで見えます。'
+  };
+}
+
 function shindanSubject(d) {
   return '【診断結果】あなたの止まり方は「' + SHINDAN.types[d.top - 1].name + '」でした';
 }
@@ -249,14 +372,15 @@ var SHINDAN_PAGE = 'https://miumiumiu4.github.io/shindan/';
 function shindanPack(d) {
   var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [], y: d.src || '' };
   if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
-  if (d.hist) o.h = d.hist.map(function (x) { return [x.lesson, x.total, x.done || 0, x.n || 0]; });
+  var sr = shindanSeries(d);
+  if (sr.length > 1) o.h = sr.map(function (x) { return [x.l, x.g, x.t, x.now ? 1 : 0, x.s.join('')]; });
   return JSON.stringify(o);
 }
 function shindanUnpack(j) {
   var o = JSON.parse(j);
   return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0, lq: o.q || [], src: o.y || '',
-    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null,
-    hist: (o.h || []).map(function (x) { return { lesson: x[0], total: x[1], done: x[2], n: x[3] }; }), page: true };
+    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null, page: true,
+    series: o.h ? o.h.map(function (x) { return { l: x[0], g: x[1], t: x[2], now: !!x[3], s: String(x[4] || '').split('').map(Number) }; }) : null };
 }
 
 // メール本文（HTML）。ページの結果表示にも使う。メールソフトでも崩れないよう、表と style 属性だけで組む。
@@ -298,29 +422,38 @@ function shindanReportHtml(d) {
     var gd = g.tb < g.ta;
     o.push(box(gd ? '#EEF8F1' : PALE, gd ? '#2E8B57' : NAVY,
       '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:' + (gd ? '#2E8B57' : NAVY) + '">合計 ' + g.ta + '点 → ' + g.tb + '点</p>' +
-      (gr ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + gr + '</table>' : '') + P(e(g.msg), 'margin:0')));
-  }
-  var tr = shindanTrend(d);
-  if (tr) {
-    o.push(H('■ これまでの推移'));
-    var maxT = Math.max.apply(null, tr.rows.map(function (x) { return x.total; }).concat([1]));
-    var bars = tr.rows.map(function (x, i) {
-      var hgt = Math.max(4, Math.round(x.total / maxT * 90)), isLast = i === tr.rows.length - 1;
-      return '<td valign="bottom" align="center" style="padding:0 4px">' +
-        '<div style="font-size:13px;font-weight:bold;color:' + (isLast ? ORANGE : NAVY) + '">' + x.total + '点</div>' +
-        '<div style="height:' + hgt + 'px;background:' + (isLast ? ORANGE : NAVY) + ';border-radius:4px 4px 0 0;margin:2px auto 0;width:70%"></div>' +
-        '<div style="font-size:12px;color:' + SUB + ';padding-top:4px;border-top:1px solid ' + LINE + '">第' + x.lesson + '回</div>' +
-        (x.n ? '<div style="font-size:11px;color:#2E8B57">できた' + x.done + '/' + x.n + '</div>' : '') + '</td>';
-    }).join('');
-    o.push(box(PALE, NAVY, '<p style="margin:0 0 8px;font-size:13px;color:' + SUB + '">止まり方の点数（低いほど動けている）</p><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="height:130px"><tr>' + bars + '</tr></table>' + P(e(tr.msg), 'margin:12px 0 0')));
+      (gr ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + gr + '</table>' : '') + P(e(g.msg), 'margin:0') +
+      shindanGrowthNotes(d).map(function (x) { return P('・' + e(x), 'margin:8px 0 0;font-size:14px'); }).join('')));
   }
   var lr = shindanLessonReview(d);
   if (lr) {
     o.push(H('■ ' + e(lr.title)));
     o.push(box(PALE, NAVY, '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + lr.rows.map(function (r) {
       var c = r.a === 'できた' ? '#2E8B57' : r.a === '少し' ? ORANGE : SUB;
-      return '<tr><td style="padding:4px 8px 4px 0;font-size:15px;line-height:1.6">' + e(r.q) + '</td><td style="padding:4px 0;font-size:15px;white-space:nowrap;text-align:right;font-weight:bold;color:' + c + '">' + e(r.a) + '</td></tr>';
+      return '<tr><td style="padding:4px 8px 4px 0;font-size:15px;line-height:1.6">' + e(r.q) + (r.link ? '<br><span style="font-size:13px;color:' + SUB + '">→ ' + e(r.link) + '</span>' : '') + '</td><td style="padding:4px 0;font-size:15px;white-space:nowrap;text-align:right;font-weight:bold;color:' + c + '">' + e(r.a) + '</td></tr>';
     }).join('') + '</table>' + P(e(lr.msg), 'margin:0')));
+  }
+  var sr = shindanSeries(d);
+  if (sr.length > 1) {
+    o.push(H('■ 成長の記録（成長スコア・100点満点）'));
+    var GREEN = '#2E8B57';
+    o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">' + sr.map(function (x) {
+      var c = x.now ? ORANGE : NAVY;
+      return '<tr><td style="padding:5px 8px 5px 0;white-space:nowrap;width:6.8em;line-height:1.3;' + (x.now ? 'font-weight:bold;color:' + ORANGE : '') + '">' + e(shindanLabelShort(x.l)) + '<br><span style="font-size:11px;font-weight:normal;color:' + SUB + '">止まり方 ' + x.t + '点</span></td>' +
+        '<td style="padding:5px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
+        (x.g > 0 ? '<td width="' + x.g + '%" style="height:22px;background:' + c + ';border-radius:4px"></td>' : '') + (x.g < 100 ? '<td style="background:#EEF1F5;border-radius:4px"></td>' : '') + '</tr></table></td>' +
+        '<td style="padding:5px 0 5px 8px;width:3.2em;text-align:right;font-weight:bold;font-size:16px;color:' + c + '">' + x.g + '点</td></tr>';
+    }).join('') + '</table>');
+    var up = sr[sr.length - 1].g - sr[0].g;
+    o.push('<div style="margin-top:10px">' + box(up > 0 ? '#EEF8F1' : PALE, up > 0 ? GREEN : NAVY, P(e(shindanSeriesMsg(sr)), 'margin:0 0 6px;font-weight:bold') + P(e(SHINDAN.growthNote), 'margin:0;font-size:13px;color:' + SUB)) + '</div>');
+    // 9つの止まり方の、はじめと今
+    var a0 = sr[0].s, b0 = sr[sr.length - 1].s;
+    if (a0 && b0 && a0.length === 9) {
+      o.push('<p style="margin:14px 0 4px;font-size:13px;font-weight:bold;color:' + SUB + '">9つの止まり方（' + e(shindanLabelShort(sr[0].l)) + ' → 今回）</p><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px">' + T.map(function (t, i) {
+        var dn = b0[i] < a0[i], upd = b0[i] > a0[i];
+        return '<tr><td style="padding:2px 0;color:' + SUB + '">' + e(t.name) + '</td><td style="padding:2px 0;text-align:right;white-space:nowrap">' + a0[i] + '点 → <b style="color:' + (dn ? GREEN : upd ? ORANGE : SUB) + '">' + b0[i] + '点' + (dn ? ' ▼' : upd ? ' ▲' : '') + '</b></td></tr>';
+      }).join('') + '</table>');
+    }
   }
   if (total <= 3) o.push('<div style="margin-top:16px">' + box(PALE, NAVY, P(e(SHINDAN.low), 'margin:0')) + '</div>');
   // 一番
@@ -353,9 +486,22 @@ function shindanReportHtml(d) {
   // 今日の一歩
   o.push(H('■ 今日できる一歩'));
   o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + NAVY + ';border-radius:10px"><tr><td style="padding:18px 20px;color:#fff;font-size:17px;line-height:1.8;font-weight:bold">✔ ' + e(top.step) + '</td></tr></table>');
-  o.push(H('■ 次に見る回'));
-  o.push(P('<b style="color:' + NAVY + '">' + e(top.lesson) + '</b>で、この止まり方の外し方を話しています。'));
-  o.push(box(PALE, NAVY, P('<b style="color:' + NAVY + '">おすすめの見方</b>', 'margin:0 0 6px') + P(e(shindanWatch(top)).replace(/\n/g, '<br>'), 'margin:0')));
+  var nx = shindanNext(d);
+  if (nx) {
+    o.push(H('■ ' + e(nx.title)));
+    o.push(box(CREAM, ORANGE, P('<b style="color:' + ORANGE + '">見る前に用意するもの</b>', 'margin:0 0 6px') + P(e(nx.prep)) + P('<b style="color:' + NAVY + '">見るときの前提</b>', 'margin:0 0 6px') + P(e(nx.watch), 'margin:0')));
+  } else {
+    o.push(H('■ 次に見る回'));
+    o.push(P('<b style="color:' + NAVY + '">' + e(top.lesson) + '</b>で、この止まり方の外し方を話しています。'));
+    o.push(box(PALE, NAVY, P('<b style="color:' + NAVY + '">おすすめの見方</b>', 'margin:0 0 6px') + P(e(shindanWatch(top)).replace(/\n/g, '<br>'), 'margin:0')));
+  }
+  var ag = shindanAgain(d);
+  if (ag) {
+    o.push(H('■ ' + e(ag.title)));
+    o.push(box(PALE, NAVY, ag.rows.map(function (r, i) {
+      return P('<b style="color:' + NAVY + '">' + e(r.name) + '</b>', 'margin:' + (i ? '12px' : '0') + ' 0 4px') + r.lines.map(function (x) { return P('▶ ' + e(x), 'margin:0 0 4px;font-size:15px'); }).join('');
+    }).join('') + P(e(ag.foot), 'margin:12px 0 0;font-size:13px;color:' + SUB)));
+  }
   var mp = shindanMap(d);
   if (mp) {
     var dots = '';
