@@ -9,7 +9,7 @@ var HEAD = ['更新日時', 'メール', '名前', 's1', 's2', 's3', 's4', 's5',
   'k1', 'k2', 'k3', 'k4', 'k5', 'k6', '送信済み', '送信日時', '今日の送信数', 'json', '回', 'src'];
 var C = {}; HEAD.forEach(function (h, i) { C[h] = i + 1; });
 var HIST_TAB = '診断_履歴';   // 回ごとに1行（メール×回で上書き）。前回との比べに使う
-var HIST_HEAD = ['日時', 'メール', '回', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', '合計', 'top'];
+var HIST_HEAD = ['日時', 'メール', '回', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', '合計', 'top', 'できた', '問数'];
 var KEEP_QUOTA = 10;      // 残りがこれを切ったら翌日に回す
 var PER_MAIL_DAY = 5;     // 同じメールに1日に送る上限（いたずら対策）
 
@@ -123,10 +123,12 @@ function history_(mail, d, now) {
     sh = ss.insertSheet(HIST_TAB);
     sh.getRange(1, 1, 1, HIST_HEAD.length).setValues([HIST_HEAD]).setFontWeight('bold');
     sh.setFrozenRows(1);
+  } else if (sh.getLastColumn() < HIST_HEAD.length) {
+    sh.getRange(1, 1, 1, HIST_HEAD.length).setValues([HIST_HEAD]).setFontWeight('bold');
   }
   var n = sh.getLastRow() - 1, mine = [];
   if (n > 0) sh.getRange(2, 1, n, HIST_HEAD.length).getValues().forEach(function (v, i) {
-    if (String(v[1]).toLowerCase() === mail) mine.push({ row: i + 2, at: new Date(v[0]).getTime(), lesson: Number(v[2]) || 0, scores: v.slice(3, 12).map(Number) });
+    if (String(v[1]).toLowerCase() === mail) mine.push({ row: i + 2, at: new Date(v[0]).getTime(), lesson: Number(v[2]) || 0, scores: v.slice(3, 12).map(Number), done: Number(v[14]) || 0, n: Number(v[15]) || 0 });
   });
   var others = mine.filter(function (m) { return !(d.lesson && m.lesson === d.lesson); });
   var earlier = others.filter(function (m) { return d.lesson && m.lesson && m.lesson < d.lesson; });
@@ -134,10 +136,17 @@ function history_(mail, d, now) {
   (earlier.length ? earlier : others).forEach(function (m) {
     if (!pick || (earlier.length ? m.lesson > pick.lesson : m.at > pick.at)) pick = m;
   });
-  var vals = [now, mail, d.lesson].concat(d.scores, [d.scores.reduce(function (a, b) { return a + b; }, 0), SHINDAN.types[d.top - 1].name]);
+  var total = d.scores.reduce(function (a, b) { return a + b; }, 0);
+  var done = (d.lq || []).filter(function (x) { return x === 'できた'; }).length, nq = (d.lq || []).length;
+  var vals = [now, mail, d.lesson].concat(d.scores, [total, SHINDAN.types[d.top - 1].name, done, nq]);
   var same = mine.filter(function (m) { return m.lesson === d.lesson; })[0];
   if (same) sh.getRange(same.row, 1, 1, vals.length).setValues([vals]);
   else sh.appendRow(vals);
+  // これまでの推移（回ごと、今回で置きかえ）
+  var sum = function (x) { return x.reduce(function (a, b) { return a + b; }, 0); };
+  d.hist = mine.filter(function (m) { return m.lesson && m.lesson !== d.lesson; })
+    .map(function (m) { return { lesson: m.lesson, total: sum(m.scores), done: m.done, n: m.n }; });
+  if (d.lesson) d.hist.push({ lesson: d.lesson, total: total, done: done, n: nq });
   return pick ? { lesson: pick.lesson, scores: pick.scores } : null;
 }
 

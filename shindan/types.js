@@ -128,6 +128,12 @@ function shindanReport(d) {
     g.rows.forEach(function (r) { L.push(r.name + ' ' + r.a + '点 → ' + r.b + '点'); });
     L.push('合計 ' + g.ta + '点 → ' + g.tb + '点', g.msg, '');
   }
+  var tr = shindanTrend(d);
+  if (tr) {
+    L.push('■ これまでの推移（止まり方の点数：低いほど動けている）');
+    tr.rows.forEach(function (x) { L.push('第' + x.lesson + '回のあと ' + x.total + '点' + (x.n ? '　ふりかえり「できた」' + x.done + '/' + x.n : '')); });
+    L.push(tr.msg, '');
+  }
   var lr = shindanLessonReview(d);
   if (lr) {
     L.push('■ ' + lr.title);
@@ -187,6 +193,18 @@ function shindanLessonReview(d) {
   return { title: '第' + d.lesson + '回のふりかえり', rows: rows, msg: msg };
 }
 
+// これまでの推移。d.hist = [{ lesson, total, done, n }]（今回を含む、回の順）
+function shindanTrend(d) {
+  var h = (d.hist || []).filter(function (x) { return x && x.lesson; });
+  if (h.length < 2) return null;
+  h = h.slice().sort(function (a, b) { return a.lesson - b.lesson; });
+  var first = h[0], last = h[h.length - 1];
+  var msg = last.total < first.total
+    ? '第' + first.lesson + '回のあとから、止まり方の点数が' + (first.total - last.total) + '点下がっています。回を重ねるごとに、動ける自分になってきています。'
+    : '点数が下がっていなくても、答え続けていること自体が前に進んでいる証拠です。どこで止まるかが見えていれば、外し方も見えてきます。';
+  return { rows: h, msg: msg };
+}
+
 // 次に見る回の「この前提で見ると、こう変わる」
 function shindanWatch(t) {
   return 'あなたは「' + t.name + '」が一番強く出ていたので、' + t.lesson.replace(/（.*）/, '') + 'は、' + t.watch + '見てください。\nそう見ると、' + t.gain + '。\n成果が出る人は、「自分ならどう使うか」を前提に見ています。ただ眺めるより、ずっと身につきます。';
@@ -201,12 +219,14 @@ var SHINDAN_PAGE = 'https://miumiumiu4.github.io/shindan/';
 function shindanPack(d) {
   var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [] };
   if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
+  if (d.hist) o.h = d.hist.map(function (x) { return [x.lesson, x.total, x.done || 0, x.n || 0]; });
   return JSON.stringify(o);
 }
 function shindanUnpack(j) {
   var o = JSON.parse(j);
   return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0, lq: o.q || [],
-    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null, page: true };
+    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null,
+    hist: (o.h || []).map(function (x) { return { lesson: x[0], total: x[1], done: x[2], n: x[3] }; }), page: true };
 }
 
 // メール本文（HTML）。ページの結果表示にも使う。メールソフトでも崩れないよう、表と style 属性だけで組む。
@@ -249,6 +269,20 @@ function shindanReportHtml(d) {
     o.push(box(gd ? '#EEF8F1' : PALE, gd ? '#2E8B57' : NAVY,
       '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:' + (gd ? '#2E8B57' : NAVY) + '">合計 ' + g.ta + '点 → ' + g.tb + '点</p>' +
       (gr ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">' + gr + '</table>' : '') + P(e(g.msg), 'margin:0')));
+  }
+  var tr = shindanTrend(d);
+  if (tr) {
+    o.push(H('■ これまでの推移'));
+    var maxT = Math.max.apply(null, tr.rows.map(function (x) { return x.total; }).concat([1]));
+    var bars = tr.rows.map(function (x, i) {
+      var hgt = Math.max(4, Math.round(x.total / maxT * 90)), isLast = i === tr.rows.length - 1;
+      return '<td valign="bottom" align="center" style="padding:0 4px">' +
+        '<div style="font-size:13px;font-weight:bold;color:' + (isLast ? ORANGE : NAVY) + '">' + x.total + '点</div>' +
+        '<div style="height:' + hgt + 'px;background:' + (isLast ? ORANGE : NAVY) + ';border-radius:4px 4px 0 0;margin:2px auto 0;width:70%"></div>' +
+        '<div style="font-size:12px;color:' + SUB + ';padding-top:4px;border-top:1px solid ' + LINE + '">第' + x.lesson + '回</div>' +
+        (x.n ? '<div style="font-size:11px;color:#2E8B57">できた' + x.done + '/' + x.n + '</div>' : '') + '</td>';
+    }).join('');
+    o.push(box(PALE, NAVY, '<p style="margin:0 0 8px;font-size:13px;color:' + SUB + '">止まり方の点数（低いほど動けている）</p><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="height:130px"><tr>' + bars + '</tr></table>' + P(e(tr.msg), 'margin:12px 0 0')));
   }
   var lr = shindanLessonReview(d);
   if (lr) {

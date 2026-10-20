@@ -151,7 +151,11 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON, lq: lqAns() };
     var h = hist.get();
     d.prev = findPrev(h, LESSON);
-    h[LESSON] = { s: s, at: Date.now() }; hist.set(h);
+    var lqDone = d.lq.filter(function (x) { return x === 'できた'; }).length;
+    h[LESSON] = { s: s, at: Date.now(), done: lqDone, n: d.lq.length }; hist.set(h);
+    var sum = function (x) { return x.reduce(function (a, b) { return a + b; }, 0); };
+    d.hist = Object.keys(h).map(Number).filter(function (k) { return k; })
+      .map(function (k) { return { lesson: k, total: sum(h[k].s), done: h[k].done || 0, n: h[k].n || 0 }; });
     store.set({ mail: mail, name: d.name, scene: d.scene, kuse: d.kuse, tie: tie ? Number(tie.value) : 0,
       checked: Array.prototype.map.call(document.querySelectorAll('input[name=q]:checked'), function (c) { return c.value; }) });
     err.hidden = true;
