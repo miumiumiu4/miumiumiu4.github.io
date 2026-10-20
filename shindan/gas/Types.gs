@@ -102,6 +102,13 @@ var SHINDAN = {
     6: '今、一人で抱えていることを1つ',
     7: 'これまでの成長スコアのグラフと、技術・お金・集客・気持ちの相談先のメモ'
   },
+  // 第1回までに答えた人へ：無料の第2回・第3回のあとに待っている診断（ワクワクさせる）
+  freeNext: {
+    2: { title: 'あなたが止まる『無意識のクセ』診断', gain: '6つのクセのグラフと、第2回のふりかえりが増えます。自分がどちらに寄っているかが、目で見えます。' },
+    3: { title: 'お金と時期の不安の正体', gain: '今日の結果からの「成長スコア」が、グラフで出ます。どの止まり方が下がったかも、1つずつ分かります。' }
+  },
+  freeUrl: 'https://fc.arigatouosouji.com/p/4q6ZdUKhWX4F',
+  freeUrlYt: 'https://fc.arigatouosouji.com/p/4q6ZdUKhWX4F?ftid=ARoJRfzSqfr1',
   growthNote: '成長スコアは、止まり方の点数が下がるほど、ふりかえりで「できた」が増えるほど、6つのクセがB（動ける側）に寄るほど上がります（100点満点）。',
   closing: '1つだけの人は、ほとんどいません。たいてい2つか3つが重なっています。\n点数が高いこと自体は、悪いことではありません。名前が付けば、外し方も見えてきます。\n何度でも答え直せます。答えが変わったら、それは動いた証拠です。'
 };
@@ -173,6 +180,12 @@ function shindanReport(d) {
     L.push('');
   }
   L.push('■ 今日できる一歩', top.step, '');
+  var ft = shindanFreeTeaser(d);
+  if (ft) {
+    L.push('■ ' + ft.title);
+    ft.rows.forEach(function (r) { L.push('・' + r.label + '：' + r.gain); });
+    L.push(ft.note, '▼ ' + ft.btn, ft.url, '');
+  }
   var nx = shindanNext(d);
   if (nx) L.push('■ ' + nx.title, nx.prep, '', nx.watch, '');
   else L.push('■ 次に見る回', top.lesson + 'で、この止まり方の外し方を話しています。', '', shindanWatch(top), '');
@@ -258,6 +271,20 @@ function shindanSeriesMsg(sr) {
   return 'スコアは同じです。点数が同じでも、ふりかえりで「できた」が1つ増えれば、次は上がります。';
 }
 
+// YouTube から来た人へ、無料の第2回・第3回のあとに待っている診断
+function shindanFreeTeaser(d) {
+  var n = Number(d.lesson || 0);
+  if (n > 2 || !/^yt/.test(d.src || '')) return null;   // YouTube から来た人だけ（購入者には出さない）
+  var rest = [2, 3].filter(function (k) { return k > n; });
+  return {
+    title: rest.length === 2 ? '次の診断が、あと2つ待っています' : '次の診断が、あと1つ待っています',
+    rows: rest.map(function (k) { return { label: '第' + k + '回「' + SHINDAN.freeNext[k].title + '」を見たあと', gain: SHINDAN.freeNext[k].gain }; }),
+    note: '第2回・第3回は無料です。見るたびに答えると、今日のあなたから、どれだけ動けるようになったかが数字で残ります。',
+    url: SHINDAN.freeUrlYt,
+    btn: n === 0 ? '無料で第1回から見る' : '無料で続きを見る'
+  };
+}
+
 // 次の回を受ける前提づくり（第1〜6回のあと）
 function shindanNext(d) {
   var n = Number(d.lesson || 0);
@@ -280,6 +307,7 @@ function shindanSubject(d) {
 var SHINDAN_PAGE = 'https://miumiumiu4.github.io/shindan/';
 function shindanPack(d) {
   var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [] };
+  if (d.src) o.c = d.src;
   if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
   var sr = shindanSeries(d);
   if (sr.length > 1) o.h = sr.map(function (x) { return [x.l, x.g, x.t, x.now ? 1 : 0, x.s.join('')]; });
@@ -288,7 +316,7 @@ function shindanPack(d) {
 function shindanUnpack(j) {
   var o = JSON.parse(j);
   return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0, lq: o.q || [],
-    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null, page: true,
+    prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null, page: true, src: o.c || '',
     series: o.h ? o.h.map(function (x) { return { l: x[0], g: x[1], t: x[2], now: !!x[3], s: String(x[4] || '').split('').map(Number) }; }) : null };
 }
 
@@ -394,6 +422,16 @@ function shindanReportHtml(d) {
   // 今日の一歩
   o.push(H('■ 今日できる一歩'));
   o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + NAVY + ';border-radius:10px"><tr><td style="padding:18px 20px;color:#fff;font-size:17px;line-height:1.8;font-weight:bold">✔ ' + e(top.step) + '</td></tr></table>');
+  var ft = shindanFreeTeaser(d);
+  if (ft) {
+    o.push(H('■ ' + e(ft.title)));
+    o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:' + CREAM + ';border:2px solid ' + ORANGE + ';border-radius:12px"><tr><td style="padding:16px 18px">' +
+      ft.rows.map(function (r, i) {
+        return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px"><tr><td style="width:2.2em;vertical-align:top"><span style="display:inline-block;width:1.8em;height:1.8em;line-height:1.8em;text-align:center;border-radius:50%;background:' + ORANGE + ';color:#fff;font-weight:bold">' + (i + 1) + '</span></td>' +
+          '<td style="vertical-align:top"><p style="margin:0 0 4px;font-size:16px;font-weight:bold;color:' + NAVY + ';line-height:1.6">' + e(r.label) + '</p>' + P(e(r.gain), 'margin:0;font-size:15px') + '</td></tr></table>';
+      }).join('') + P(e(ft.note), 'margin:4px 0 12px;font-size:15px;color:' + SUB) +
+      '<p style="text-align:center;margin:0"><a href="' + e(ft.url) + '" style="display:inline-block;background:' + ORANGE + ';color:#fff;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:10px;font-size:17px">' + e(ft.btn) + '</a></p></td></tr></table>');
+  }
   var nx = shindanNext(d);
   if (nx) {
     o.push(H('■ ' + e(nx.title)));

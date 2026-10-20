@@ -148,7 +148,7 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var tieShown = !$('tieBox').hidden, tie = document.querySelector('input[name=tie]:checked');
     if (tieShown && !tie) { err.textContent = '点数が同じものがあります。一番自分を止めていると思うものを1つ選んでください。'; err.hidden = false; $('tieBox').scrollIntoView({ behavior: 'smooth' }); return; }
     var r = shindanRank(s, tie ? Number(tie.value) : 0);
-    var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON, lq: lqAns() };
+    var d = { name: f.name.value.trim(), scores: s, top: r.top, second: r.second, scene: f.scene.value.trim().slice(0, 500), kuse: kuse(), lesson: LESSON, lq: lqAns(), src: SRC };
     var h = hist.get();
     d.prev = findPrev(h, LESSON);
     d.hist = Object.keys(h).map(function (k) { return { l: Number(k), s: h[k].s, q: h[k].q || [], k: h[k].k || [] }; });

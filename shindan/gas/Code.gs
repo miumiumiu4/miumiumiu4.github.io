@@ -36,6 +36,7 @@ function doPost(e) {
   try { lq = JSON.parse(p.lq || '[]'); } catch (err) {}
   d.lq = (SHINDAN.lessonQ[d.lesson] || []).map(function (q, i) { return SHINDAN.lessonA.indexOf(lq[i]) >= 0 ? lq[i] : ''; });
   var src = String(p.src || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 30);
+  d.src = src;
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
