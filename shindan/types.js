@@ -160,6 +160,13 @@ function shindanReport(d) {
   }
   L.push('■ 今日できる一歩', top.step, '');
   L.push('■ 次に見る回', top.lesson + 'で、この止まり方の外し方を話しています。', '', shindanWatch(top), '');
+  var mp = shindanMap(d);
+  if (mp) {
+    L.push('■ ' + mp.head, mp.lead, '');
+    mp.rows.forEach(function (r) { L.push(r.t + (r.note ? ' …… ' + r.note : '')); });
+    L.push(mp.tail, '', mp.end, '');
+    if (mp.cta) L.push('▼' + mp.cta.label, mp.cta.url, '');
+  }
   L.push(SHINDAN.closing, '');
   if (d.viewUrl) L.push('▼ 結果をグラフで見る', d.viewUrl, '');
   L.push('三浦公嗣（ありがとうグループ）');
@@ -205,6 +212,29 @@ function shindanTrend(d) {
   return { rows: h, msg: msg };
 }
 
+// 成長の地図（無料の第1〜3回の途中の人・YouTubeから来た人に、次に答え直す楽しみを見せる）
+var SHINDAN_OPTIN = 'https://fc.arigatouosouji.com/p/4q6ZdUKhWX4F?ftid=ARoJRfzSqfr1&openExternalBrowser=1';
+function shindanMap(d) {
+  var yt = d.src === 'youtube';
+  var cur = d.lesson || 1;
+  if (!yt && cur > 3) return null;
+  var steps = [
+    { n: 1, t: '第1回（無料・4本）：止まる仕組みを知る', after: '' },
+    { n: 2, t: '第2回（無料）：6つの判断のクセ', after: '見終わったら答え直す → クセの変化が見える' },
+    { n: 3, t: '第3回（無料）：お金と時期の不安', after: '答え直す → お金の不安が動く' }
+  ];
+  return {
+    yt: yt, cur: cur,
+    head: cur <= 1 ? 'この点数は、スタート地点です' : '第' + cur + '回の印がつきました',
+    lead: cur <= 1 ? '今日の答えは「第1回の印」として残ります。無料の講座を見て、もう一度答えると、今日の印と並んで「変化」が見えます。'
+      : '次の回を見て、もう一度答えると、今日の印と並んで「変化」が見えます。',
+    rows: steps.map(function (x) { return { t: x.t, note: x.n === cur ? '今日ここ' : x.n < cur ? '済' : x.after }; }),
+    tail: '第4回から：講座の中で、残りの止まり方を外していきます',
+    end: '全7回で、あなたの「線」ができます。',
+    cta: yt ? { label: '第1回（無料4本）を受け取る', url: SHINDAN_OPTIN } : null
+  };
+}
+
 // 次に見る回の「この前提で見ると、こう変わる」
 function shindanWatch(t) {
   return 'あなたは「' + t.name + '」が一番強く出ていたので、' + t.lesson.replace(/（.*）/, '') + 'は、' + t.watch + '見てください。\nそう見ると、' + t.gain + '。\n成果が出る人は、「自分ならどう使うか」を前提に見ています。ただ眺めるより、ずっと身につきます。';
@@ -217,14 +247,14 @@ function shindanSubject(d) {
 // 結果ページのURL（点数とクセだけを ?r= に詰める。名前と場面の文は転送されても見えないよう入れない）
 var SHINDAN_PAGE = 'https://miumiumiu4.github.io/shindan/';
 function shindanPack(d) {
-  var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [] };
+  var o = { s: d.scores, t: d.top, u: d.second, k: d.kuse, l: d.lesson || 0, q: d.lq || [], y: d.src || '' };
   if (d.prev) { o.p = d.prev.scores; o.pl = d.prev.lesson || 0; }
   if (d.hist) o.h = d.hist.map(function (x) { return [x.lesson, x.total, x.done || 0, x.n || 0]; });
   return JSON.stringify(o);
 }
 function shindanUnpack(j) {
   var o = JSON.parse(j);
-  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0, lq: o.q || [],
+  return { name: '', scores: o.s, top: o.t, second: o.u, scene: '', kuse: o.k || ['', '', '', '', '', ''], lesson: o.l || 0, lq: o.q || [], src: o.y || '',
     prev: o.p ? { scores: o.p, lesson: o.pl || 0 } : null,
     hist: (o.h || []).map(function (x) { return { lesson: x[0], total: x[1], done: x[2], n: x[3] }; }), page: true };
 }
@@ -326,6 +356,21 @@ function shindanReportHtml(d) {
   o.push(H('■ 次に見る回'));
   o.push(P('<b style="color:' + NAVY + '">' + e(top.lesson) + '</b>で、この止まり方の外し方を話しています。'));
   o.push(box(PALE, NAVY, P('<b style="color:' + NAVY + '">おすすめの見方</b>', 'margin:0 0 6px') + P(e(shindanWatch(top)).replace(/\n/g, '<br>'), 'margin:0')));
+  var mp = shindanMap(d);
+  if (mp) {
+    var dots = '';
+    for (var di = 1; di <= 7; di++) dots += '<span style="display:inline-block;width:16px;height:16px;border-radius:50%;margin:0 4px;' + (di <= mp.cur ? 'background:' + ORANGE : 'border:2px solid ' + LINE + ';box-sizing:border-box') + '"></span>';
+    var mrows = mp.rows.map(function (r) {
+      var here = r.note === '今日ここ';
+      return '<tr><td style="padding:6px 0;font-size:15px;line-height:1.6;' + (here ? 'font-weight:bold;color:' + ORANGE : '') + '">' + e(r.t) +
+        (r.note ? '<br><span style="font-size:13px;color:' + (here ? ORANGE : SUB) + '">' + (here ? '● ' : '→ ') + e(r.note) + '</span>' : '') + '</td></tr>';
+    }).join('');
+    o.push(H('■ ' + e(mp.head)));
+    o.push(box(CREAM, ORANGE, P(e(mp.lead)) + '<p style="margin:4px 0 12px;text-align:center">' + dots + '</p>' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + mrows + '<tr><td style="padding:6px 0;font-size:14px;color:' + SUB + '">' + e(mp.tail) + '</td></tr></table>' +
+      P('<b>' + e(mp.end) + '</b>', 'margin:12px 0 0') +
+      (mp.cta ? '<p style="text-align:center;margin:16px 0 0"><a href="' + e(mp.cta.url) + '" style="display:inline-block;background:' + ORANGE + ';color:#fff;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:10px;font-size:16px">' + e(mp.cta.label) + '</a></p>' : '')));
+  }
   o.push('<div style="border-top:1px solid ' + LINE + ';margin-top:24px;padding-top:16px">' + P(e(SHINDAN.closing).replace(/\n/g, '<br>'), 'color:' + SUB + ';font-size:15px') + '</div>');
   var btn = function (href, label, bg) { return '<a href="' + e(href) + '" style="display:inline-block;background:' + bg + ';color:#fff;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:10px;font-size:16px;margin:6px 4px">' + label + '</a>'; };
   if (d.viewUrl || d.againUrl) o.push('<p style="text-align:center;margin:20px 0">' + (d.viewUrl ? btn(d.viewUrl, '結果をページで見る', NAVY) : '') + (d.againUrl ? btn(d.againUrl, '答え直す', ORANGE) : '') + '</p>');
