@@ -126,7 +126,7 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     $('send').textContent = '前回との変化を見る';
   }
   if (fromUrl('mail')) f.mail.value = fromUrl('mail');
-  if (fromUrl('name') && !f.name.value) f.name.value = fromUrl('name');
+  if (fromUrl('name') && !/%/.test(fromUrl('name')) && !f.name.value) f.name.value = fromUrl('name');
 
   // ?r= 付きで開いたとき（メールの「結果をページで見る」）は結果だけを出す
   var b64decode = function (r) {
@@ -144,6 +144,7 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var err = $('err'), btn = $('send');
     var mail = f.mail.value.trim();
     if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(mail)) { err.textContent = 'メールアドレスを確かめてください。'; err.hidden = false; f.mail.focus(); return; }
+    if (!f.name.value.trim() || /%/.test(f.name.value)) { err.textContent = 'お名前を入れてください。'; err.hidden = false; f.name.focus(); return; }
     var s = scores();
     var tieShown = !$('tieBox').hidden, tie = document.querySelector('input[name=tie]:checked');
     if (tieShown && !tie) { err.textContent = '点数が同じものがあります。一番自分を止めていると思うものを1つ選んでください。'; err.hidden = false; $('tieBox').scrollIntoView({ behavior: 'smooth' }); return; }
