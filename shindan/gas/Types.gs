@@ -144,7 +144,7 @@ function shindanReport(d) {
   var total = d.scores.reduce(function (a, b) { return a + b; }, 0);
   var top = T[d.top - 1], second = T[d.second - 1];
   L.push(d.name ? d.name + 'さん' : '診断シートにお答えいただいた方へ', '');
-  L.push('診断シートにお答えいただき、ありがとうございます。', '結果をお送りします。この結果は、三浦が面談や集客戦略会議の参考に読ませていただきます。', '');
+  L.push('診断シートにお答えいただき、ありがとうございます。', '結果をお送りします。', '');
   L.push('■ あなたの点数（印1つ＝1点、各3点満点）');
   T.forEach(function (t, i) { L.push(t.n + ' ' + t.name + ' ' + d.scores[i] + '点'); });
   L.push('合計 ' + total + '点（27点満点）', '');
@@ -397,7 +397,7 @@ function shindanReportHtml(d) {
   o.push('<div style="background:' + PALE + ';padding:16px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid ' + LINE + '"><tr><td style="padding:24px 20px;font-family:\'Hiragino Sans\',\'Noto Sans JP\',sans-serif">');
   o.push('<p style="margin:0 0 4px;font-size:14px;color:' + SUB + '">止まり方診断シート　結果</p>');
   o.push('<p style="margin:0 0 16px;font-size:22px;font-weight:bold;color:' + NAVY + ';line-height:1.5">あなたを一番止めているのは<br><span style="color:' + ORANGE + '">「' + e(top.name) + '」</span></p>');
-  o.push(P(e(d.name ? d.name + 'さん' : '診断シートにお答えいただいた方へ') + '<br>お答えいただき、ありがとうございます。この結果は、三浦が面談や集客戦略会議の参考に読ませていただきます。'));
+  o.push(P(e(d.name ? d.name + 'さん' : '診断シートにお答えいただいた方へ') + '<br>お答えいただき、ありがとうございます。'));
   // 点数の棒グラフ
   o.push(H('■ あなたの点数（各3点満点）'));
   o.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px">');
