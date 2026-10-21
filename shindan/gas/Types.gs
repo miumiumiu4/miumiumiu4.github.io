@@ -239,7 +239,7 @@ function shindanLessonReview(d) {
 // 成長の地図（無料の第1〜3回の途中の人・YouTubeから来た人に、次に答え直す楽しみを見せる）
 var SHINDAN_OPTIN = 'https://fc.arigatouosouji.com/p/4q6ZdUKhWX4F?ftid=ARoJRfzSqfr1&openExternalBrowser=1';
 function shindanMap(d) {
-  var yt = d.src === 'youtube';
+  var yt = /^(youtube|yt)/i.test(d.src || '');   // youtube・yt_short・yt_long など
   var cur = d.lesson || 1;
   if (!yt && cur > 3) return null;
   var steps = [
