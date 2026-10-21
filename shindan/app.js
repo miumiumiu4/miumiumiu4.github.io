@@ -144,7 +144,6 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var err = $('err'), btn = $('send');
     var mail = f.mail.value.trim();
     if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(mail)) { err.textContent = 'メールアドレスを確かめてください。'; err.hidden = false; f.mail.focus(); return; }
-    if (!f.name.value.trim() || /%/.test(f.name.value)) { err.textContent = 'お名前を入れてください。'; err.hidden = false; f.name.focus(); return; }
     var s = scores();
     var tieShown = !$('tieBox').hidden, tie = document.querySelector('input[name=tie]:checked');
     if (tieShown && !tie) { err.textContent = '点数が同じものがあります。一番自分を止めていると思うものを1つ選んでください。'; err.hidden = false; $('tieBox').scrollIntoView({ behavior: 'smooth' }); return; }
