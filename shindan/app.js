@@ -94,9 +94,15 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
   var qp = new URLSearchParams(location.search);
   var LESSON = Math.max(0, Math.min(7, parseInt(qp.get('lesson'), 10) || 0));
   var SRC = (qp.get('src') || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 30);
-  if (LESSON) $('sub').textContent = '（第' + LESSON + '回のあと）';
+  // YouTube から来た人（src が youtube／yt で始まる）は、まだ講座を見ていない前提。
+  // 講座を見た人向けの問い（第2回のクセ・その回のふりかえり）は出さない。答えは今までどおり ?lesson= の印で残る。
+  var FROM_YT = /^(youtube|yt)/i.test(SRC);
+  if (FROM_YT) {
+    $('sub').textContent = '（はじめての方へ）';
+    $('kuseBox').hidden = true;
+  } else if (LESSON) $('sub').textContent = '（第' + LESSON + '回のあと）';
   // その回のふりかえり（できた・少し・まだ）
-  var LQ = SHINDAN.lessonQ[LESSON] || [];
+  var LQ = FROM_YT ? [] : (SHINDAN.lessonQ[LESSON] || []);
   if (LQ.length) {
     $('lqBox').hidden = false;
     $('lqTitle').textContent = '4．第' + LESSON + '回のふりかえり';
