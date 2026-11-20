@@ -1,4 +1,5 @@
-"""エイムポイントの音声ページ（朝の5分 1〜31日目）を作る。題を直したら TITLES を直して python3 _make_pages.py。
+"""音声を足したら python3 _make_levels.py で波用の大きさ（mp3/dayNN.json）も作る。
+エイムポイントの音声ページ（朝の5分 1〜31日目）を作る。題を直したら TITLES を直して python3 _make_pages.py。
 音声は mp3/dayNN.mp3 に置く。ページは NN/index.html。"""
 from pathlib import Path
 TITLES = ["自慢は布団の中でしなさい","頑張る人ほど人が逃げる","人脈はお腹で育つ","財布は配るほど膨らむ","根性は二人で持て",
