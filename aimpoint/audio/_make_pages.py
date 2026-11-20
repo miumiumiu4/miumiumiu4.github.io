@@ -13,5 +13,5 @@ for i, t in enumerate(TITLES, 1):
     d = Path(__file__).parent / f"{i:02d}"
     d.mkdir(exist_ok=True)
     (d / "index.html").write_text(TPL.replace("{{SITE}}", SITE).replace("{{N}}", str(i)).replace("{{NN}}", f"{i:02d}")
-                                  .replace("{{TITLE}}", t), encoding="utf-8")
+                                  .replace("{{TITLE}}", t).replace("{{COURSE}}", "うぬぼれは密室で育てろ"), encoding="utf-8")
 print(len(TITLES), "pages")
