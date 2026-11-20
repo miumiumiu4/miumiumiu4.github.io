@@ -6,23 +6,23 @@
 <meta name="robots" content="noindex,nofollow">
 <title>朝の5分 5日目「根性は二人で持て」｜エイムポイント</title>
 <style>
-:root{--ink:#2a2a26;--paper:#fff;--soft:#f4f4f4;--line:#dcdcdc;--text:#222;--muted:#555}
+:root{--ink:#1f3b2d;--ink2:#2c5240;--paper:#f7f4ec;--soft:#ffffff;--line:#d9d3c3;--text:#23302a;--muted:#5a6660;--accent:#c98a2b}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--paper);color:var(--text);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;font-size:18px;line-height:1.8;min-height:100vh;display:flex;flex-direction:column}
 header{background:var(--ink);color:#fff;text-align:center;padding:22px 16px;font-size:26px;font-weight:700;letter-spacing:.06em}
 main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:56px 16px 64px}
-.card{background:var(--ink);border:2px solid #3a3d42;color:#fff;text-align:center;aspect-ratio:600/262;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px}
-.card .no{font-size:20px;font-weight:700;letter-spacing:.05em}
+.card{background:linear-gradient(160deg,var(--ink2),var(--ink));border:0;border-radius:14px;box-shadow:0 6px 20px rgba(31,59,45,.18);color:#fff;text-align:center;aspect-ratio:600/262;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px}
+.card .no{font-size:18px;font-weight:700;letter-spacing:.08em;color:#f2d9a6}
 .card .ttl{font-size:clamp(22px,5.4vw,30px);font-weight:700;margin-top:8px;line-height:1.4}
-.player{margin-top:24px;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px}
-.play{flex:none;width:48px;height:48px;border-radius:50%;border:0;background:#1c1c1c;color:#fff;display:grid;place-items:center;cursor:pointer}
+.player{margin-top:24px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.play{flex:none;width:48px;height:48px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:grid;place-items:center;cursor:pointer}
 .play svg{width:20px;height:20px;fill:#fff}
-.bar{flex:1;min-width:0;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:linear-gradient(#1c1c1c,#1c1c1c) 0/var(--p,0%) 100% no-repeat,#ddd;outline:none}
-.bar::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#1c1c1c;cursor:pointer}
-.bar::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#1c1c1c}
-.time{flex:none;font-size:15px;color:#333;font-variant-numeric:tabular-nums;white-space:nowrap}
-.rate{flex:none;border:0;border-radius:6px;background:#1c1c1c;color:#fff;font-weight:700;font-size:14px;padding:6px 12px;cursor:pointer;min-width:52px}
+.bar{flex:1;min-width:0;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:linear-gradient(var(--accent),var(--accent)) 0/var(--p,0%) 100% no-repeat,#e6e1d4;outline:none}
+.bar::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ink);cursor:pointer}
+.bar::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--ink)}
+.time{flex:none;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rate{flex:none;border:0;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:14px;padding:6px 12px;cursor:pointer;min-width:52px}
 .note{margin-top:40px;font-size:15px;color:var(--muted);line-height:1.9}
 .note p{margin:0 0 6px}
 footer{background:var(--ink);color:#fff;padding:28px 16px}
@@ -49,7 +49,7 @@ footer small{font-size:14px;opacity:.85}
     <p>皆さまに安心して聞いていただくため、ご理解とご協力をお願いいたします。</p>
   </div>
 </main>
-<footer><div class="in"><div class="name">エイムポイント</div><small>© 2026 エイムポイント</small></div></footer>
+<footer><div class="in"><div class="name">エイムポイント</div><small>© 2026 AimPoint LLC</small></div></footer>
 <script>
 (function(){
 var a=document.getElementById('a'),play=document.getElementById('play'),ico=document.getElementById('ico'),
