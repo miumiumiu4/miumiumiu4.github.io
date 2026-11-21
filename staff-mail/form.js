@@ -3,6 +3,17 @@
   var btn = document.getElementById("btn");
   var msg = document.getElementById("msg");
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var OTHER = "__other__";
+
+  // 11/21 HAPPY Q19：店舗の一覧があれば選ぶ形に。一覧にない時だけ「その他」で書く
+  var stores = Array.isArray(window.STAFF_MAIL_STORES) ? window.STAFF_MAIL_STORES.filter(function (s) { return typeof s === "string" && s.trim(); }) : [];
+  var sel = document.getElementById("storeSel");
+  if (stores.length) {
+    stores.forEach(function (s) { var o = document.createElement("option"); o.value = s.trim(); o.textContent = s.trim(); sel.appendChild(o); });
+    var other = document.createElement("option"); other.value = OTHER; other.textContent = "一覧にない（書いて入れる）"; sel.appendChild(other);
+    sel.hidden = false; f.store.hidden = true; f.store.placeholder = "一覧にない店舗名";
+    sel.addEventListener("change", function () { f.store.hidden = sel.value !== OTHER; if (sel.value === OTHER) f.store.focus(); });
+  }
 
   function show(text, ok) {
     msg.textContent = text;
@@ -11,7 +22,7 @@
 
   f.addEventListener("submit", function (ev) {
     ev.preventDefault();
-    var store = f.store.value.trim();
+    var store = stores.length && sel.value !== OTHER ? sel.value : f.store.value.trim();
     var name = f.name.value.trim();
     var email = f.email.value.trim();
     var email2 = f.email2.value.trim();
@@ -29,7 +40,7 @@
       .then(function (res) {
         if (res && res.ok) {
           show((res.updated ? "登録内容を更新しました。" : "登録しました。") + "ありがとうございます！続けて別の方も登録できます。", true);
-          f.name.value = ""; f.email.value = ""; f.email2.value = "";
+          f.name.value = ""; f.email.value = ""; f.email2.value = "";   // 店舗はそのまま（続けて同じ店の人を入れられる）
         } else {
           show((res && res.error) || "登録できませんでした。もう一度お試しください。", false);
         }
