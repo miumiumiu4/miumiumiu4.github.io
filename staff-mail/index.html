@@ -20,6 +20,7 @@
   label { display:block; font-weight:600; margin:16px 0 6px; }
   label:first-of-type { margin-top:0; }
   .req { color:var(--ng); font-size:.8rem; margin-left:6px; }
+  select { width:100%; font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:6px; }
   input, textarea { width:100%; font:inherit; color:inherit; background:transparent; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
   input:focus, textarea:focus { outline:2px solid var(--accent); outline-offset:1px; }
   textarea { min-height:72px; resize:vertical; }
@@ -37,6 +38,7 @@
   <p class="lead">12月末に「ありがとうシステム」が完成する予定です。完成後は、案件の共有がメールで自動で届くようになります。受け取るメールアドレスを登録してください（1分で終わります）。</p>
   <form id="f" novalidate>
     <label for="store">所属の店舗名<span class="req">必須</span></label>
+    <select id="storeSel" hidden><option value="">— 選んでください —</option></select>
     <input id="store" name="store" maxlength="60" required placeholder="例：〇〇店">
 
     <label for="name">お名前<span class="req">必須</span></label>
@@ -52,10 +54,10 @@
 
     <button id="btn" type="submit">登録する</button>
     <div id="msg" class="msg" role="status" aria-live="polite"></div>
-    <small>ご登録のメールアドレスは、ありがとうグループの案件共有（お仕事のご案内メール）のためだけに使います。<br>店舗の責任者さんがスタッフさんの分をまとめて入れても大丈夫です（1人ずつ「登録する」を押してください）。同じメールアドレスで送り直すと、店舗名・お名前が上書きされます。</small>
+    <small>ご登録のメールアドレスは、ありがとうグループの案件共有（お仕事のご案内メール）のためだけに使います。<br>店舗の責任者さんがスタッフさんの分をまとめて入れても大丈夫です（1人ずつ「登録する」を押してください）。同じメールアドレスで送り直すと、店舗名・お名前が上書きされます。<br>登録しても、確認のメールは届きません（画面に「登録しました」と出れば完了です）。</small>
   </form>
 </main>
-<script src="config.js?v=2"></script>
-<script src="form.js?v=2"></script>
+<script src="config.js?v=3"></script>
+<script src="form.js?v=3"></script>
 </body>
 </html>
