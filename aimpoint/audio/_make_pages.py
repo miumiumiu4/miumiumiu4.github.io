@@ -9,10 +9,12 @@ TITLES = ["自慢は布団の中でしなさい","頑張る人ほど人が逃げ
 "21日目の自分に拍手しろ","想像はまず黒板消しから","発酵する人間関係","先にあいさつした者が勝つ","ほめ言葉は下手なほど届く",
 "三日坊主は若返りの薬","誇りはポケットにしまえ","準備は冷蔵庫から始まる","1か月前の自分は他人","前の夜は何もするな","今夜8時、密室が開く"]
 SITE = "エイムポイント"
+# 再生の記録を受け取るGAS（ウェブアプリのURL）。空なら記録しない。シートは new-gurucon/listen-log/Code.gs
+LOG_URL = ""
 TPL = Path(__file__).with_name("_template.html").read_text(encoding="utf-8")
 for i, t in enumerate(TITLES, 1):
     d = Path(__file__).parent / f"{i:02d}"
     d.mkdir(exist_ok=True)
     (d / "index.html").write_text(TPL.replace("{{SITE}}", SITE).replace("{{N}}", str(i)).replace("{{NN}}", f"{i:02d}")
-                                  .replace("{{TITLE}}", t).replace("{{COURSE}}", "うぬぼれは密室で育てろ"), encoding="utf-8")
+                                  .replace("{{TITLE}}", t).replace("{{COURSE}}", "うぬぼれは密室で育てろ").replace("{{LOG_URL}}", LOG_URL), encoding="utf-8")
 print(len(TITLES), "pages")
