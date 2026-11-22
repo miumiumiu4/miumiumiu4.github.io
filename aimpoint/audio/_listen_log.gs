@@ -8,6 +8,7 @@ var TZ = 'Asia/Tokyo';
 var SS_ID = '1JeV9-11BpaZ8Enr7-ZQMQGoMBhyVSJ3_jVxN0KFZWJk';
 function ss_() { return SpreadsheetApp.openById(SS_ID); }
 var REC = '記録', RANK = 'やる気ランキング', README = '見方';
+var EXCL = 'ランキングから外す名前'; // さとぴー本人・テスト・スタッフ。記録は残すが、ランキングとプレゼント選考には出さない
 var REC_HEAD = ['キー', '名前', '日', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)',
   'はじめて聞いた', '最後に聞いた', '配った日のうちに聞いた', 'LINE内で聞いた', '外部ブラウザで聞いた', '端末'];
 
@@ -17,9 +18,14 @@ function setup() {
   r.getRange(1, 1, 1, REC_HEAD.length).setValues([REC_HEAD]).setFontWeight('bold');
   r.setFrozenRows(1); r.hideColumns(1);
   (ss.getSheetByName(RANK) || ss.insertSheet(RANK, ss.getSheets().length));
+  if (!ss.getSheetByName(EXCL)) {
+    var x = ss.insertSheet(EXCL, ss.getSheets().length);
+    x.getRange(1, 1, 1, 2).setValues([['名前（記録の「名前」と同じに書く）', 'メモ']]).setFontWeight('bold');
+    x.setFrozenRows(1);
+  }
   var h = ss.getSheetByName(README) || ss.insertSheet(README, ss.getSheets().length);
   h.clear();
-  h.getRange(1, 1, 8, 1).setValues([
+  h.getRange(1, 1, 9, 1).setValues([
     ['このシートの見方'],
     ['「記録」：1人×1日で1行。どこまで聞いたか・合計で何秒聞いたかが自動で入ります（15秒ごとに更新）。'],
     ['「やる気ランキング」：1時間ごとに自動で並べ直します。'],
@@ -27,7 +33,8 @@ function setup() {
     ['同じ名前は同じ人としてまとめます（全角・半角・空白の違いはそろえます）。'],
     ['端末の欄に番号が2つ以上ある人は、LINE内と外部ブラウザの両方で聞いたか、同じ名前の別の人です。'],
     ['先送りして最後まで飛ばした分は「聞いた」に入りません（再生して進んだところだけ数えます）。'],
-    ['']
+    ['「ランキングから外す名前」：ここに書いた名前（さとぴー本人・テスト・スタッフ）は、記録は残りますがランキングと音声ページの順位には出ません。'],
+    ['音声ページのランキング：「今週」はその週に配った7日分の音声の点数、「ここまでの合計」は全部の点数。上位5人と、本人の順位が出ます。']
   ]);
   ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('rebuildRanking').timeBased().everyHours(1).create();
@@ -60,6 +67,7 @@ function takenNames_() {
 function doGet(e) {
   var p = (e && e.parameter) || {};
   if (p.taken) return json_({ names: takenNames_() });
+  if (p.rank) return json_(rankJson_(p.n || ''));
   if (p.reserve) {
     var name = norm_(p.reserve), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
     if (!name) return json_({ ok: false });
@@ -128,36 +136,95 @@ function doPost(e) {
   return ContentService.createTextOutput('ok');
 }
 
-function rebuildRanking() {
-  var ss = ss_();
-  var sh = ss.getSheetByName(REC), out = ss.getSheetByName(RANK);
-  var last = sh.getLastRow();
-  var people = {};
+function excluded_() {
+  var sh = ss_().getSheetByName(EXCL), set = {};
+  if (sh && sh.getLastRow() >= 2) sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().forEach(function (r) {
+    var n = norm_(r[0]); if (n) set[n.toLowerCase()] = 1;
+  });
+  return set;
+}
+
+// 今日が何日目か（配る前は0、最後は31まで）
+function todayDay_() {
+  var d = Math.floor((new Date().getTime() - START.getTime()) / 86400000) + 1;
+  return Math.max(0, Math.min(31, d));
+}
+
+// 1人分の点数（from〜to日目の音声だけで数える）
+function score_(p, from, to) {
+  var n = 0, ontime = 0, full = 0, twice = 0, best = 0, cur = 0, sec = 0;
+  for (var d = from; d <= to; d++) {
+    var x = p.days[d];
+    if (x) { sec += x.add; if (x.ontime) ontime++; if (x.full) full++; if (x.twice) twice++; }
+    if (x && x.ok) { n++; cur++; best = Math.max(best, cur); } else cur = 0;
+  }
+  return { s: n * 10 + ontime * 3 + full * 2 + twice * 2 + best, n: n, ontime: ontime, full: full, twice: twice, best: best, min: Math.round(sec / 60) };
+}
+
+// 記録から全員の点数をまとめる（外す名前は除く）
+function snapshot_() {
+  var sh = ss_().getSheetByName(REC), last = sh.getLastRow(), people = {}, ex = excluded_();
   if (last >= 2) {
     sh.getRange(2, 1, last - 1, REC_HEAD.length).getValues().forEach(function (v) {
-      var k = String(v[0]).split('|')[0];
-      var p = people[k] || (people[k] = { name: v[1], days: {}, ontime: 0, full: 0, twice: 0, minutes: 0, last: v[8] });
+      var k = String(v[0]).split('|')[0], day = Number(v[2]);
+      if (!k || ex[k] || !(day >= 1 && day <= 31)) return;
+      var p = people[k] || (people[k] = { name: String(v[1]), days: {}, last: String(v[8]) });
       var pct = Number(v[5]) || 0;
-      if (pct >= 80) p.days[v[2]] = true;
-      if (v[9] === '○') p.ontime++;
-      if (pct >= 95) p.full++;
-      if (v[4] && Number(v[6]) >= Number(v[4]) * 1.5) p.twice++;
-      p.minutes += (Number(v[6]) || 0) / 60;
-      if (v[8] > p.last) p.last = v[8];
+      p.days[day] = { ok: pct >= 80, ontime: v[9] === '○', full: pct >= 95, twice: !!(v[4] && Number(v[6]) >= Number(v[4]) * 1.5), add: Number(v[6]) || 0 };
+      if (String(v[8]) > p.last) p.last = String(v[8]);
     });
   }
-  var rows = Object.keys(people).map(function (k) {
-    var p = people[k], n = Object.keys(p.days).length, best = 0, cur = 0;
-    for (var d = 1; d <= 31; d++) { cur = p.days[d] ? cur + 1 : 0; best = Math.max(best, cur); }
-    var score = n * 10 + p.ontime * 3 + p.full * 2 + p.twice * 2 + best;
-    return [p.name, score, n, p.ontime, p.full, p.twice, best, Math.round(p.minutes), p.last];
-  }).sort(function (a, b) { return b[1] - a[1] || b[7] - a[7]; });
-  rows.forEach(function (r, i) { r.unshift(i + 1); });
+  var td = todayDay_(), wk = Math.max(0, Math.floor((Math.max(td, 1) - 1) / 7)), wf = wk * 7 + 1, wt = Math.min(31, wf + 6);
+  var list = Object.keys(people).map(function (k) {
+    var p = people[k], tot = score_(p, 1, 31), w = score_(p, wf, wt), st = 0;
+    for (var d = td; d >= 1; d--) { if (p.days[d] && p.days[d].ok) st++; else if (d === td) continue; else break; }
+    var done = Object.keys(p.days).filter(function (d) { return p.days[d].ok; }).map(Number);
+    return { k: k, n: p.name, tot: tot, w: w, st: st, done: done, last: p.last };
+  });
+  function order(f) {
+    return list.slice().sort(function (a, b) { return b[f].s - a[f].s || b[f].min - a[f].min || (a.last < b.last ? -1 : 1); });
+  }
+  var snap = { td: td, wf: wf, wt: wt, at: Utilities.formatDate(new Date(), TZ, 'M/d H:mm'), w: [], tot: [], me: {} };
+  ['w', 'tot'].forEach(function (f) {
+    order(f).forEach(function (x, i) {
+      if (x[f].s <= 0) return;
+      if (i < 5) snap[f].push({ n: x.n, s: x[f].s, st: x.st });
+      var m = snap.me[x.k] || (snap.me[x.k] = { st: x.st, done: x.done });
+      m[f] = { r: i + 1, s: x[f].s };
+    });
+  });
+  return { snap: snap, list: list, order: order };
+}
+
+function saveSnap_(snap) {
+  try { CacheService.getScriptCache().put('rank', JSON.stringify(snap), 21600); } catch (e) { }
+}
+
+// 音声ページ用：?rank=1&n=ニックネーム → 上位5人（今週・合計）と本人の順位
+function rankJson_(name) {
+  var c = CacheService.getScriptCache().get('rank'), snap;
+  if (c) snap = JSON.parse(c); else { snap = snapshot_().snap; saveSnap_(snap); }
+  var k = norm_(name).toLowerCase(), out = { td: snap.td, wf: snap.wf, wt: snap.wt, at: snap.at, w: snap.w, tot: snap.tot, me: null };
+  if (k) {
+    if (snap.me[k]) out.me = snap.me[k];
+    else if (excluded_()[k]) out.ex = true;
+  }
+  return out;
+}
+
+function rebuildRanking() {
+  var ss = ss_(), out = ss.getSheetByName(RANK);
+  var r = snapshot_(), snap = r.snap;
+  saveSnap_(snap);
+  var rows = r.order('tot').map(function (x, i) {
+    var t = x.tot;
+    return [i + 1, x.n, t.s, x.w.s, t.n, t.ontime, t.full, t.twice, t.best, x.st, t.min, x.last];
+  });
   out.clear();
-  var head = ['順位', '名前', 'やる気スコア', '聞いた日数(80%以上)', 'その日のうちに聞いた', '最後まで聞いた', '2回以上聞いた', '最長連続日数', '聞いた合計(分)', '最後に聞いた'];
+  var head = ['順位', '名前', 'やる気スコア（合計）', '今週の点数', '聞いた日数(80%以上)', 'その日のうちに聞いた', '最後まで聞いた', '2回以上聞いた', '最長連続日数', 'いまの連続日数', '聞いた合計(分)', '最後に聞いた'];
   out.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold');
   out.setFrozenRows(1);
   if (rows.length) out.getRange(2, 1, rows.length, head.length).setValues(rows);
   out.getRange(2, 1, Math.min(3, Math.max(rows.length, 1)), head.length).setBackground(rows.length ? '#fff4c2' : null);
-  out.getRange(1, 12).setValue('更新: ' + Utilities.formatDate(new Date(), TZ, 'M/d HH:mm'));
+  out.getRange(1, head.length + 2).setValue('更新: ' + Utilities.formatDate(new Date(), TZ, 'M/d HH:mm') + '（今週＝' + snap.wf + '〜' + snap.wt + '日目）');
 }

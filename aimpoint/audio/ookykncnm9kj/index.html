@@ -64,6 +64,30 @@ footer small{display:block;margin-top:8px;color:var(--muted);font-size:13px}
 .ask .go:disabled{opacity:.4;cursor:default}
 .ask .go{margin-top:14px;width:100%;font:inherit;font-size:18px;font-weight:800;color:#e9f7ff;padding:10px;cursor:pointer;border:1px solid var(--blue);background:linear-gradient(90deg,var(--blue2),var(--blue));
 clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.rank{margin-top:22px;padding:22px 16px 18px;display:none}
+.rank.on{display:block}
+.rank h3{margin:0;text-align:center;font-size:22px;font-weight:900;letter-spacing:.06em;text-shadow:0 0 14px rgba(47,184,255,.5)}
+.rank .at{text-align:center;font-size:13px;color:var(--muted);margin:2px 0 12px}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tabs button{flex:1;font:inherit;font-size:16px;font-weight:700;padding:7px 0;border:1px solid var(--line);background:none;color:var(--muted);cursor:pointer;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.tabs button.on{color:#fff;background:linear-gradient(90deg,var(--blue2),var(--blue));border-color:var(--blue)}
+.r{display:grid;grid-template-columns:34px 1fr auto;align-items:center;column-gap:8px;padding:9px 4px;border-bottom:1px solid rgba(47,184,255,.15)}
+.r .no{font-weight:900;font-size:18px;text-align:center;color:var(--muted)}
+.r .nm{font-weight:800;font-size:18px;line-height:1.4;word-break:break-all}
+.r .nm small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.r .pt{font-weight:900;font-size:18px;color:var(--blue);font-variant-numeric:tabular-nums}
+.r .pt small{font-size:13px;color:var(--muted);margin-left:2px}
+.r .sub{grid-column:2/4;display:flex;align-items:center;gap:8px;margin-top:4px}
+.r .rb{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.r .rb i{display:block;height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue));box-shadow:0 0 8px var(--glow)}
+.r .fire{font-size:14px;color:#ffb36b;white-space:nowrap}
+.r.top .nm{font-size:20px}
+.crown{width:28px;height:22px;display:block;margin:0 auto}
+.r.me{margin-top:12px;padding:12px 10px;border:1px solid rgba(255,90,190,.6);background:rgba(255,60,170,.10);box-shadow:0 0 18px rgba(255,60,170,.25) inset;border-radius:6px}
+.r.me .rb i{background:linear-gradient(90deg,#c03cff,#ff5ab4);box-shadow:0 0 8px rgba(255,90,180,.6)}
+.r.me .pt{color:#ff7cc8}
+.rank .next{margin-top:8px;font-size:15px;color:#ffd6ee;line-height:1.6}
+.rank .empty{text-align:center;color:var(--muted);font-size:15px;padding:10px 0}
 </style>
 </head>
 <body>
@@ -84,6 +108,10 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
   <div class="note">
     <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#2fb8ff" stroke-opacity=".6"/><rect x="15" y="22" width="18" height="14" rx="2" fill="#2fb8ff"/><path d="M18 22v-4a6 6 0 0 1 12 0v4" fill="none" stroke="#2fb8ff" stroke-width="2.5"/><circle cx="24" cy="28" r="2" fill="#02060f"/><rect x="23" y="29" width="2" height="4" fill="#02060f"/></svg>
     <div>※こちらの音声は、講座にお申し込みいただいた方にお届けしているものです。録音・転載・複製・第三者への共有や、SNS等への公開はご遠慮ください。</div>
+  </div>
+  <div class="panel rank" id="rank"><h3>やる気ランキング</h3><div class="at" id="rat"></div>
+    <div class="tabs"><button type="button" class="on" data-f="w">今週</button><button type="button" data-f="tot">ここまでの合計</button></div>
+    <div id="rlist"></div><div class="next" id="rnext"></div>
   </div>
 </main>
 <footer><a href="https://aimpoint.co.jp/">エイムポイント合同会社</a><small>© 2026 AimPoint LLC</small></footer>
@@ -118,10 +146,32 @@ function open(cb){then=cb;draw3();ask.classList.add('on');
   [].forEach.call(picks.children,function(x){if(taken[x.textContent])re=true});if(re)draw3()}).catch(function(){})}catch(e){}}}
 function done(){if(!chosen)return;mem.n=chosen;put('aimpoint_name',mem.n);ask.classList.remove('on');
  if(URL&&URL.indexOf('{{')!==0){try{fetch(URL+'?reserve='+encodeURIComponent(chosen)+'&d='+encodeURIComponent(mem.d)).catch(function(){})}catch(e){}}
+ if(window.__loadRank)window.__loadRank();
  var cb=then;then=null;if(cb)cb()}
 more.onclick=draw3;askg.onclick=done;
 if(!URL||URL.indexOf('{{')===0)return;
 window.__needName=function(cb){if(mem.n)return false;open(cb);return true};
+// やる気ランキング（上位5人と自分の行）。点数はスプレッドシート側で1時間ごとに計算する
+var rk=null,rf='w',rbox=document.getElementById('rank'),rlist=document.getElementById('rlist'),rnext=document.getElementById('rnext'),rat=document.getElementById('rat');
+var CC=['#ffd54a','#d7e3f0','#e08a4a'];
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function crown(i){return '<svg class="crown" viewBox="0 0 28 22" aria-label="'+(i+1)+'位"><path d="M2 18 L4 6 L10 12 L14 3 L18 12 L24 6 L26 18 Z" fill="'+CC[i]+'" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="18" width="24" height="3" fill="'+CC[i]+'"/></svg>'}
+function line(no,nm,s,st,top,cls){return '<div class="r'+cls+'"><div class="no">'+no+'</div><div class="nm">'+nm+'</div><div class="pt">'+s+'<small>点</small></div><div class="sub"><div class="rb"><i style="width:'+Math.max(3,Math.round(s/top*100))+'%"></i></div>'+(st>=2?'<span class="fire">🔥'+st+'日連続</span>':'')+'</div></div>'}
+function drawRank(){if(!rk)return;var L=rk[rf]||[],me=rk.me&&rk.me[rf],top=Math.max(L.length?L[0].s:1,me?me.s:1),h='';
+ [].forEach.call(rbox.querySelectorAll('.tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-f')===rf)});
+ rat.textContent=rk.at+' 時点・1時間ごとに更新'+(rf==='w'?'（今週＝'+rk.wf+'〜'+rk.wt+'日目の音声）':'');
+ if(!L.length)h='<div class="empty">まだだれも入っていません。最初の1人になりましょう！</div>';
+ L.forEach(function(x,i){var mine=me&&me.r===i+1;h+=line(i<3?crown(i):i+1,esc(x.n)+(mine?'<small>あなた</small>':''),x.s,x.st,top,(i<3?' top':'')+(mine?' me':''))});
+ if(me&&me.r>5)h+=line(me.r,'あなた<small>'+esc(mem.n)+'</small>',me.s,rk.me.st,top,' me');
+ rlist.innerHTML=h;
+ var t='',done=rk.me&&rk.me.done&&rk.me.done.indexOf(DAY)>=0,plus=DAY===rk.td?15:12;
+ if(rk.ex)t='運営メンバーの名前なので、ランキングには入りません。';
+ else if(mem.n){if(me&&me.r>5&&L.length>=5)t='あと<b>'+(L[4].s-me.s+1)+'点</b>で5位！ ';else if(me&&me.r>1)t='あと<b>'+(L[me.r-2].s-me.s+1)+'点</b>で'+(me.r-1)+'位！ ';
+  t+=done?'この回はクリア！ 明日の音声で、また点数が伸びます。':'この音声を最後まで聞くと <b>+'+plus+'点</b>'+(plus===15?'（今日のうちに聞いたぶん +3点こみ）':'')}
+ rnext.innerHTML=t;rbox.classList.add('on')}
+[].forEach.call(rbox.querySelectorAll('.tabs button'),function(b){b.onclick=function(){rf=b.getAttribute('data-f');drawRank()}});
+function loadRank(){try{fetch(URL+'?rank=1&n='+encodeURIComponent(mem.n||'')).then(function(r){return r.json()}).then(function(j){rk=j;drawRank()}).catch(function(){})}catch(e){}}
+window.__loadRank=loadRank;loadRank();
 var ua=/\bLine\//i.test(navigator.userAgent)?'line':'other',max=0,add=0,lastT=0,sentMax=-1;
 a.addEventListener('timeupdate',function(){var t=a.currentTime,d=t-lastT;if(!a.paused&&d>0&&d<3){add+=d;if(t>max)max=t}lastT=t});
 a.addEventListener('seeked',function(){lastT=a.currentTime});
