@@ -94,9 +94,12 @@ function talk(){
  .then(function(){return chips(['お金・始め方','集客・人のこと','迷っていて決められない','そのほか（当日お話しします）'])})
  .then(function(c){topic=c;return bot('ありがとうございます。いまの状況に近いのはどれですか？')})
  .then(function(){return chips(['会社などに勤めている','独立して1年未満','独立して1年以上'])})
- .then(function(c){stage=c;send(topic,stage);return bot('ありがとうございます。三浦にお伝えしておきます。では、ご都合のいい日時を選んでください。')})
+ .then(function(c){stage=c;if(!PREVIEW)send(topic,stage);return bot('ありがとうございます。三浦にお伝えしておきます。では、ご都合のいい日時を選んでください。')})
  .then(function(){var a=document.getElementById('book');a.href=BOOK;document.getElementById('go').classList.add('on');a.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})});
 }
+// ?preview=1：見本として会話を流す（記録・招待には何も残さない）
+var PREVIEW=/[?&]preview=1(&|$)/.test(location.search);
+if(PREVIEW){talk();return}
 // 招待されているかを確かめる（招待されていなければ案内だけ）
 if(!name){document.getElementById('no').classList.add('on');return}
 try{fetch(LOG_URL+'?rank=1&n='+encodeURIComponent(name)).then(function(r){return r.json()}).then(function(j){if(j.invite)talk();else document.getElementById('no').classList.add('on')})
