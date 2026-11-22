@@ -113,6 +113,7 @@ function doGet(e) {
 function doPost(e) {
   var p;
   try { p = JSON.parse(e.postData.contents); } catch (err) { return ContentService.createTextOutput('ng'); }
+  if (p.kind === 'consult') return consultNote_(p);
   var name = norm_(p.n), day = Math.floor(Number(p.day)), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
   var dur = Math.min(Math.max(Number(p.dur) || 0, 0), 3600);
   var max = Math.min(Math.max(Number(p.max) || 0, 0), dur || 3600);
@@ -226,4 +227,22 @@ function monthlyInvite() {
   var picked = ranks.filter(function (x) { return !recent[x.n]; }).slice(0, INVITES);
   picked.forEach(function (x) { sh.appendRow(["'" + thisM, ranks.indexOf(x) + 1, x.n, x.s, fmt_(now, 'yyyy/MM/dd'), '', '']); });
   rebuild();
+}
+
+// 無料コンサルの招待ページで選んだ「いちばん聞きたいこと」「今の状況」を、その人の招待の行のメモに書く（三浦さんが当日の準備に使う）
+function consultNote_(p) {
+  var name = norm_(p.n), topic = String(p.topic || '').slice(0, 60), stage = String(p.stage || '').slice(0, 60);
+  if (!name) return ContentService.createTextOutput('ng');
+  var lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    var sh = sheet_(CONSULT, CONSULT_HEAD), last = sh.getLastRow(), month = fmt_(new Date(), 'yyyy-MM');
+    var memo = '聞きたいこと：' + topic + '／今の状況：' + stage + '（' + fmt_(new Date(), 'M/d HH:mm') + ' ページで回答）';
+    if (last >= 2) {
+      var rows = sh.getRange(2, 1, last - 1, 3).getValues();
+      for (var i = rows.length - 1; i >= 0; i--) {
+        if (String(rows[i][0]) === month && String(rows[i][2]) === name) { sh.getRange(i + 2, 7).setValue(memo); return ContentService.createTextOutput('ok'); }
+      }
+    }
+  } finally { lock.releaseLock(); }
+  return ContentService.createTextOutput('ng');   // 招待の行がない（招待されていない）ときは書かない
 }
