@@ -98,9 +98,9 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
   </div>
 </div>
 <script>
-// 再生の記録：名前（端末に保存）と、どこまで聞いたか・何秒聞いたかを  へ送る
+// 再生の記録：名前（端末に保存）と、どこまで聞いたか・何秒聞いたかを https://script.google.com/macros/s/AKfycbx-ZoNE6ouWsx_Rn4HSwRQD4N0lECpzGKOvAZaa1Q9z2XrGClpx945BkN47Rdb0P7GJ/exec へ送る
 (function(){
-var URL='',DAY=6,a=document.getElementById('a');
+var URL='https://script.google.com/macros/s/AKfycbx-ZoNE6ouWsx_Rn4HSwRQD4N0lECpzGKOvAZaa1Q9z2XrGClpx945BkN47Rdb0P7GJ/exec',DAY=6,a=document.getElementById('a');
 function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
 function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 var mem={n:get('aimpoint_name'),d:get('aimpoint_dev')};
