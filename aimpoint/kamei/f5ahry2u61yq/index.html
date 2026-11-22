@@ -97,6 +97,8 @@ function talk(){
  .then(function(c){stage=c;send(topic,stage);return bot('ありがとうございます。三浦にお伝えしておきます。では、ご都合のいい日時を選んでください。')})
  .then(function(){var a=document.getElementById('book');a.href=BOOK;document.getElementById('go').classList.add('on');a.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})});
 }
+// ?preview=1：三浦さん・スタッフが会話の流れを見るための見本。答えは送らない（記録・招待には何も残らない）
+if(/[?&]preview=1/.test(location.search)){send=function(){};var pv=document.querySelector('.note');pv.textContent='見本として表示しています（答えは送られません）';talk();return}
 // 招待されているかを確かめる（招待されていなければ案内だけ）
 if(!name){document.getElementById('no').classList.add('on');return}
 try{fetch(LOG_URL+'?rank=1&n='+encodeURIComponent(name)).then(function(r){return r.json()}).then(function(j){if(j.invite)talk();else document.getElementById('no').classList.add('on')})
