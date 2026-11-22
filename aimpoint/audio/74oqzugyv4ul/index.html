@@ -53,8 +53,6 @@ footer{margin-top:28px;text-align:center}
 footer a{color:var(--text);text-decoration:none;font-size:18px;font-weight:700;border-bottom:1px solid var(--line);padding-bottom:2px}
 footer a:hover{color:var(--blue)}
 footer small{display:block;margin-top:8px;color:var(--muted);font-size:13px}
-.who{margin-top:12px;text-align:right;font-size:13px;color:var(--muted)}
-.who button{background:none;border:0;color:var(--blue);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline;padding:0 0 0 6px}
 .ask{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,15,.86)}
 .ask.on{display:flex}
 .ask .panel{width:100%;max-width:440px;text-align:center}
@@ -85,7 +83,6 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
     <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#2fb8ff" stroke-opacity=".6"/><rect x="15" y="22" width="18" height="14" rx="2" fill="#2fb8ff"/><path d="M18 22v-4a6 6 0 0 1 12 0v4" fill="none" stroke="#2fb8ff" stroke-width="2.5"/><circle cx="24" cy="28" r="2" fill="#02060f"/><rect x="23" y="29" width="2" height="4" fill="#02060f"/></svg>
     <div>※こちらの音声は、講座にお申し込みいただいた方にお届けしているものです。録音・転載・複製・第三者への共有や、SNS等への公開はご遠慮ください。</div>
   </div>
-  <div class="who" id="who" hidden>記録のお名前：<span id="whon"></span><button id="whoc" type="button">変える</button></div>
 </main>
 <footer><a href="https://aimpoint.co.jp/">エイムポイント合同会社</a><small>© 2026 AimPoint LLC</small></footer>
 </div>
@@ -105,17 +102,13 @@ function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
 function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 var mem={n:get('aimpoint_name'),d:get('aimpoint_dev')};
 if(!mem.d){mem.d=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);put('aimpoint_dev',mem.d)}
-var ask=document.getElementById('ask'),askn=document.getElementById('askn'),askg=document.getElementById('askg'),
-who=document.getElementById('who'),whon=document.getElementById('whon'),whoc=document.getElementById('whoc'),then=null;
-function show(){if(mem.n){whon.textContent=mem.n;who.hidden=false}else who.hidden=true}
+var ask=document.getElementById('ask'),askn=document.getElementById('askn'),askg=document.getElementById('askg'),then=null;
 function open(cb){then=cb;askn.value=mem.n;ask.classList.add('on');setTimeout(function(){askn.focus()},50)}
 function done(){var v=askn.value.normalize?askn.value.normalize('NFKC').trim():askn.value.trim();if(!v){askn.focus();return}
- mem.n=v.slice(0,30);put('aimpoint_name',mem.n);ask.classList.remove('on');show();var cb=then;then=null;if(cb)cb()}
+ mem.n=v.slice(0,30);put('aimpoint_name',mem.n);ask.classList.remove('on');var cb=then;then=null;if(cb)cb()}
 askg.onclick=done;askn.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();done()}});
-whoc.onclick=function(){open(null)};
 if(!URL||URL.indexOf('{{')===0)return;
 window.__needName=function(cb){if(mem.n)return false;open(cb);return true};
-show();
 var ua=/\bLine\//i.test(navigator.userAgent)?'line':'other',max=0,add=0,lastT=0,sentMax=-1;
 a.addEventListener('timeupdate',function(){var t=a.currentTime,d=t-lastT;if(!a.paused&&d>0&&d<3){add+=d;if(t>max)max=t}lastT=t});
 a.addEventListener('seeked',function(){lastT=a.currentTime});
