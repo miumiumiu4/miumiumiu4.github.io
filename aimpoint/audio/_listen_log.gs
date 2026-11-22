@@ -52,6 +52,7 @@ function doPost(e) {
 
   var key = name.toLowerCase() + '|' + day;
   var now = new Date();
+  var stamp = Utilities.formatDate(now, TZ, 'yyyy/MM/dd HH:mm:ss'); // ファイルのタイムゾーンに関係なく日本時間で書く
   var today = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
   var release = Utilities.formatDate(new Date(START.getTime() + (day - 1) * 86400000), TZ, 'yyyy-MM-dd');
 
@@ -70,7 +71,7 @@ function doPost(e) {
       }
     }
     if (!row) {
-      sh.appendRow([key, name, day, 0, 0, 0, 0, now, now, '', '', '', '']);
+      sh.appendRow([key, name, day, 0, 0, 0, 0, stamp, stamp, '', '', '', '']);
       row = sh.getLastRow();
     }
     cache.put(key, String(row), 21600);
@@ -79,7 +80,7 @@ function doPost(e) {
     v[4] = Math.max(Number(v[4]) || 0, Math.round(dur));
     v[5] = v[4] ? Math.min(100, Math.round(v[3] / v[4] * 100)) : 0;
     v[6] = Math.round((Number(v[6]) || 0) + add);
-    v[8] = now;
+    v[8] = stamp;
     if (today <= release && v[5] >= 80) v[9] = '○';
     if (line) v[10] = '○'; else v[11] = '○';
     var devs = String(v[12] || '').split(',').filter(String);
