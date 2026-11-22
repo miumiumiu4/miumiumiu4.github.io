@@ -38,7 +38,44 @@ function norm_(s) {
   return String(s || '').normalize('NFKC').replace(/\s+/g, ' ').trim().slice(0, 30);
 }
 
-function doGet() { return ContentService.createTextOutput('ok'); }
+var NICK = 'ニックネーム'; // 選ばれたニックネームの控え（かぶり防止）
+
+function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+
+// 使われているニックネームの一覧（記録の名前＋選ばれた控え）
+function takenNames_() {
+  var cache = CacheService.getScriptCache(), c = cache.get('taken');
+  if (c) return JSON.parse(c);
+  var ss = ss_(), set = {};
+  [[REC, 2], [NICK, 1]].forEach(function (t) {
+    var sh = ss.getSheetByName(t[0]); if (!sh || sh.getLastRow() < 2) return;
+    sh.getRange(2, t[1], sh.getLastRow() - 1, 1).getValues().forEach(function (r) { if (r[0]) set[String(r[0])] = 1; });
+  });
+  var names = Object.keys(set);
+  cache.put('taken', JSON.stringify(names), 60);
+  return names;
+}
+
+// ?taken=1 → 使用中の名前一覧 ／ ?reserve=名前&d=端末 → 控えに書く（使用中なら ok:false）
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  if (p.taken) return json_({ names: takenNames_() });
+  if (p.reserve) {
+    var name = norm_(p.reserve), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
+    if (!name) return json_({ ok: false });
+    var lock = LockService.getScriptLock(); lock.waitLock(15000);
+    try {
+      CacheService.getScriptCache().remove('taken');
+      if (takenNames_().indexOf(name) >= 0) return json_({ ok: false });
+      var ss = ss_(), sh = ss.getSheetByName(NICK);
+      if (!sh) { sh = ss.insertSheet(NICK, ss.getSheets().length); sh.getRange(1, 1, 1, 3).setValues([['ニックネーム', '端末', '選んだ日時']]).setFontWeight('bold'); sh.setFrozenRows(1); }
+      sh.appendRow([name, dev, Utilities.formatDate(new Date(), TZ, 'yyyy/MM/dd HH:mm:ss')]);
+      CacheService.getScriptCache().remove('taken');
+    } finally { lock.releaseLock(); }
+    return json_({ ok: true });
+  }
+  return ContentService.createTextOutput('ok');
+}
 
 function doPost(e) {
   var p;
