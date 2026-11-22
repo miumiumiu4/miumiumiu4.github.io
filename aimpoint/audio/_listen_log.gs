@@ -1,19 +1,23 @@
 // ===== 朝の5分音声：だれが・何日目を・どこまで聞いたか =====
 // 音声ページ（aimpoint.co.jp/audio/NN/）が、聞いている間15秒ごと・一時停止・閉じたときに送ってくる。
-// 使い方：このシートの「拡張機能 > Apps Script」に貼る → setup() を1回実行 → ウェブアプリとしてデプロイ（自分として実行／全員）。
+// 記録は送信表のファイル（講座前の毎日音声_オプチャ送信表）の「記録」「やる気ランキング」「見方」タブに書く（11/23 さとぴー：1つのファイルにまとめる）。
+// 送信表タブ（HAPPYが毎朝使う）は触らない。新しいタブは右端に足す。
+// 使い方：Apps Script「朝の5分_再生記録」に貼る → setup() を1回実行 → デプロイを管理で新しいバージョン（URLはそのまま）。
 var START = new Date('2026-11-22T00:00:00+09:00'); // 1日目を配る日（N日目は START + N-1 日）
 var TZ = 'Asia/Tokyo';
+var SS_ID = '1JeV9-11BpaZ8Enr7-ZQMQGoMBhyVSJ3_jVxN0KFZWJk';
+function ss_() { return SpreadsheetApp.openById(SS_ID); }
 var REC = '記録', RANK = 'やる気ランキング', README = '見方';
 var REC_HEAD = ['キー', '名前', '日', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)',
   'はじめて聞いた', '最後に聞いた', '配った日のうちに聞いた', 'LINE内で聞いた', '外部ブラウザで聞いた', '端末'];
 
 function setup() {
-  var ss = SpreadsheetApp.getActive();
-  var r = ss.getSheetByName(REC) || ss.insertSheet(REC);
+  var ss = ss_();
+  var r = ss.getSheetByName(REC) || ss.insertSheet(REC, ss.getSheets().length);
   r.getRange(1, 1, 1, REC_HEAD.length).setValues([REC_HEAD]).setFontWeight('bold');
   r.setFrozenRows(1); r.hideColumns(1);
-  (ss.getSheetByName(RANK) || ss.insertSheet(RANK, 0));
-  var h = ss.getSheetByName(README) || ss.insertSheet(README);
+  (ss.getSheetByName(RANK) || ss.insertSheet(RANK, ss.getSheets().length));
+  var h = ss.getSheetByName(README) || ss.insertSheet(README, ss.getSheets().length);
   h.clear();
   h.getRange(1, 1, 8, 1).setValues([
     ['このシートの見方'],
@@ -54,7 +58,7 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
-    var sh = SpreadsheetApp.getActive().getSheetByName(REC);
+    var sh = ss_().getSheetByName(REC);
     var cache = CacheService.getScriptCache();
     var row = Number(cache.get(key)) || 0;
     if (row && sh.getRange(row, 1).getValue() !== key) row = 0;
@@ -87,7 +91,7 @@ function doPost(e) {
 }
 
 function rebuildRanking() {
-  var ss = SpreadsheetApp.getActive();
+  var ss = ss_();
   var sh = ss.getSheetByName(REC), out = ss.getSheetByName(RANK);
   var last = sh.getLastRow();
   var people = {};
