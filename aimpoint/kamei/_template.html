@@ -130,6 +130,8 @@ var URL='{{LOG_URL}}',DAY={{N}},a=document.getElementById('a');
 function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
 function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 var mem={n:get('kamei_name'),d:get('kamei_dev')};
+// ?staff=1 で開くと、この端末は記録しない（さとぴー・スタッフのテスト用）。?staff=0 で戻す
+var qs=location.search;if(/[?&]staff=1/.test(qs))put('kamei_staff','1');if(/[?&]staff=0/.test(qs))put('kamei_staff','');var staff=get('kamei_staff')==='1';
 if(!mem.d){mem.d=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);put('kamei_dev',mem.d)}
 var ask=document.getElementById('ask'),picks=document.getElementById('picks'),more=document.getElementById('more'),askg=document.getElementById('askg'),then=null,chosen='',taken={};
 // ニックネーム：様子×生きもの×2けた。だれか分からない名前を3つ出して選んでもらう（自分で打つ欄はない）
@@ -154,7 +156,7 @@ a.addEventListener('timeupdate',function(){var t=a.currentTime,d=t-lastT;if(!a.p
 a.addEventListener('seeked',function(){lastT=a.currentTime});
 a.addEventListener('ended',function(){if(a.duration)max=a.duration;send()});
 function send(){if(!mem.n||(add<0.5&&max===sentMax))return;
- var body=JSON.stringify({n:mem.n,d:mem.d,day:DAY,max:Math.round(max),dur:Math.round(a.duration||0),add:Math.round(add),ua:ua});
+ var body=JSON.stringify({st:staff?1:0,n:mem.n,d:mem.d,day:DAY,max:Math.round(max),dur:Math.round(a.duration||0),add:Math.round(add),ua:ua});
  var ok=false;try{ok=navigator.sendBeacon&&navigator.sendBeacon(URL,new Blob([body],{type:'text/plain'}))}catch(e){}
  if(!ok){try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:body})}catch(e){}}
  add=0;sentMax=max}
