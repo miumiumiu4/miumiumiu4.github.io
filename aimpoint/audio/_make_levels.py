@@ -1,10 +1,10 @@
-"""音声の大きさ（0.05秒ごと、0〜99）を mp3/dayNN.json に書く。ページの波はこれを見て動く（スマホの画面を消しても再生が止まらないよう、Web Audio は使わない）。
+"""音声の大きさ（0.05秒ごと、0〜99）を mp3/<KEY>.json に書く。ページの波はこれを見て動く（スマホの画面を消しても再生が止まらないよう、Web Audio は使わない）。
 使い方: python3 _make_levels.py            （mp3/ の中で json がまだないものを全部）"""
 import json, subprocess, struct, math
 from pathlib import Path
 D = Path(__file__).parent / "mp3"
 STEP = 0.05
-for mp3 in sorted(D.glob("day*.mp3")):
+for mp3 in sorted(D.glob("*.mp3")):
     out = mp3.with_suffix(".json")
     if out.exists() and out.stat().st_mtime > mp3.stat().st_mtime:
         continue
