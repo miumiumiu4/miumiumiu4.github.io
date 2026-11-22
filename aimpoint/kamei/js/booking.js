@@ -16,11 +16,14 @@
   function hm(t) { return t.h + ':' + (t.mi < 10 ? '0' : '') + t.mi; }
   function src() { var q = location.search.replace(/^\?/, ''); return (location.pathname + (q ? '?' + q : '')).slice(0, 200); }
 
+  // 空き時間は、ページを開いたらすぐ取りに行く（エイミーが話している間に読み終わるように）
+  var pre = {};
+  function prefetch(type) { if (!pre[type]) pre[type] = fetch(API + '?slots=1&type=' + encodeURIComponent(type)).then(function (r) { return r.json(); }); return pre[type]; }
   function mount(box, opt) {
     if (!document.getElementById('bk-css')) { var s = document.createElement('style'); s.id = 'bk-css'; s.textContent = css; document.head.appendChild(s); }
     var root = document.createElement('div'); root.className = 'bk'; box.appendChild(root);
     root.innerHTML = '<p class="msg">空いている日時を調べています…</p>';
-    fetch(API + '?slots=1&type=' + encodeURIComponent(opt.type)).then(function (r) { return r.json(); }).then(function (j) {
+    prefetch(opt.type).then(function (j) {
       var slots = (j && j.slots) || [];
       if (!slots.length) { root.innerHTML = '<p class="msg">ただいま予約できる日時がありません。お手数ですが、届いたメールにご返信ください。こちらから日時をご案内します。</p>'; return; }
       var byDay = {}, order = [];
@@ -72,5 +75,5 @@
       }
     }).catch(function () { root.innerHTML = '<p class="msg">空き日時を読み込めませんでした。少し時間をおいて、もう一度開いてください。</p>'; });
   }
-  window.Booking = { mount: mount };
+  window.Booking = { mount: mount, prefetch: prefetch };
 })();
