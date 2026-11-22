@@ -43,6 +43,7 @@ ol.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap
 .go.on{display:block}
 .go a{display:block;padding:16px;font-size:20px;font-weight:900;color:#2a2215;text-decoration:none;letter-spacing:.04em;
 background:linear-gradient(180deg,#fff0c4,var(--gold) 55%,#b48c42);border:1px solid #fff0c4;border-radius:8px;box-shadow:0 0 22px rgba(217,180,106,.45)}
+.go{--bk-line:#d9b46a;--bk-bg:rgba(10,10,16,.9);--bk-fg:#f3dca0;--bk-on:#8a6a2c;--bk-btn:linear-gradient(180deg,#fff0c4,#d9b46a 55%,#b48c42);--bk-btnfg:#2a2215;text-align:left}
 .go a small{display:block;font-size:14px;font-weight:700;letter-spacing:0}
 .note{margin:14px 0 0;text-align:center;font-size:13px;color:var(--muted)}
 .no{display:none;text-align:center;font-size:15px;color:var(--muted)}
@@ -62,12 +63,13 @@ footer{margin-top:22px;text-align:center;font-size:13px;color:var(--muted)}
   </div>
   <div class="rule"></div>
   <ol class="log" id="log" aria-live="polite"></ol>
-  <div class="go" id="go"><a id="book" href="#">日程を選ぶ<small>30分・オンライン</small></a></div>
+  <div class="go" id="go"><div id="bookbox"></div></div>
   <p class="no" id="no">このページは、加盟前の毎朝の音声で、先月たくさん聞いてくださった方へのご招待です。<br>音声を聞いた端末（スマホ）で開いてください。<br><a href="../0hy0tt09hxl8/">毎朝の音声へ</a></p>
   <p class="note">このページは招待された方だけのものです。</p>
 </div>
 <footer>© 2026 ありがとうグループ</footer>
 </div>
+<script src="../js/booking.js"></script>
 <script>
 (function(){
 // 予約の飛び先（今は個別面談の予約ページ。無料コンサル用ができたらここを変える）
@@ -95,7 +97,9 @@ function talk(){
  .then(function(c){topic=c;return bot('ありがとうございます。いまの状況に近いのはどれですか？')})
  .then(function(){return chips(['会社などに勤めている','独立して1年未満','独立して1年以上'])})
  .then(function(c){stage=c;if(!PREVIEW)send(topic,stage);return bot('ありがとうございます。三浦にお伝えしておきます。では、ご都合のいい日時を選んでください。')})
- .then(function(){var a=document.getElementById('book');a.href=BOOK;document.getElementById('go').classList.add('on');a.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})});
+ .then(function(){var g=document.getElementById('go');g.classList.add('on');
+  Booking.mount(document.getElementById('bookbox'),{type:'consult',note:'聞きたいこと：'+topic+'／今の状況：'+stage,nick:name,preview:PREVIEW,onDone:function(){bot('ご予約ありがとうございます！ 当日、三浦があなたのためだけにお話しします🎁')}});
+  g.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})});
 }
 // ?preview=1：見本として会話を流す（記録・招待には何も残さない）
 var PREVIEW=/[?&]preview=1(&|$)/.test(location.search);
