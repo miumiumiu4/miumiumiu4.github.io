@@ -4,7 +4,7 @@ import json, subprocess, struct, math
 from pathlib import Path
 D = Path(__file__).parent / "mp3"
 STEP = 0.05
-for mp3 in sorted(D.glob("day*.mp3")):
+for mp3 in sorted(D.glob("*.mp3")):
     out = mp3.with_suffix(".json")
     if out.exists() and out.stat().st_mtime > mp3.stat().st_mtime:
         continue
