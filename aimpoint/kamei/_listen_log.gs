@@ -14,6 +14,7 @@ var REC = '記録', NICK = 'ニックネーム', WEEK = '今週のランキン�
 var REC_HEAD = ['キー', 'ニックネーム', '日', '聞いた日（日本時間）', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)', 'はじめて聞いた', '最後に聞いた', 'LINE内', '外部ブラウザ', '端末'];
 var CONSULT_HEAD = ['月', '順位', 'ニックネーム', 'その月の点数', '招待した日', '受けた日（三浦さんが記入）', 'メモ'];
 var REST_MONTHS = 3, INVITES = 3, SHOW = 5;
+var STAFF = '除外（スタッフ）';   // ここに書いたニックネームは、ランキング・招待に出さない（さとぴー・スタッフのテスト用）
 
 function props_() { return PropertiesService.getScriptProperties(); }
 function ss_() {
@@ -38,14 +39,16 @@ function setup() {
   sheet_(NICK, ['ニックネーム', '端末', '選んだ日時']);
   sheet_(WEEK); sheet_(MONTH);
   sheet_(CONSULT, CONSULT_HEAD);
+  sheet_(STAFF, ['ランキング・招待に出さないニックネーム（さとぴー・スタッフ）']);
   var h = sheet_(README);
   h.clear();
-  h.getRange(1, 1, 9, 1).setValues([
+  h.getRange(1, 1, 10, 1).setValues([
     ['このシートの見方（加盟前の毎日音声・資料請求した方へ）'],
     ['「記録」：1人×1本×1日で1行。どこまで聞いたか・合計で何秒聞いたかが自動で入ります（15秒ごと）。'],
     ['「今週のランキング」：月曜 7:00 から今までの点数。1時間ごとに並べ直します。ページには上位5人と、その人自身の順位が出ます。'],
     ['「今月のランキング」：その月の1日から今までの点数。毎月1日の朝に、先月の上位3名を「無料コンサル」に書き出します。'],
     ['点数：80%以上聞いた本数 ×10点／最後まで聞いた +2点／2回以上聞いた +2点／聞いた日が続いた日数 ×1点（その週・その月の中で一番長い連続）'],
+    ['「除外（スタッフ）」：ここに書いたニックネームは、ランキングと招待に出ません。?staff=1 を付けて開いた端末は、記録そのものをしません。'],
     ['「無料コンサル」：招待した人の一覧。受けたら「受けた日」を書いてください。一度招待した人は3か月お休みで、次の順位の人に回ります。'],
     ['招待された人のページには「あなたは今月の無料コンサルの対象です」と日程を選ぶボタンが出ます（その月の末日まで）。'],
     ['ニックネームと本人のつながりは、このシートにもありません（本人が無料コンサルや面談に来たときに分かります）。'],
@@ -115,6 +118,7 @@ function doPost(e) {
   var max = Math.min(Math.max(Number(p.max) || 0, 0), dur || 3600);
   var add = Math.min(Math.max(Number(p.add) || 0, 0), 120);
   if (!name || !(day >= 1 && day <= 400)) return ContentService.createTextOutput('ng');
+  if (p.st) return ContentService.createTextOutput('ok');   // ?staff=1 で開いた端末（さとぴー・スタッフ）は記録しない
   var now = new Date(), today = fmt_(now, 'yyyy-MM-dd'), stamp = fmt_(now, 'yyyy/MM/dd HH:mm:ss');
   var key = name.toLowerCase() + '|' + day + '|' + today;   // 同じ回を別の日に聞き直したら別の行（その日の点）
   var lock = LockService.getScriptLock(); lock.waitLock(15000);
@@ -147,9 +151,16 @@ function doPost(e) {
 }
 
 // 点数：from〜to（日本時間の日付 'yyyy-MM-dd'）の記録で数える
+function staff_() {
+  var sh = sheet_(STAFF, ['ランキング・招待に出さないニックネーム（さとぴー・スタッフ）']), last = sh.getLastRow(), set = {};
+  if (last >= 2) sh.getRange(2, 1, last - 1, 1).getValues().forEach(function (r) { if (r[0]) set[norm_(r[0])] = 1; });
+  return set;
+}
+
 function scores_(from, to) {
-  var sh = sheet_(REC, REC_HEAD), last = sh.getLastRow(), people = {};
+  var sh = sheet_(REC, REC_HEAD), last = sh.getLastRow(), people = {}, skip = staff_();
   if (last >= 2) sh.getRange(2, 1, last - 1, REC_HEAD.length).getValues().forEach(function (v) {
+    if (skip[norm_(v[1])]) return;
     var d = v[3] instanceof Date ? fmt_(v[3], 'yyyy-MM-dd') : String(v[3]);
     if (d < from || d > to) return;
     var p = people[v[1]] || (people[v[1]] = { n: v[1], eps: {}, full: 0, twice: 0, dates: {} });
