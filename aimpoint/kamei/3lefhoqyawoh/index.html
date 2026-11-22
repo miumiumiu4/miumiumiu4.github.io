@@ -73,8 +73,8 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
 .invite a{display:block;padding:14px;font-size:19px;font-weight:900;color:#e9f7ff;text-decoration:none;background:linear-gradient(90deg,var(--blue2),var(--blue));clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
 .rank{margin-top:22px;display:none}
 .rank.on{display:block}
-.rank h2{margin:0 0 10px;font-size:20px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.rank h2 small{font-size:13px;color:var(--muted);font-weight:700}
+.rank h2{margin:0 0 10px;font-size:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 8px}
+.rank h2 small{font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
 .rank ol{list-style:none;margin:0;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(3,12,28,.75)}
 .rank li{display:grid;grid-template-columns:3.4em 1fr auto;align-items:center;gap:4px 8px;padding:8px 0;border-bottom:1px solid rgba(47,184,255,.15);font-size:15px}
 .rank li:last-child{border-bottom:0}
