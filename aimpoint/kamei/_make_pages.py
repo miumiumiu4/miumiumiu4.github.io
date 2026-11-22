@@ -1,4 +1,4 @@
-"""加盟前の毎日音声（資料請求した方へ・毎朝5分 1〜14日目）のページを作る。デザインは aimpoint/audio と同じ。
+"""加盟前の毎日音声（資料請求した方へ・毎朝3分 1〜14日目）のページを作る。デザインは aimpoint/audio と同じ。
 題を直したら TITLES を直して python3 _make_pages.py。音声は mp3/dayNN.mp3、波用の大きさは python3 _make_levels.py（mp3/dayNN.json）。
 ページは NN/index.html。下の「個別面談で相談する」ボタンは UTM 付き（utm_content=dNN）。"""
 from pathlib import Path
