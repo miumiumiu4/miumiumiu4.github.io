@@ -34,7 +34,7 @@
         var b = document.createElement('button'); b.type = 'button'; b.className = 'c'; b.textContent = k;
         b.onclick = function () {
           [].forEach.call(days.children, function (x) { x.classList.toggle('on', x === b); }); chosen = null; fw.innerHTML = '';
-          tw.innerHTML = '<h3>② 時間を選んでください（' + (opt.type === 'consult' ? '30分' : '60分') + '）</h3><div class="times"></div>';
+          tw.innerHTML = '<h3>② 時間を選んでください（' + (opt.type === 'mendan' ? '60分' : '30分') + '）</h3><div class="times"></div>';
           var times = tw.querySelector('.times');
           byDay[k].forEach(function (iso) {
             var c = document.createElement('button'); c.type = 'button'; c.className = 'c'; c.textContent = hm(jst(iso));
