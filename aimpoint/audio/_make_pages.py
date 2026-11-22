@@ -12,7 +12,7 @@ TITLES = ["自慢は布団の中でしなさい","頑張る人ほど人が逃げ
 SITE = "エイムポイント"
 KEYS = ["i3sp60eulgun", "rwb2svczhcb9", "ojp7roxmi9uw", "s0wrnp1u1k1v", "7i8wzq0ii194", "w7kvh90rcw44", "r1uc18mcnd4v", "l92ypmoj3z2d", "06xabhp05osw", "bq41rljo2bj1", "doycmjxgg4r4", "cngtj3a89nit", "qlfv7yshnrut", "os7ajb2dbqwi", "74oqzugyv4ul", "lk1nrpzq41vp", "85s9p1ec7c5g", "0ykcr9tde4o5", "5a4yhl3bhe7t", "hpwr3s3xj7ic", "18tmupxsi7nh", "zimu55zzh8br", "ahdyoal0ap9u", "39obv6c3i82g", "15d012h556tz", "5csi9jt5dokr", "6mpsz2sn5x9i", "1bv8h0u1bwmk", "lszxj8srnvas", "oq2rgbvchpz4", "ookykncnm9kj"]
 # 再生の記録を受け取るGAS（ウェブアプリのURL）。空なら記録しない。シートは new-gurucon/listen-log/Code.gs
-LOG_URL = ""
+LOG_URL = "https://script.google.com/macros/s/AKfycbx-ZoNE6ouWsx_Rn4HSwRQD4N0lECpzGKOvAZaa1Q9z2XrGClpx945BkN47Rdb0P7GJ/exec"
 TPL = Path(__file__).with_name("_template.html").read_text(encoding="utf-8")
 for i, t in enumerate(TITLES, 1):
     html = (TPL.replace("{{SITE}}", SITE).replace("{{N}}", str(i)).replace("{{NN}}", f"{i:02d}")

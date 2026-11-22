@@ -92,15 +92,15 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
 <div class="ask" id="ask" role="dialog" aria-modal="true" aria-labelledby="askt">
   <div class="panel">
     <h2 id="askt">お名前（ニックネーム）を教えてください</h2>
-    <p>オープンチャットと同じ名前だとうれしいです。<br>入れるのは最初の1回だけです。どこまで聞いたかを、講座の準備のために記録します。</p>
+    <p>オープンチャットと同じ名前だとうれしいです（入れるのは最初の1回だけ）。<br>毎朝の5分が、12月22日のあなたを変えます。<br>31日間、いっしょに走り切りましょう。</p>
     <input id="askn" type="text" maxlength="30" autocomplete="nickname" placeholder="例：さとぴー">
     <button class="go" id="askg" type="button">聞きはじめる</button>
   </div>
 </div>
 <script>
-// 再生の記録：名前（端末に保存）と、どこまで聞いたか・何秒聞いたかを  へ送る
+// 再生の記録：名前（端末に保存）と、どこまで聞いたか・何秒聞いたかを https://script.google.com/macros/s/AKfycbx-ZoNE6ouWsx_Rn4HSwRQD4N0lECpzGKOvAZaa1Q9z2XrGClpx945BkN47Rdb0P7GJ/exec へ送る
 (function(){
-var URL='',DAY=19,a=document.getElementById('a');
+var URL='https://script.google.com/macros/s/AKfycbx-ZoNE6ouWsx_Rn4HSwRQD4N0lECpzGKOvAZaa1Q9z2XrGClpx945BkN47Rdb0P7GJ/exec',DAY=19,a=document.getElementById('a');
 function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
 function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 var mem={n:get('aimpoint_name'),d:get('aimpoint_dev')};
