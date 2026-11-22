@@ -1,19 +1,23 @@
 // ===== 朝の5分音声：だれが・何日目を・どこまで聞いたか =====
 // 音声ページ（aimpoint.co.jp/audio/NN/）が、聞いている間15秒ごと・一時停止・閉じたときに送ってくる。
-// 使い方：このシートの「拡張機能 > Apps Script」に貼る → setup() を1回実行 → ウェブアプリとしてデプロイ（自分として実行／全員）。
+// 記録は送信表のファイル（講座前の毎日音声_オプチャ送信表）の「記録」「やる気ランキング」「見方」タブに書く（11/23 さとぴー：1つのファイルにまとめる）。
+// 送信表タブ（HAPPYが毎朝使う）は触らない。新しいタブは右端に足す。
+// 使い方：Apps Script「朝の5分_再生記録」に貼る → setup() を1回実行 → デプロイを管理で新しいバージョン（URLはそのまま）。
 var START = new Date('2026-11-22T00:00:00+09:00'); // 1日目を配る日（N日目は START + N-1 日）
 var TZ = 'Asia/Tokyo';
+var SS_ID = '1JeV9-11BpaZ8Enr7-ZQMQGoMBhyVSJ3_jVxN0KFZWJk';
+function ss_() { return SpreadsheetApp.openById(SS_ID); }
 var REC = '記録', RANK = 'やる気ランキング', README = '見方';
 var REC_HEAD = ['キー', '名前', '日', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)',
   'はじめて聞いた', '最後に聞いた', '配った日のうちに聞いた', 'LINE内で聞いた', '外部ブラウザで聞いた', '端末'];
 
 function setup() {
-  var ss = SpreadsheetApp.getActive();
-  var r = ss.getSheetByName(REC) || ss.insertSheet(REC);
+  var ss = ss_();
+  var r = ss.getSheetByName(REC) || ss.insertSheet(REC, ss.getSheets().length);
   r.getRange(1, 1, 1, REC_HEAD.length).setValues([REC_HEAD]).setFontWeight('bold');
   r.setFrozenRows(1); r.hideColumns(1);
-  (ss.getSheetByName(RANK) || ss.insertSheet(RANK, 0));
-  var h = ss.getSheetByName(README) || ss.insertSheet(README);
+  (ss.getSheetByName(RANK) || ss.insertSheet(RANK, ss.getSheets().length));
+  var h = ss.getSheetByName(README) || ss.insertSheet(README, ss.getSheets().length);
   h.clear();
   h.getRange(1, 1, 8, 1).setValues([
     ['このシートの見方'],
@@ -34,7 +38,44 @@ function norm_(s) {
   return String(s || '').normalize('NFKC').replace(/\s+/g, ' ').trim().slice(0, 30);
 }
 
-function doGet() { return ContentService.createTextOutput('ok'); }
+var NICK = 'ニックネーム'; // 選ばれたニックネームの控え（かぶり防止）
+
+function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+
+// 使われているニックネームの一覧（記録の名前＋選ばれた控え）
+function takenNames_() {
+  var cache = CacheService.getScriptCache(), c = cache.get('taken');
+  if (c) return JSON.parse(c);
+  var ss = ss_(), set = {};
+  [[REC, 2], [NICK, 1]].forEach(function (t) {
+    var sh = ss.getSheetByName(t[0]); if (!sh || sh.getLastRow() < 2) return;
+    sh.getRange(2, t[1], sh.getLastRow() - 1, 1).getValues().forEach(function (r) { if (r[0]) set[String(r[0])] = 1; });
+  });
+  var names = Object.keys(set);
+  cache.put('taken', JSON.stringify(names), 60);
+  return names;
+}
+
+// ?taken=1 → 使用中の名前一覧 ／ ?reserve=名前&d=端末 → 控えに書く（使用中なら ok:false）
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  if (p.taken) return json_({ names: takenNames_() });
+  if (p.reserve) {
+    var name = norm_(p.reserve), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
+    if (!name) return json_({ ok: false });
+    var lock = LockService.getScriptLock(); lock.waitLock(15000);
+    try {
+      CacheService.getScriptCache().remove('taken');
+      if (takenNames_().indexOf(name) >= 0) return json_({ ok: false });
+      var ss = ss_(), sh = ss.getSheetByName(NICK);
+      if (!sh) { sh = ss.insertSheet(NICK, ss.getSheets().length); sh.getRange(1, 1, 1, 3).setValues([['ニックネーム', '端末', '選んだ日時']]).setFontWeight('bold'); sh.setFrozenRows(1); }
+      sh.appendRow([name, dev, Utilities.formatDate(new Date(), TZ, 'yyyy/MM/dd HH:mm:ss')]);
+      CacheService.getScriptCache().remove('taken');
+    } finally { lock.releaseLock(); }
+    return json_({ ok: true });
+  }
+  return ContentService.createTextOutput('ok');
+}
 
 function doPost(e) {
   var p;
@@ -48,13 +89,14 @@ function doPost(e) {
 
   var key = name.toLowerCase() + '|' + day;
   var now = new Date();
+  var stamp = Utilities.formatDate(now, TZ, 'yyyy/MM/dd HH:mm:ss'); // ファイルのタイムゾーンに関係なく日本時間で書く
   var today = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
   var release = Utilities.formatDate(new Date(START.getTime() + (day - 1) * 86400000), TZ, 'yyyy-MM-dd');
 
   var lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
-    var sh = SpreadsheetApp.getActive().getSheetByName(REC);
+    var sh = ss_().getSheetByName(REC);
     var cache = CacheService.getScriptCache();
     var row = Number(cache.get(key)) || 0;
     if (row && sh.getRange(row, 1).getValue() !== key) row = 0;
@@ -66,7 +108,7 @@ function doPost(e) {
       }
     }
     if (!row) {
-      sh.appendRow([key, name, day, 0, 0, 0, 0, now, now, '', '', '', '']);
+      sh.appendRow([key, name, day, 0, 0, 0, 0, stamp, stamp, '', '', '', '']);
       row = sh.getLastRow();
     }
     cache.put(key, String(row), 21600);
@@ -75,7 +117,7 @@ function doPost(e) {
     v[4] = Math.max(Number(v[4]) || 0, Math.round(dur));
     v[5] = v[4] ? Math.min(100, Math.round(v[3] / v[4] * 100)) : 0;
     v[6] = Math.round((Number(v[6]) || 0) + add);
-    v[8] = now;
+    v[8] = stamp;
     if (today <= release && v[5] >= 80) v[9] = '○';
     if (line) v[10] = '○'; else v[11] = '○';
     var devs = String(v[12] || '').split(',').filter(String);
@@ -87,7 +129,7 @@ function doPost(e) {
 }
 
 function rebuildRanking() {
-  var ss = SpreadsheetApp.getActive();
+  var ss = ss_();
   var sh = ss.getSheetByName(REC), out = ss.getSheetByName(RANK);
   var last = sh.getLastRow();
   var people = {};
