@@ -9,7 +9,8 @@
   クリーニングBASE（松本さん）のペライチLP → この会話型ページ → 予約フォーム（GAS）。
   ありがとうエアコンの予約チャット（arigatou-booking/welcome）と同じ流れ：
   最初に「はい／いいえ」→ お伺いの一言 → 予約フォームへ。
-  ※予約フォームのGASは他ページへの埋め込みを許していない（2026-11-24確認）ので、ボタンで同じ画面のままフォームへ移る。
+  予約フォームは松本さんの見積もり・予約フォーム（baselphp369-cmyk.github.io/estimate-form）をページ内に埋め込む。
+  （GASの予約フォーム script.google.com/…/exec は埋め込み不可＋Googleの帯が出るため使わない。2026-11-24）
   住所は推測できない文字列（連番にしない）。
 -->
 <style>
@@ -54,6 +55,10 @@
   .panel { background: #fff; border-radius: 16px; padding: 16px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); animation: pop .35s ease-out both; }
   .panel h2 { font-size: 18px; margin: 0 0 8px; }
   .panel .note { font-size: 15px; color: var(--muted); margin: 0 0 12px; }
+  .panel.form { padding: 8px; scroll-margin-top: 64px; }
+  .panel.form iframe { display: block; width: 100%; height: 85vh; min-height: 640px; border: 0; border-radius: 12px; background: #fff; }
+  .fallback { font-size: 14px; margin: 8px 8px 4px; color: var(--muted); }
+  .fallback a { color: #1a5fb4; }
   footer { text-align: center; font-size: 13px; color: #fff; padding: 8px 16px 32px; }
   footer a { color: #fff; }
 </style>
@@ -70,8 +75,12 @@
       <button type="button" class="btn ghost" id="no">いいえ</button>
     </div>
     <div class="choices" id="toForm" hidden>
-      <a class="btn primary wide" id="goForm" href="https://script.google.com/macros/s/AKfycbyaQ5tsrLVK8zP-rTS01p_1P6j6OS4wWdLY4p78uB6ial2TBqlRB9iNvO_6KJoK9V05/exec">ご予約フォームへ進む</a>
+      <button type="button" class="btn primary wide" id="goForm">ご予約フォームへ進む</button>
     </div>
+    <section class="panel form" id="formPanel" hidden>
+      <iframe id="formFrame" title="ご予約フォーム"></iframe>
+      <p class="fallback">フォームがうまく出ないときは <a id="formLink" target="_blank" rel="noopener">こちらから開いてください</a></p>
+    </section>
     <div class="choices" id="noNext" hidden>
       <button type="button" class="btn primary" id="yesAfter">やっぱり予約する</button>
       <a class="btn ghost" id="backLp" href="https://8dfe7.hp.peraichi.com/">ページに戻る</a>
@@ -80,7 +89,7 @@
   <footer>クリーニングBASE</footer>
 <script>
 (function () {
-  var FORM_URL = 'https://script.google.com/macros/s/AKfycbyaQ5tsrLVK8zP-rTS01p_1P6j6OS4wWdLY4p78uB6ial2TBqlRB9iNvO_6KJoK9V05/exec';
+  var FORM_URL = 'https://baselphp369-cmyk.github.io/estimate-form/estimate-form.html';
   var MSG = {
     first: 'ご覧いただきありがとうございます。エアコンクリーニングのご予約でよろしいですか？',
     yes: 'お手数をお掛けしますが、ご予約フォームへのご入力をお願いできますでしょうか？',
@@ -116,7 +125,7 @@
     var b = addRow('in', null);
     later(function () { b.textContent = text; if (then) then(); }, reduce ? 0 : 900);
   }
-  function hideAll() { ['choices', 'toForm', 'noNext'].forEach(function (id) { $(id).hidden = true; }); }
+  function hideAll() { ['choices', 'toForm', 'noNext', 'formPanel'].forEach(function (id) { $(id).hidden = true; }); }
   function start() {
     timers.forEach(clearTimeout); timers = [];
     chat.innerHTML = ''; hideAll();
@@ -132,9 +141,15 @@
     hideAll(); track('no'); addRow('out', 'いいえ');
     say(MSG.no, function () { $('noNext').hidden = false; });
   });
-  // 予約フォーム（Google Apps Script）は、ほかのページの中に埋め込むと表示されない設定のため、同じ画面でフォームへ移る
-  $('goForm').href = formUrl;
-  $('goForm').addEventListener('click', function () { track('form_open'); });
+  // 予約フォームは松本さんの見積もり・予約フォーム（GitHub Pages）をこのページの中に表示する
+  $('goForm').addEventListener('click', function () {
+    hideAll(); track('form_open');
+    var f = $('formFrame'); if (!f.src) f.src = formUrl;
+    $('formLink').href = formUrl;
+    $('formPanel').hidden = false;
+    $('formPanel').scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+  });
+  $('formLink').addEventListener('click', function () { track('form_newtab'); });
   $('reset').addEventListener('click', start);
   track('view');
   start();
