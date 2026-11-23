@@ -144,6 +144,9 @@ var HIST = 'ever_shindan_hist';   // { "回": { s: [9], at: 時刻 } } 前回と
     var err = $('err'), btn = $('send');
     var mail = f.mail.value.trim();
     if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(mail)) { err.textContent = 'メールアドレスを確かめてください。'; err.hidden = false; f.mail.focus(); return; }
+    // 11/24：よくある打ち間違い（gmai.com など）は1回だけ聞く。同じアドレスでもう一度押されたら通す
+    var sug = window.mailTypo ? window.mailTypo(mail) : '';
+    if (sug && f.mail.dataset.typoOk !== mail) { f.mail.dataset.typoOk = mail; err.textContent = 'もしかして「' + sug + '」ですか？ 直す時は書き直してください。このままでよければ、もう一度押してください。'; err.hidden = false; f.mail.focus(); return; }
     var s = scores();
     var tieShown = !$('tieBox').hidden, tie = document.querySelector('input[name=tie]:checked');
     if (tieShown && !tie) { err.textContent = '点数が同じものがあります。一番自分を止めていると思うものを1つ選んでください。'; err.hidden = false; $('tieBox').scrollIntoView({ behavior: 'smooth' }); return; }
