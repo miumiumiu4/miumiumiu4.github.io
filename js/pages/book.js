@@ -114,6 +114,9 @@
     if (!v.name) return ["name", "お名前を入れてください"];
     if (!/^0\d{9,10}$/.test(v.phone)) return ["phone", "電話番号は、市外局番から数字で入れてください（例：09012345678）"];
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) return ["email", "メールアドレスの形を確かめてください"];
+    // 11/24：よくある打ち間違い（gmai.com など）は1回だけ聞く。同じアドレスでもう一度押されたら通す
+    var sug = window.mailTypo ? window.mailTypo(v.email) : "";
+    if (sug && form.elements.email.getAttribute("data-typo-ok") !== v.email) { form.elements.email.setAttribute("data-typo-ok", v.email); return ["email", "もしかして「" + sug + "」ですか？ 直す時は書き直してください。このままでよければ、もう一度押してください。"]; }
     if (!/^\d{3}-?\d{4}$/.test(v.zip)) return ["zip", "郵便番号は7けたの数字で入れてください（例：222-0000）"];
     if (v.address.length < 5) return ["address", "住所を番地まで入れてください"];
     if (!v.agreePrivacy || !v.agreeTerms) return ["agree", "個人情報の取りあつかいと、利用規約・キャンセルの決まりに同意してください"];
