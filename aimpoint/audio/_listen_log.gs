@@ -88,6 +88,7 @@ function doGet(e) {
 function doPost(e) {
   var p;
   try { p = JSON.parse(e.postData.contents); } catch (err) { return ContentService.createTextOutput('ng'); }
+  if (p.t === 'rn') return saveRealName_(p);
   var name = norm_(p.n), day = Math.floor(Number(p.day)), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
   var dur = Math.min(Math.max(Number(p.dur) || 0, 0), 3600);
   var max = Math.min(Math.max(Number(p.max) || 0, 0), dur || 3600);
@@ -210,6 +211,24 @@ function rankJson_(name) {
     else if (excluded_()[k]) out.ex = true;
   }
   return out;
+}
+
+// お名前の対応表：ニックネームと本名。送信表（HAPPYも使う）には書かず、さとぴーだけのファイル（このプログラムの置き場）に書く
+var RN_SS_ID = '1HYx9skjn8bvZQDyZffqAMq1p7BFPip56Pa1fQyPUTUk', RN = 'お名前の対応表';
+function saveRealName_(p) {
+  var nick = norm_(p.n), rn = norm_(p.rn).replace(/^([=+\-@])/, "'$1"), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
+  if (!nick || !rn) return ContentService.createTextOutput('ng');
+  var lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    var ss = SpreadsheetApp.openById(RN_SS_ID), sh = ss.getSheetByName(RN);
+    if (!sh) {
+      sh = ss.insertSheet(RN, 0);
+      sh.getRange(1, 1, 1, 5).setValues([['ニックネーム', 'お名前（本人が入力）', '入力した日時', '端末', '開き方']]).setFontWeight('bold');
+      sh.setFrozenRows(1);
+    }
+    sh.appendRow([nick, rn, Utilities.formatDate(new Date(), TZ, 'yyyy/MM/dd HH:mm:ss'), dev, p.ua === 'line' ? 'LINE内' : '外部ブラウザ']);
+  } finally { lock.releaseLock(); }
+  return ContentService.createTextOutput('ok');
 }
 
 function rebuildRanking() {

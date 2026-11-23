@@ -54,7 +54,7 @@ footer a{color:var(--text);text-decoration:none;font-size:18px;font-weight:700;b
 footer a:hover{color:var(--blue)}
 footer small{display:block;margin-top:8px;color:var(--muted);font-size:13px}
 .ask{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,15,.86)}
-.ask.on{display:flex}
+.ask.on{display:flex;overflow-y:auto;align-items:safe center}
 .ask .panel{width:100%;max-width:440px;text-align:center}
 .ask h2{margin:0 0 6px;font-size:21px;line-height:1.5}
 .ask p{margin:0 0 14px;font-size:15px;color:var(--muted);line-height:1.7}
@@ -62,6 +62,16 @@ footer small{display:block;margin-top:8px;color:var(--muted);font-size:13px}
 .ask .pick.sel{border-color:var(--blue);box-shadow:0 0 12px var(--glow);color:#fff;background:rgba(10,108,255,.25)}
 .ask .more{background:none;border:0;color:var(--blue);font:inherit;font-size:15px;cursor:pointer;text-decoration:underline;padding:2px 0 4px}
 .ask .go:disabled{opacity:.4;cursor:default}
+.ask .rn{margin-top:14px;padding-top:14px;border-top:1px solid rgba(47,184,255,.25);text-align:left}
+.ask .rn label{display:block;font-size:16px;font-weight:800;margin-bottom:6px}
+.ask .rn input{width:100%;font:inherit;font-size:18px;color:var(--text);padding:9px 12px;background:rgba(3,12,28,.9);border:1px solid var(--line);border-radius:4px;outline:none}
+.ask .rn input:focus{border-color:var(--blue);box-shadow:0 0 10px var(--glow)}
+.ask .rn small{display:block;margin-top:8px;font-size:14px;color:var(--muted);line-height:1.7}
+.ask .rn small b{color:#ffd54a}
+.ask .later{display:none;margin:10px auto 0;background:none;border:0;color:var(--muted);font:inherit;font-size:15px;cursor:pointer;text-decoration:underline}
+.ask.only-rn #picks,.ask.only-rn #more{display:none}
+.ask.only-rn .rn{border-top:0;margin-top:4px;padding-top:0}
+.ask.only-rn .later{display:block}
 .ask .go{margin-top:14px;width:100%;font:inherit;font-size:18px;font-weight:800;color:#e9f7ff;padding:10px;cursor:pointer;border:1px solid var(--blue);background:linear-gradient(90deg,var(--blue2),var(--blue));
 clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
 .rank{margin-top:22px;padding:22px 16px 18px;display:none}
@@ -123,7 +133,10 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
     <p>毎朝の5分が、12月22日のあなたを変えます。<br>31日間、このニックネームでいっしょに走り切りましょう。</p>
     <div id="picks"></div>
     <button class="more" id="more" type="button">ほかの3つを見る</button>
+    <div class="rn"><label for="rn">お名前（さとぴーだけが見ます）</label><input id="rn" type="text" maxlength="30" autocomplete="name" placeholder="例：山田 太郎">
+      <small>🏆 鼓膜のオリンピックの<b>1位と2位には、さとぴーからプレゼント</b>があります。お届けするために、お名前を教えてください。ランキングに出るのはニックネームだけです。</small></div>
     <button class="go" id="askg" type="button">聞きはじめる</button>
+    <button class="later" id="later" type="button">あとで</button>
   </div>
 </div>
 <script>
@@ -132,9 +145,9 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
 var URL='https://script.google.com/macros/s/AKfycbx-ZoNE6ouWsx_Rn4HSwRQD4N0lECpzGKOvAZaa1Q9z2XrGClpx945BkN47Rdb0P7GJ/exec',DAY=13,a=document.getElementById('a');
 function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
 function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-var mem={n:get('aimpoint_name'),d:get('aimpoint_dev')};
+var mem={n:get('aimpoint_name'),d:get('aimpoint_dev'),rn:get('aimpoint_rn_asked')};
 if(!mem.d){mem.d=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);put('aimpoint_dev',mem.d)}
-var ask=document.getElementById('ask'),picks=document.getElementById('picks'),more=document.getElementById('more'),askg=document.getElementById('askg'),then=null,chosen='',taken={};
+var ask=document.getElementById('ask'),picks=document.getElementById('picks'),more=document.getElementById('more'),askg=document.getElementById('askg'),then=null,chosen='',taken={},rnIn=document.getElementById('rn'),later=document.getElementById('later'),askt=document.getElementById('askt'),askp=ask.querySelector('p'),onlyRn=false;
 // ニックネーム：様子×生きもの×2けた。だれか分からない名前を3つ出して選んでもらう（自分で打つ欄はない）
 var A=['あおい','あかい','しろい','きんいろの','ぎんいろの','みどりの','ちいさな','おおきな','しずかな','げんきな','ひかる','あさの','よるの','かぜの','もりの','うみの','そらの','はるの','なつの','あきの','ふゆの','にじいろの','ねむい','はやい'];
 var B=['クジラ','ことり','ネコ','イヌ','キツネ','クマ','シカ','ウサギ','タカ','フクロウ','イルカ','ペンギン','カメ','リス','パンダ','ヒツジ','ツバメ','カワウソ','ラッコ','ホタル','チョウ','ライオン','トラ','コアラ'];
@@ -142,16 +155,26 @@ function r(n){return Math.floor(Math.random()*n)}
 function gen(){var out=[],guard=0;while(out.length<3&&guard++<200){var v=A[r(A.length)]+B[r(B.length)]+(10+r(90));if(!taken[v]&&out.indexOf(v)<0)out.push(v)}return out}
 function draw3(){chosen='';askg.disabled=true;picks.innerHTML='';gen().forEach(function(v){var b=document.createElement('button');b.type='button';b.className='pick';b.textContent=v;
  b.onclick=function(){chosen=v;askg.disabled=false;[].forEach.call(picks.children,function(x){x.classList.toggle('sel',x===b)})};picks.appendChild(b)})}
+// ニックネームを選び済みの人には、お名前だけを1回聞く
+function openRn(cb){then=cb;onlyRn=true;ask.classList.add('only-rn','on');askt.textContent='プレゼントを受け取れるようにしませんか？';
+ askp.innerHTML='あなたのニックネームは <b style="color:#fff">'+mem.n.replace(/[&<>"]/g,'')+'</b> です。';askg.disabled=false}
+// 本名は「お名前の対応表」（さとぴーだけのファイル）へ。ページの住所には入れずに送る
+function sendRn(){var v=(rnIn.value||'').trim().slice(0,30);mem.rn='1';put('aimpoint_rn_asked','1');if(!v||!URL||URL.indexOf('{{')===0)return;
+ var body=JSON.stringify({t:'rn',n:mem.n,d:mem.d,rn:v,ua:/\bLine\//i.test(navigator.userAgent)?'line':'other'});
+ var ok=false;try{ok=navigator.sendBeacon&&navigator.sendBeacon(URL,new Blob([body],{type:'text/plain'}))}catch(e){}
+ if(!ok){try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:body})}catch(e){}}}
+function finish(){ask.classList.remove('on','only-rn');var cb=then;then=null;if(cb)cb()}
 function open(cb){then=cb;draw3();ask.classList.add('on');
  if(URL&&URL.indexOf('{{')!==0){try{fetch(URL+'?taken=1').then(function(r){return r.json()}).then(function(j){var re=false;(j.names||[]).forEach(function(n){taken[n]=1});
   [].forEach.call(picks.children,function(x){if(taken[x.textContent])re=true});if(re)draw3()}).catch(function(){})}catch(e){}}}
-function done(){if(!chosen)return;mem.n=chosen;put('aimpoint_name',mem.n);ask.classList.remove('on');
+function done(){if(onlyRn){onlyRn=false;sendRn();finish();return}if(!chosen)return;mem.n=chosen;put('aimpoint_name',mem.n);ask.classList.remove('on');
  if(URL&&URL.indexOf('{{')!==0){try{fetch(URL+'?reserve='+encodeURIComponent(chosen)+'&d='+encodeURIComponent(mem.d)).catch(function(){})}catch(e){}}
  if(window.__loadRank)window.__loadRank();
+ sendRn();
  var cb=then;then=null;if(cb)cb()}
-more.onclick=draw3;askg.onclick=done;
+more.onclick=draw3;askg.onclick=done;later.onclick=function(){onlyRn=false;mem.rn='1';put('aimpoint_rn_asked','1');finish()};
 if(!URL||URL.indexOf('{{')===0)return;
-window.__needName=function(cb){if(mem.n)return false;open(cb);return true};
+window.__needName=function(cb){if(!mem.n){open(cb);return true}if(!mem.rn){openRn(cb);return true}return false};
 // やる気ランキング（上位5人と自分の行）。点数はスプレッドシート側で1時間ごとに計算する
 var rk=null,rf='w',rbox=document.getElementById('rank'),rlist=document.getElementById('rlist'),rnext=document.getElementById('rnext'),rat=document.getElementById('rat');
 var CC=['#ffd54a','#d7e3f0','#e08a4a'];
