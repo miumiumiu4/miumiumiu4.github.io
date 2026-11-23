@@ -88,6 +88,7 @@ function doGet(e) {
 function doPost(e) {
   var p;
   try { p = JSON.parse(e.postData.contents); } catch (err) { return ContentService.createTextOutput('ng'); }
+  if (p.t === 'rn') return saveRealName_(p);
   var name = norm_(p.n), day = Math.floor(Number(p.day)), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
   var dur = Math.min(Math.max(Number(p.dur) || 0, 0), 3600);
   var max = Math.min(Math.max(Number(p.max) || 0, 0), dur || 3600);
@@ -179,7 +180,7 @@ function snapshot_() {
     var p = people[k], tot = score_(p, 1, 31), w = score_(p, wf, wt), st = 0;
     for (var d = td; d >= 1; d--) { if (p.days[d] && p.days[d].ok) st++; else if (d === td) continue; else break; }
     var done = Object.keys(p.days).filter(function (d) { return p.days[d].ok; }).map(Number);
-    return { k: k, n: p.name, tot: tot, w: w, st: st, done: done, last: p.last };
+    return { k: k, n: p.name, tot: tot, w: w, st: st, done: done, last: p.last, p: p };
   });
   function order(f) {
     return list.slice().sort(function (a, b) { return b[f].s - a[f].s || b[f].min - a[f].min || (a.last < b.last ? -1 : 1); });
@@ -212,10 +213,55 @@ function rankJson_(name) {
   return out;
 }
 
+// お名前の対応表：ニックネームと本名。送信表（HAPPYも使う）には書かず、さとぴーだけのファイル（このプログラムの置き場）に書く
+var RN_SS_ID = '1HYx9skjn8bvZQDyZffqAMq1p7BFPip56Pa1fQyPUTUk', RN = 'お名前の対応表';
+function saveRealName_(p) {
+  var nick = norm_(p.n), rn = norm_(p.rn).replace(/^([=+\-@])/, "'$1"), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
+  if (!nick || !rn) return ContentService.createTextOutput('ng');
+  var lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    var ss = SpreadsheetApp.openById(RN_SS_ID), sh = ss.getSheetByName(RN);
+    if (!sh) {
+      sh = ss.insertSheet(RN, 0);
+      sh.getRange(1, 1, 1, 5).setValues([['ニックネーム', 'お名前（本人が入力）', '入力した日時', '端末', '開き方']]).setFontWeight('bold');
+      sh.setFrozenRows(1);
+    }
+    sh.appendRow([nick, rn, Utilities.formatDate(new Date(), TZ, 'yyyy/MM/dd HH:mm:ss'), dev, p.ua === 'line' ? 'LINE内' : '外部ブラウザ']);
+  } finally { lock.releaseLock(); }
+  return ContentService.createTextOutput('ok');
+}
+
+// プレゼント候補（さとぴーだけのファイル）：毎週の1位と、合計の1位・2位。お名前の対応表から本名も並べる
+function writePrize_(r) {
+  var ss = SpreadsheetApp.openById(RN_SS_ID), names = {};
+  var rn = ss.getSheetByName(RN);
+  if (rn && rn.getLastRow() >= 2) rn.getRange(2, 1, rn.getLastRow() - 1, 2).getValues().forEach(function (v) { names[String(v[0]).toLowerCase()] = v[1]; });
+  var td = r.snap.td, rows = [];
+  for (var wf = 1; wf <= 31 && wf <= Math.max(td, 1); wf += 7) {
+    var wt = Math.min(31, wf + 6), best = null;
+    r.list.forEach(function (x) {
+      var sc = score_(x.p, wf, wt);
+      if (sc.s > 0 && (!best || sc.s > best.sc.s || (sc.s === best.sc.s && sc.min > best.sc.min))) best = { x: x, sc: sc };
+    });
+    var label = '第' + ((wf - 1) / 7 + 1) + '週（' + wf + '〜' + wt + '日目）' + (td <= wt ? '・途中' : '・確定');
+    rows.push([label, '1位', best ? best.x.n : '（まだいません）', best ? best.sc.s : '', best ? (names[best.x.k] || '（お名前なし）') : '']);
+  }
+  r.order('tot').slice(0, 2).forEach(function (x, i) {
+    if (x.tot.s > 0) rows.push(['ここまでの合計' + (td >= 31 ? '・確定' : '・途中'), (i + 1) + '位', x.n, x.tot.s, names[x.k] || '（お名前なし）']);
+  });
+  var sh = ss.getSheetByName('プレゼント候補') || ss.insertSheet('プレゼント候補', 0);
+  sh.clear();
+  sh.getRange(1, 1, 1, 5).setValues([['大会', '順位', 'ニックネーム', '点数', 'お名前']]).setFontWeight('bold');
+  sh.setFrozenRows(1);
+  if (rows.length) sh.getRange(2, 1, rows.length, 5).setValues(rows);
+  sh.getRange(1, 7).setValue('更新: ' + Utilities.formatDate(new Date(), TZ, 'M/d HH:mm') + '　プレゼント：毎週の1位、合計の1位・2位（ランキングから外す名前は入りません）');
+}
+
 function rebuildRanking() {
   var ss = ss_(), out = ss.getSheetByName(RANK);
   var r = snapshot_(), snap = r.snap;
   saveSnap_(snap);
+  try { writePrize_(r); } catch (e) { }
   var rows = r.order('tot').map(function (x, i) {
     var t = x.tot;
     return [i + 1, x.n, t.s, x.w.s, t.n, t.ontime, t.full, t.twice, t.best, x.st, t.min, x.last];
