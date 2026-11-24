@@ -58,6 +58,18 @@
   .panel .note { font-size: 15px; color: var(--muted); margin: 0 0 12px; }
   footer { text-align: center; font-size: 13px; color: #fff; padding: 8px 16px 32px; }
   footer a { color: #fff; }
+  .panel h2 { font-size: 18px; margin: 0 0 8px; }
+  .areas { display: flex; gap: 6px; margin: 0 0 8px; }
+  .areas button { flex: 1 1 0; min-height: 40px; border-radius: 999px; border: 1px solid #c5ccd4; background: #fff; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer; }
+  .areas button[aria-pressed="true"] { background: #2b3a55; border-color: #2b3a55; color: #fff; }
+  .areanote { font-size: 13px; color: var(--muted); margin: 0 0 4px; }
+  .menu { list-style: none; margin: 0; padding: 0; }
+  .menu li.cat { padding: 12px 0 2px; font-size: 13px; font-weight: 700; color: #e8590c; border-top: 0; }
+  .menu li.item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .menu li.cat + li.item { border-top: 0; }
+  .menu .label { font-weight: 600; }
+  .menu .sub { font-size: 13px; color: var(--muted); }
+  .menu .btn { min-height: 40px; padding: 6px 14px; font-size: 14px; flex: 0 0 auto; }
 </style>
 </head>
 <body>
@@ -74,19 +86,25 @@
     <div class="choices" id="toForm" hidden>
       <a class="btn primary wide" id="goForm" href="https://script.google.com/macros/s/AKfycbyaQ5tsrLVK8zP-rTS01p_1P6j6OS4wWdLY4p78uB6ial2TBqlRB9iNvO_6KJoK9V05/exec">ご予約フォームへ進む</a>
     </div>
-    <div class="choices" id="noNext" hidden>
-      <button type="button" class="btn primary" id="yesAfter">やっぱり予約する</button>
-      <a class="btn ghost" id="backLp" href="https://8dfe7.hp.peraichi.com/">ページに戻る</a>
-    </div>
+    <section class="panel" id="menuPanel" hidden>
+      <h2>メニュー</h2>
+      <p class="areanote">ご訪問先の地域で、できるメニューが変わります。</p>
+      <div class="areas" role="group" aria-label="ご訪問先の地域">
+        <button type="button" data-area="osaka" aria-pressed="false">大阪府</button>
+        <button type="button" data-area="saitama" aria-pressed="false">埼玉県</button>
+        <button type="button" data-area="other" aria-pressed="true">そのほか</button>
+      </div>
+      <ul class="menu" id="menuList"></ul>
+    </section>
   </main>
-  <footer>クリーニングBASE</footer>
+  <footer>クリーニングBASE<br>© クリーニングBASE</footer>
 <script>
 (function () {
   var FORM_URL = 'https://script.google.com/macros/s/AKfycbyaQ5tsrLVK8zP-rTS01p_1P6j6OS4wWdLY4p78uB6ial2TBqlRB9iNvO_6KJoK9V05/exec';
   var MSG = {
     first: 'ご覧いただきありがとうございます。クリーニングBASEの受付係、アライグマのアライくんです。エアコンクリーニングのご予約でよろしいですか？',
     yes: 'お手数をお掛けしますが、ご予約フォームへのご入力をお願いできますでしょうか？',
-    no: 'ごゆっくりご覧ください。ご予約はいつでもこちらからどうぞ。'
+    no: 'ごゆっくりメニューをご覧ください。'
   };
 
   // 流入元（utm_* など）はフォームの住所にもそのまま渡す（英数字と . _ - だけ、各40字）
@@ -118,7 +136,50 @@
     var b = addRow('in', null);
     later(function () { b.textContent = text; if (then) then(); }, reduce ? 0 : 900);
   }
-  function hideAll() { ['choices', 'toForm', 'noNext'].forEach(function (id) { $(id).hidden = true; }); }
+  // メニュー（松本さんの予約フォームの中身、2026-11-24時点）。地域でできることが違う：
+  //   浴室・ハウス・縦型洗濯機は大阪府だけ。ドラム式洗濯機は埼玉県だけ（別途お見積もり）。エアコンは全地域。
+  //   料金は予約フォームで自動で出るので、ここでは書かない（料金表が変わってもずれないように）
+  var MENU = [
+    { cat: 'エアコン', label: 'エアコンクリーニング', sub: '壁掛け', areas: ['osaka', 'saitama', 'other'] },
+    { cat: 'エアコン', label: 'エアコンクリーニング', sub: 'お掃除機能付き', areas: ['osaka', 'saitama', 'other'] },
+    { cat: 'エアコン', label: '埋込み・天吊りエアコン', sub: '天井のエアコン', areas: ['osaka', 'saitama', 'other'] },
+    { cat: 'エアコンと一緒に', label: 'おまとめセット', sub: '防カビ・抗菌コート＋室外機　人気No.1', areas: ['osaka', 'saitama', 'other'] },
+    { cat: 'エアコンと一緒に', label: 'まるごとセット', sub: '防カビ・抗菌コート＋室外機＋ドレンホース　人気No.2', areas: ['osaka', 'saitama', 'other'] },
+    { cat: 'エアコンと一緒に', label: '防カビ・抗菌コート／室外機洗浄／ドレンホース洗浄', sub: '1つずつでも選べます', areas: ['osaka', 'saitama', 'other'] },
+    { cat: '洗濯機', label: '縦型洗濯機クリーニング', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: '洗濯機', label: 'ドラム式洗濯機クリーニング', sub: '埼玉県だけ・別途お見積もり', areas: ['saitama'] },
+    { cat: 'お風呂', label: '浴室クリーニング', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'お風呂', label: '風呂釜洗浄', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'お風呂', label: '浴槽裏洗浄', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'お風呂', label: '浴室換気扇', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'ハウスクリーニング', label: 'レンジフード', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'ハウスクリーニング', label: 'キッチン', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'ハウスクリーニング', label: 'トイレ・洗面台', sub: '大阪府だけ', areas: ['osaka'] },
+    { cat: 'ハウスクリーニング', label: '窓・ベランダ・玄関・床', sub: '大阪府だけ', areas: ['osaka'] }
+  ];
+  var area = 'other';
+  function renderMenu() {
+    var ul = $('menuList'); ul.innerHTML = ''; var last = '';
+    MENU.filter(function (m) { return m.areas.indexOf(area) >= 0; }).forEach(function (m) {
+      if (m.cat !== last) { var c = document.createElement('li'); c.className = 'cat'; c.textContent = m.cat; ul.appendChild(c); last = m.cat; }
+      var li = document.createElement('li'); li.className = 'item';
+      var t = document.createElement('div');
+      var l = document.createElement('div'); l.className = 'label'; l.textContent = m.label; t.appendChild(l);
+      if (m.sub) { var sb = document.createElement('div'); sb.className = 'sub'; sb.textContent = m.sub; t.appendChild(sb); }
+      var b = document.createElement('a'); b.className = 'btn primary'; b.textContent = 'これを予約'; b.href = formUrl;
+      b.addEventListener('click', function () { track('menu_' + area); });
+      li.appendChild(t); li.appendChild(b); ul.appendChild(li);
+    });
+  }
+  document.querySelectorAll('.areas button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      area = b.dataset.area;
+      document.querySelectorAll('.areas button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      renderMenu();
+    });
+  });
+  renderMenu();
+  function hideAll() { ['choices', 'toForm', 'menuPanel'].forEach(function (id) { $(id).hidden = true; }); }
   function start() {
     timers.forEach(clearTimeout); timers = [];
     chat.innerHTML = ''; hideAll();
@@ -129,10 +190,9 @@
     say(MSG.yes, function () { $('toForm').hidden = false; });
   }
   $('yes').addEventListener('click', yes);
-  $('yesAfter').addEventListener('click', yes);
   $('no').addEventListener('click', function () {
     hideAll(); track('no'); addRow('out', 'いいえ');
-    say(MSG.no, function () { $('noNext').hidden = false; });
+    say(MSG.no, function () { $('menuPanel').hidden = false; });
   });
   // 予約フォーム（Google Apps Script）は、ほかのページの中に埋め込むと表示されない設定のため、同じ画面でフォームへ移る
   $('goForm').href = formUrl;
