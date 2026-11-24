@@ -227,6 +227,13 @@ function saveRealName_(p) {
       sh.setFrozenRows(1);
     }
     sh.appendRow([nick, rn, Utilities.formatDate(new Date(), TZ, 'yyyy/MM/dd HH:mm:ss'), dev, p.ua === 'line' ? 'LINE内' : '外部ブラウザ']);
+    // 11/24 さとぴー：送信表の「ニックネーム」タブにもお名前を並べる（D列）
+    var nk = ss_().getSheetByName(NICK);
+    if (nk && nk.getLastRow() >= 2) {
+      nk.getRange(1, 4).setValue('お名前（本人が入力）').setFontWeight('bold');
+      var col = nk.getRange(2, 1, nk.getLastRow() - 1, 1).getValues();
+      for (var i = 0; i < col.length; i++) if (norm_(col[i][0]) === nick) { nk.getRange(i + 2, 4).setValue(rn); break; }
+    }
   } finally { lock.releaseLock(); }
   return ContentService.createTextOutput('ok');
 }
