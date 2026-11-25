@@ -65,11 +65,11 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <p id="status" role="status">スプレッドシートを読んでいます</p>
 </form>
 <section aria-live="polite">
-<dl><div><dt>売上</dt><dd id="r1">–</dd></div><div><dt>スタッフの報酬</dt><dd id="r2">–</dd></div><div><dt>広告費</dt><dd id="r3">–</dd></div><div class="main"><dt>粗利</dt><dd id="r4">–</dd></div></dl>
+<dl><div><dt>売上</dt><dd id="r1">–</dd></div><div><dt>スタッフの報酬</dt><dd id="r2">–</dd></div><div><dt>ポータルサイト利用料</dt><dd id="r3">–</dd></div><div class="main"><dt>粗利</dt><dd id="r4">–</dd></div></dl>
 <div class="goal"><span id="goal">粗利330万円まで</span><div class="bar"><i id="bar"></i></div></div>
-<h2>月ごと</h2><div class="wrap"><table><thead><tr><th>月</th><th>売上</th><th>報酬</th><th>広告費</th><th>粗利</th></tr></thead><tbody id="m"></tbody></table></div>
+<h2>月ごと</h2><div class="wrap"><table><thead><tr><th>月</th><th>売上</th><th>報酬</th><th>ポータルサイト利用料</th><th>粗利</th></tr></thead><tbody id="m"></tbody></table></div>
 <h2>入れた記録（新しい5件）</h2><div class="wrap"><table><thead><tr><th>日付</th><th class="l">担当</th><th class="l">入口</th><th class="l">作業内容</th><th>売上</th><th>粗利</th></tr></thead><tbody id="rows"></tbody></table></div>
-<p class="note">見本です。だれでも試せます（1日50件まで。毎晩、0円に戻ります）。粗利＝売上−スタッフの報酬−広告費（サイトの手数料を含む）。広告費の割合は入口ごとの見本で、実際の手数料は契約の形で変わります。料金は2026年10月2日のありがとうエアコンお掃除専門店の料金表（税込）です。同じ結果の約束ではありません。申告の帳簿や税金の計算は別に必要です。</p>
+<p class="note">見本です。だれでも試せます（1日50件まで。毎晩、0円に戻ります）。粗利＝売上−スタッフの報酬−ポータルサイト利用料。ポータルサイト利用料の割合は入口ごとの見本で、実際の手数料は契約の形で変わります。料金は2026年10月2日のありがとうエアコンお掃除専門店の料金表（税込）です。同じ結果の約束ではありません。申告の帳簿や税金の計算は別に必要です。</p>
 </section></div></main>
 <script>
 (function(){
@@ -84,7 +84,7 @@ function drawRoutes(){
   $("c").textContent="";cfg.routes.forEach(function(r){var b=el("button","",r.name);b.type="button";b.setAttribute("aria-pressed",String(r.name===route));
     b.addEventListener("click",function(){route=r.name;drawRoutes()});$("c").appendChild(b)});
   var r=cfg.routes.filter(function(x){return x.name===route})[0];
-  $("cm").textContent=r?"広告費 "+Math.round(r.rate*1000)/10+"%"+(r.memo?"（"+r.memo+"）":""):"";
+  $("cm").textContent=r?"ポータルサイト利用料 "+Math.round(r.rate*1000)/10+"%"+(r.memo?"（"+r.memo+"）":""):"";
 }
 function drawMenu(){
   var open={};[].forEach.call($("menu").querySelectorAll("details"),function(d){open[d.dataset.g]=d.open});
