@@ -34,6 +34,7 @@ a{color:var(--cream)}
 .note{font-size:12.5px;color:var(--soft);margin:0}
 @media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}h1{font-size:22px}dl{grid-template-columns:1fr 1fr}}
 input[type=date]{cursor:pointer}
+a.see{display:flex;align-items:center;justify-content:center;min-height:44px;border:2px solid var(--white);border-radius:6px;color:var(--white);font-size:17px;font-weight:700;text-decoration:none}
 </style></head><body>
 <main>
 <h1>入力するだけ。売上と粗利は自動で計算されます</h1>
@@ -46,6 +47,7 @@ input[type=date]{cursor:pointer}
 <label for="n">台数・件数<input id="n" type="number" min="1" max="20" value="1" required></label>
 <label for="s">売上（円）<input id="s" type="number" min="100" max="500000" step="100" value="0" required></label>
 <button id="b" type="submit">スプレッドシートに入れる</button>
+<a class="see" id="open" href="https://docs.google.com/spreadsheets/d/1VLcOrRDyhuQAljEL5F4m0mWEC0IlUClondBHjeIPf2s/edit#gid=104" target="_blank" rel="noopener">スプレッドシートを見る</a>
 <p id="status" role="status">スプレッドシートを読んでいます</p>
 </form>
 <section aria-live="polite">
@@ -53,7 +55,7 @@ input[type=date]{cursor:pointer}
 <div class="goal"><span id="goal">粗利330万円まで</span><div class="bar"><i id="bar"></i></div></div>
 <h2>月ごと</h2><div class="wrap"><table><thead><tr><th>月</th><th>売上</th><th>報酬</th><th>広告費</th><th>粗利</th></tr></thead><tbody id="m"></tbody></table></div>
 <h2>入れた記録（新しい5件）</h2><div class="wrap"><table><thead><tr><th>日付</th><th class="l">担当</th><th class="l">入口</th><th>件数</th><th>売上</th><th>粗利</th></tr></thead><tbody id="rows"></tbody></table></div>
-<p class="note">見本です。だれでも試せます（1日50件まで。毎晩、0円に戻ります）。粗利＝売上−スタッフの報酬−広告費（サイトの手数料を含む）。割合は見本で、広告費は「お客様リスト」以外に同じ割合をかけています。実際の手数料はサイトごとに違います。同じ結果の約束ではありません。申告の帳簿や税金の計算は別に必要です。<a id="open" href="https://docs.google.com/spreadsheets/d/1VLcOrRDyhuQAljEL5F4m0mWEC0IlUClondBHjeIPf2s/edit">スプレッドシートを開く</a></p>
+<p class="note">見本です。だれでも試せます（1日50件まで。毎晩、0円に戻ります）。粗利＝売上−スタッフの報酬−広告費（サイトの手数料を含む）。割合は見本で、広告費は「お客様リスト」以外に同じ割合をかけています。実際の手数料はサイトごとに違います。同じ結果の約束ではありません。申告の帳簿や税金の計算は別に必要です。</p>
 </section></div></main>
 <script>
 (function(){
