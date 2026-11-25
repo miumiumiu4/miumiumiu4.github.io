@@ -54,7 +54,7 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <h2 id="ft">今日の1件を入れる</h2>
 <label for="d">日付<input id="d" type="date" min="2026-11-01" max="2028-12-31" required></label>
 <label for="w">担当<select id="w"></select></label>
-<fieldset id="kf" hidden><legend>取れたら押す（スタッフの歩合が上がります）</legend><div class="chips" id="k"></div><p class="memo" id="km"></p></fieldset>
+<fieldset id="kf" hidden><legend>取れたら押す（スタッフの歩合が上がります）</legend><div class="chips" id="k"></div><p class="memo">3つ取れた時の歩合</p><div class="chips" id="kc"></div><p class="memo" id="km"></p></fieldset>
 <fieldset><legend>予約の入口</legend><div class="chips" id="c"></div><p class="memo" id="cm"></p></fieldset>
 <fieldset><legend>作業内容（押すと合計が出ます）</legend><div id="menu"></div></fieldset>
 <label for="s">売上の合計（円・直せます）<input id="s" type="number" min="1" max="1000000" step="1" value="0" required></label>
@@ -77,7 +77,7 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 </section></div></main>
 <script>
 (function(){
-var $=function(i){return document.getElementById(i)},cfg=null,route="",qty={},checks=[false,false,false],editing="",NAMES=["口コミ","LINE","メルマガ"];
+var $=function(i){return document.getElementById(i)},cfg=null,route="",qty={},checks=[false,false,false],cap=0,editing="",NAMES=["口コミ","LINE","メルマガ"];
 var num=function(v){return Number(String(v==null?"":v).replace(/[^0-9.-]/g,""))||0},yen=function(v){return Math.round(num(v)).toLocaleString("ja-JP")+"円"};
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function row(tb,cells,left){var tr=el("tr");cells.forEach(function(c,i){tr.appendChild(el("td",left.indexOf(i)>=0?"l":"",c))});tb.appendChild(tr)}
@@ -90,19 +90,24 @@ function drawRoutes(){
   var r=cfg.routes.filter(function(x){return x.name===route})[0];
   $("cm").textContent=r?"ポータルサイト利用料 "+Math.round(r.rate*1000)/10+"%"+(r.memo?"（"+r.memo+"）":"")+(r.recv<1?"／受け取りは売上の"+Math.round(r.recv*1000)/10+"%（残りは渡した会社の分）":""):"";
 }
+function pct(v){return Math.round(v*10000)/100+"%"}
+function ownCap(){cap=cfg.cap[cfg.who.indexOf($("w").value)]||cfg.pay.start}
 function drawChecks(){
   var w=$("w").value;$("kf").hidden=w==="自分";$("k").textContent="";
   NAMES.forEach(function(n,i){var b=el("button","",(checks[i]?"✓ ":"")+n);b.type="button";b.setAttribute("aria-pressed",String(checks[i]));
     b.addEventListener("click",function(){checks[i]=!checks[i];drawChecks()});$("k").appendChild(b)});
-  var cap=cfg.cap[cfg.who.indexOf(w)]||cfg.pay.start,v=cfg.pay.start+(cap-cfg.pay.start)/3*checks.filter(Boolean).length;
-  $("km").textContent="歩合 "+Math.round(v*1000)/10+"% → 報酬は売上の "+Math.round(v*cfg.pay.base*1000)/10+"%";
+  var list=cfg.caps.slice();if(list.indexOf(cap)<0)list.push(cap);list.sort();
+  $("kc").textContent="";list.forEach(function(v){var b=el("button","",pct(v));b.type="button";b.setAttribute("aria-pressed",String(v===cap));
+    b.addEventListener("click",function(){cap=v;drawChecks()});$("kc").appendChild(b)});
+  var v=cfg.pay.start+(cap-cfg.pay.start)/3*checks.filter(Boolean).length;
+  $("km").textContent="歩合 "+pct(v)+" → 報酬は売上の "+pct(v*cfg.pay.base);
 }
-function reset(){editing="";qty={};checks=[false,false,false];$("s").value=0;$("n").value=1;$("ft").textContent="今日の1件を入れる";$("b").textContent="スプレッドシートに入れる";
+function reset(){editing="";qty={};checks=[false,false,false];$("s").value=0;$("n").value=1;ownCap();$("ft").textContent="今日の1件を入れる";$("b").textContent="スプレッドシートに入れる";
   ["ec","ed","eq"].forEach(function(i){$(i).hidden=true});drawMenu();drawChecks()}
 function edit(r){
   editing=r[14];$("d").value=r[0].replace(/\//g,"-");$("w").value=r[1];route=r[2];$("n").value=num(r[3]);checks=[r[10],r[11],r[12]].map(function(x){return x==="✓"});qty={};
   (r[8]||"").split("、").forEach(function(t){var k=t.lastIndexOf("×"),i=cfg.menu.map(function(m){return m.name}).indexOf(t.slice(0,k));if(k>0&&i>=0)qty[i]=Number(t.slice(k+1))});
-  drawRoutes();drawMenu();drawChecks();$("s").value=num(r[4]);
+  ownCap();if(num(r[15])>0)cap=num(r[15])/100;drawRoutes();drawMenu();drawChecks();$("s").value=num(r[4]);
   $("ft").textContent="この1件を直す";$("b").textContent="直してスプレッドシートに入れる";$("ec").hidden=false;$("ed").hidden=false;$("eq").hidden=true;
   $("ft").scrollIntoView({block:"start"});$("status").textContent="直したい所を変えて、オレンジのボタンを押してください";
 }
@@ -121,7 +126,7 @@ function drawMenu(){
   });
 }
 function show(o){
-  if(!cfg){cfg=o.config;cfg.who.forEach(function(w){$("w").appendChild(el("option","",w))});route=cfg.routes[0].name;drawRoutes();drawMenu();drawChecks()}
+  if(!cfg){cfg=o.config;cfg.who.forEach(function(w){$("w").appendChild(el("option","",w))});route=cfg.routes[0].name;drawRoutes();drawMenu();ownCap();drawChecks()}
   var t=o.total;["r1","r2","r3","r4"].forEach(function(k,i){$(k).textContent=yen(t[i])});
   $("goal").textContent="粗利330万円まで、あと "+yen(Math.max(0,3300000-num(t[3])));$("bar").style.width=Math.max(0,Math.min(100,num(t[3])/33000))+"%";
   $("m").textContent="";o.months.filter(function(r){return num(r[1])>0}).forEach(function(r){row($("m"),[r[0],yen(r[1]),yen(r[2]),yen(r[3]),yen(r[4])],[])});
@@ -142,7 +147,7 @@ function start(){call().then(function(){$("status").textContent="見本シート
 var now=new Date();$("d").value=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
 $("d").addEventListener("click",function(){try{this.showPicker()}catch(e){}});
 $("d").addEventListener("change",function(){if(cfg){drawMenu();if(Object.keys(qty).some(function(k){return qty[k]}))total()}});
-$("w").addEventListener("change",function(){if(cfg)drawChecks()});
+$("w").addEventListener("change",function(){if(cfg){ownCap();drawChecks()}});
 $("ec").addEventListener("click",function(){reset();$("status").textContent=""});
 $("ed").addEventListener("click",function(){$("ed").hidden=true;$("eq").hidden=false;$("en").focus()});
 $("en").addEventListener("click",function(){$("eq").hidden=true;$("ed").hidden=false});
@@ -152,7 +157,7 @@ start();
 $("f").addEventListener("submit",function(ev){ev.preventDefault();if(!cfg)return;
   $("b").disabled=true;$("status").textContent="スプレッドシートに入れています";
   var items=Object.keys(qty).filter(function(k){return qty[k]>0}).map(function(k){return[Number(k),qty[k]]});
-  var p={date:$("d").value,who:$("w").value,route:route,n:Number($("n").value),sales:Number($("s").value),items:items,checks:checks};if(editing)p.id=editing;
+  var p={date:$("d").value,who:$("w").value,route:route,n:Number($("n").value),sales:Number($("s").value),items:items,checks:checks,cap:cap};if(editing)p.id=editing;
   call(p).then(function(){$("status").textContent=editing?"直しました。シートが計算し直しました":"入りました。シートが計算し直しました";var m=$("status").textContent;reset();$("status").textContent=m}).catch(say)
     .then(function(){$("b").disabled=false});
 });
