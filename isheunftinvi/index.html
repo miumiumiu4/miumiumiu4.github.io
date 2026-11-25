@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>売上と利益の診断</title>
+<style>
+/* 左＝条件を動かす、右＝スコアボード。提案資料（紺×オレンジ×白）と同じ色 */
+:root{--navy:#082344;--navy2:#0f315c;--line:#2b4a74;--orange:#f07a12;--cream:#fff1e3;--white:#fff;--soft:#b9c9de}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--white);font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.45;font-variant-numeric:tabular-nums}
+main{max-width:1180px;margin:0 auto;padding:22px 24px}
+h1{font-size:30px;margin:0;padding-bottom:10px;border-bottom:3px solid var(--orange)}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:26px;margin-top:18px}
+.field{margin-bottom:13px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+label{font-size:15px}
+output{font-size:20px;font-weight:700;color:var(--orange);white-space:nowrap}
+.big output{font-size:34px;line-height:1.1}
+.big label{font-size:18px;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--orange);height:28px;margin:0;cursor:pointer}
+.seg{display:flex;gap:8px;margin-top:4px}
+.seg button{flex:1;min-height:40px;font:inherit;font-size:15px;color:var(--white);background:transparent;border:1px solid var(--soft);border-radius:6px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--orange);border-color:var(--orange);font-weight:700}
+:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+details{border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-size:15px;color:var(--soft);margin-bottom:10px}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.score>div{background:var(--white);color:var(--navy);border-radius:8px;padding:12px 18px;min-width:0}
+.score .main{background:var(--orange);color:var(--white)}
+.score dt{font-size:15px}.score dd{margin:0;font-size:38px;font-weight:800;line-height:1.2;white-space:nowrap}
+dl{margin:0}
+.sub{font-size:13px;display:block}
+.chart{margin-top:14px}.chart h2,.list h2{font-size:16px;margin:0 0 6px}
+.bars{display:grid;grid-template-columns:repeat(12,1fr);gap:5px;height:124px;align-items:end}
+.bars div{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center;font-size:12px;min-width:0}
+.bars i{display:block;background:var(--orange);border-radius:3px 3px 0 0;min-height:2px}
+.bars .off i{background:var(--soft)}
+.list{margin-top:14px;background:var(--cream);color:var(--navy);border-radius:8px;padding:12px 18px}
+.list p{margin:0;font-size:15px}.list b{font-size:21px;color:#c25600;white-space:nowrap}
+.note{font-size:12.5px;color:var(--soft);margin:14px 0 0}
+@media(max-width:760px){main{padding:16px}h1{font-size:23px}.grid{grid-template-columns:minmax(0,1fr);gap:16px}.score dd{font-size:26px}.score>div{padding:10px 12px}.bars div{font-size:10px}}
+</style></head><body><main>
+<h1>人数でわかる、売上と利益の診断</h1>
+<div class="grid"><section aria-label="条件">
+<div class="field big"><div class="row"><label for="staff">現場を回るスタッフ</label><output id="o-staff"></output></div><input id="staff" type="range" min="0" max="20" step="1" value="10"></div>
+<div class="field"><label>自分も現場に出る</label><div class="seg" id="self"><button type="button" data-v="1">出る</button><button type="button" data-v="0">出ない</button></div></div>
+<div class="field"><label>計画に対して</label><div class="seg" id="rate"><button type="button" data-v="100">計画どおり</button><button type="button" data-v="80">8割</button><button type="button" data-v="60">6割</button></div></div>
+<div class="field"><div class="row"><label for="years">続けた年数（人数は同じまま）</label><output id="o-years"></output></div><input id="years" type="range" min="1" max="5" step="1" value="1"></div>
+<details id="more"><summary>細かい条件を変える</summary>
+<div class="field"><div class="row"><label for="on">1人の月売上 5〜12月</label><output id="o-on"></output></div><input id="on" type="range" min="20" max="100" step="5" value="70"></div>
+<div class="field"><div class="row"><label for="off">1人の月売上 1〜4月</label><output id="o-off"></output></div><input id="off" type="range" min="0" max="70" step="5" value="30"></div>
+<div class="field"><div class="row"><label for="ms">スタッフが回った利益率</label><output id="o-ms"></output></div><input id="ms" type="range" min="10" max="50" step="5" value="30"></div>
+<div class="field"><div class="row"><label for="me">自分が回った利益率</label><output id="o-me"></output></div><input id="me" type="range" min="10" max="80" step="5" value="60"></div>
+<div class="field"><div class="row"><label for="unit">お客様1件の単価</label><output id="o-unit"></output></div><input id="unit" type="range" min="10000" max="25000" step="1000" value="15000"></div>
+<div class="field"><div class="row"><label for="reg">お客様リストへの登録</label><output id="o-reg"></output></div><input id="reg" type="range" min="10" max="100" step="5" value="90"></div>
+</details>
+</section>
+<section aria-live="polite" aria-label="結果">
+<dl class="score">
+<div><dt>1年の売上</dt><dd id="sales"></dd><span class="sub" id="salesm"></span></div>
+<div class="main"><dt>1年の利益</dt><dd id="profit"></dd><span class="sub" id="profitm"></span></div>
+</dl>
+<div class="chart"><h2>月ごとの利益（万円）</h2><div class="bars" id="bars"></div></div>
+<div class="list"><h2>育っていくお客様リスト</h2><p id="listtext"></p></div>
+</section></div>
+<p class="note">試算で、同じ結果の約束ではありません。利益は粗利（売上−スタッフの報酬−広告費〈サイトの手数料を含む〉）の目安で、売上×利益率で計算しています。毎月の費用・加盟金の支払い・税金は引いていません。キャンペーンは、約1万件のリストに7日間ご案内して売上1,200万円だった1社の実績（2026年9月）の割合をもとに計算しています。売上で、利益ではありません。予約を受けきれる人数には限りがあります。</p>
+</main><script>
+function calc(s){
+  var r=s.rate/100,months=[],sales=0,jobs=0;
+  for(var m=1;m<=12;m++){var p=(m<=4?s.off:s.on)*r,st=p*s.staff,me=p*s.self;
+    sales+=st+me;jobs+=(st+me)*10000/s.unit;
+    months.push(st*s.ms/100+me*s.me/100)}
+  var profit=months.reduce(function(a,b){return a+b},0),list=jobs*s.years*s.reg/100;
+  return{sales:sales,profit:profit,months:months,jobs:jobs,list:list,camp:list*0.1134,book:list*0.06303}}
+if(typeof document!=="undefined"){(function(){
+  var $=function(i){return document.getElementById(i)},sel={self:1,rate:100},
+  ids=["staff","years","on","off","ms","me","unit","reg"],
+  u={staff:"人",years:"年",on:"万円",off:"万円",ms:"%",me:"%",unit:"円",reg:"%"};
+  sel.self=0;
+  var n=function(v){return Math.round(v).toLocaleString("ja-JP")};
+  function draw(){
+    var s={self:sel.self,rate:sel.rate};
+    ids.forEach(function(i){s[i]=+$(i).value;$("o-"+i).textContent=(i==="unit"?n(s[i]):s[i])+u[i]});
+    ["self","rate"].forEach(function(g){$(g).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.v===sel[g]))})});
+    var c=calc(s),max=Math.max.apply(null,c.months.concat([1]));
+    $("sales").textContent=n(c.sales)+"万円";$("salesm").textContent="月の平均 "+n(c.sales/12)+"万円／現場 約"+n(c.jobs)+"件";
+    $("profit").textContent=n(c.profit)+"万円";$("profitm").textContent="月の平均 "+n(c.profit/12)+"万円";
+    $("bars").innerHTML=c.months.map(function(v,i){return'<div class="'+(i<4?"off":"")+'"><span>'+n(v)+'</span><i style="height:'+Math.max(0,v/max*76)+'px"></i><span>'+(i+1)+"月</span></div>"}).join("");
+    $("listtext").innerHTML=s.years+"年でリストは約<b>"+n(c.list)+"件</b>。1回のキャンペーンで約<b>"+n(c.camp)+"万円</b>の売上（約"+n(c.book)+"件の予約）";
+  }
+  ids.forEach(function(i){$(i).addEventListener("input",draw)});
+  ["self","rate"].forEach(function(g){$(g).addEventListener("click",function(e){var b=e.target.closest("button");if(b){sel[g]=+b.dataset.v;draw()}})});
+  draw();
+})()}
+if(typeof module!=="undefined")module.exports=calc;
+</script></body></html>
