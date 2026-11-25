@@ -53,6 +53,15 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 .pick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:8px;text-align:center}.pick.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));text-align:left}.pick label{min-width:0}.set label{margin-top:8px}.set select,.set input{min-width:0}
 #more{width:100%;margin-bottom:18px}
 .th{margin:16px 0 8px}.tax dd{font-size:17px}@media(max-width:1060px){dl{grid-template-columns:1fr 1fr}}.tax div{background:#e8f2e6}
+.act{display:grid;gap:10px}
+.it.on{background:var(--line);border-radius:6px;padding:4px 8px}
+.ed #f{outline:3px solid var(--orange);outline-offset:9px;border-radius:2px;align-content:start}
+.ed .set,.ed #open,.ed #z,.ed #zq{display:none}
+.ed>section{opacity:.5}#ei,#lh{scroll-margin-top:14px}
+.ed .act{grid-template-columns:1fr 1fr;position:sticky;bottom:0;background:var(--navy);padding:10px 0;z-index:2}.ed #b,.ed #eq{grid-column:1/-1}
+#ei{background:var(--cream);color:var(--navy);border-radius:8px;padding:10px 14px}#ei p{margin:4px 0 0;font-size:14px}#ew{font-size:16px}#el{font-weight:700;color:var(--deep)}
+.ch{border-left:5px solid var(--orange);padding-left:10px}
+tr.now td{background:var(--line)}
 [hidden]{display:none!important}
 </style></head><body>
 <main>
@@ -60,17 +69,18 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <div class="grid">
 <form id="f">
 <h2 id="ft">今日の1件を入れる</h2>
-<label for="d">日付<input id="d" type="date" min="2026-11-01" max="2028-12-31" required></label>
-<label for="w">担当<select id="w"></select></label>
-<fieldset id="kf" hidden><legend>取れたら押す（スタッフの歩合が上がります）</legend><div class="chips" id="k"></div><label for="kr" class="kl">3つ取れた時の歩合 <output id="ko"></output></label><div class="knob"><button id="kd" type="button" aria-label="歩合を下げる">−</button><input id="kr" type="range"><button id="ku" type="button" aria-label="歩合を上げる">＋</button></div><p class="memo" id="km"></p></fieldset>
-<fieldset><legend>予約の入口</legend><div class="chips" id="c"></div><p class="memo" id="cm"></p></fieldset>
-<fieldset><legend>作業内容（押すと合計が出ます）</legend><div id="menu"></div></fieldset>
-<label for="s">売上の合計（円・直せます）<input id="s" type="number" min="1" max="1000000" step="1" value="0" required></label>
-<label for="n">件数（お客様1軒で1件）<input id="n" type="number" min="1" max="20" value="1" required></label>
-<button id="b" type="submit">スプレッドシートに入れる</button>
+<div id="ei" hidden><b id="ew"></b><p>下の欄のうち、直したい所だけを変えてください。変えた所にオレンジの線がつきます。</p><p id="el" role="status"></p></div>
+<label for="d" data-k="日付">日付<input id="d" type="date" min="2026-11-01" max="2028-12-31" required></label>
+<label for="w" data-k="担当">担当<select id="w"></select></label>
+<fieldset id="kf" data-k="歩合" hidden><legend>取れたら押す（スタッフの歩合が上がります）</legend><div class="chips" id="k"></div><label for="kr" class="kl">3つ取れた時の歩合 <output id="ko"></output></label><div class="knob"><button id="kd" type="button" aria-label="歩合を下げる">−</button><input id="kr" type="range"><button id="ku" type="button" aria-label="歩合を上げる">＋</button></div><p class="memo" id="km"></p></fieldset>
+<fieldset data-k="予約の入口"><legend>予約の入口</legend><div class="chips" id="c"></div><p class="memo" id="cm"></p></fieldset>
+<fieldset data-k="作業内容"><legend>作業内容（押すと合計が出ます）</legend><div id="menu"></div></fieldset>
+<label for="s" data-k="売上">売上の合計（円・直せます）<input id="s" type="number" min="1" max="1000000" step="1" value="0" required></label>
+<label for="n" data-k="件数">件数（お客様1軒で1件）<input id="n" type="number" min="1" max="20" value="1" required></label>
+<div class="act"><button id="b" type="submit">スプレッドシートに入れる</button>
 <button id="ec" class="zero" type="button" hidden>直すのをやめる</button>
 <button id="ed" class="zero" type="button" hidden>この1件を消す</button>
-<div id="eq" class="ask" hidden><span>この1件を消します。よろしいですか？</span><button id="ey" type="button">はい、消す</button><button id="en" class="zero" type="button">やめる</button></div>
+<div id="eq" class="ask" hidden><span>この1件を消します。よろしいですか？</span><button id="ey" type="button">はい、消す</button><button id="en" class="zero" type="button">やめる</button></div></div>
 <a class="see" id="open" href="https://docs.google.com/spreadsheets/d/1VLcOrRDyhuQAljEL5F4m0mWEC0IlUClondBHjeIPf2s/edit#gid=104" target="_blank" rel="noopener">スプレッドシートを見る</a>
 <details class="set" id="rp"><summary>ポータルサイトの手数料率（月ごと）</summary>
 <label for="rm">月<select id="rm"></select></label><p class="memo">空欄の入口は、いつもの割合（灰色の数字）で計算します。保存すると、その月の記録も計算し直します。</p>
@@ -103,7 +113,7 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <div class="goal" id="g1" hidden><span></span><div class="bar"><i></i></div></div>
 <div class="goal" id="g2" hidden><span></span><div class="bar"><i></i></div></div>
 <h2>月ごと</h2><div class="wrap"><table><thead><tr><th>月</th><th>売上</th><th>報酬</th><th>ポータルサイト利用料</th><th>粗利</th></tr></thead><tbody id="m"></tbody></table></div>
-<h2>入れた記録（歩合などを変える時は「直す」）</h2>
+<h2 id="lh">入れた記録（歩合などを変える時は「直す」）</h2><p class="memo" id="ls" role="status"></p>
 <div class="pick"><button id="vp" class="zero" type="button">前の月</button><b id="vm"></b><button id="vn" class="zero" type="button">次の月</button></div>
 <div class="pick two"><label for="fw">担当<select id="fw"></select></label><label for="fc">予約の入口<select id="fc"></select></label></div>
 <p class="memo" id="vc"></p><div class="wrap"><table><thead><tr><th></th><th class="l">日付</th><th class="l">担当</th><th class="l">入口</th><th class="l">作業内容</th><th class="l">歩合</th><th>売上</th><th>報酬</th><th>粗利</th></tr></thead><tbody id="rows"></tbody></table></div><button id="more" class="zero" type="button" hidden>もっと見る</button>
@@ -111,7 +121,7 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 </section></div></main>
 <script>
 (function(){
-var $=function(i){return document.getElementById(i)},cfg=null,route="",qty={},checks=[false,false,false],cap=0,view="",data=null,page=20,editing="",NAMES=["口コミ","LINE","メルマガ"];
+var $=function(i){return document.getElementById(i)},cfg=null,route="",qty={},checks=[false,false,false],cap=0,view="",data=null,page=20,editing="",orig={},NAMES=["口コミ","LINE","メルマガ"];
 var num=function(v){return Number(String(v==null?"":v).replace(/[^0-9.-]/g,""))||0},yen=function(v){return Math.round(num(v)).toLocaleString("ja-JP")+"円"};
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function row(tb,cells,left){var tr=el("tr");cells.forEach(function(c,i){tr.appendChild(el("td",left.indexOf(i)>=0?"l":"",c))});tb.appendChild(tr)}
@@ -184,14 +194,24 @@ function drawChecks(){
     $("km").textContent+="（"+yen(x)+"なら "+yen(a)+"）／この1件の粗利 "+(g<0?"−":"")+yen(Math.abs(g))+(g<0?"。報酬と利用料が売上を超えています":"")}
 
 }
-function reset(){editing="";qty={};checks=[false,false,false];$("s").value=0;$("n").value=1;drawWho();ownCap();$("ft").textContent="今日の1件を入れる";$("b").textContent="スプレッドシートに入れる";
+function snap(){var w=$("w").value;return{"日付":$("d").value.replace(/-/g,"/"),"担当":w,"予約の入口":route,"作業内容":cfg.menu.map(function(m,i){return qty[i]?m.name+"×"+qty[i]:""}).filter(String).join("、"),"売上":yen($("s").value),"件数":$("n").value+"件",
+  "歩合":w==="自分"?"":pct(cap)+(checks.some(Boolean)?"・"+NAMES.filter(function(x,i){return checks[i]}).join("・"):"")}}
+function diff(){
+  var now=editing?snap():{},L=[];
+  [].forEach.call($("f").querySelectorAll("[data-k]"),function(e){var k=e.dataset.k,x=!!editing&&now[k]!==orig[k];e.classList.toggle("ch",x);if(x)L.push(k+"："+(orig[k]||"なし")+" → "+(now[k]||"なし"))});
+  $("el").textContent=L.length?"変わる所　"+L.join("／"):"まだ何も変えていません";
+}
+function mode(on){$("f").parentNode.classList.toggle("ed",on);$("ei").hidden=!on}
+function back(t){$("ls").textContent=t;$("lh").scrollIntoView({block:"start"})}
+function reset(){editing="";mode(false);diff();qty={};checks=[false,false,false];$("s").value=0;$("n").value=1;drawWho();ownCap();$("ft").hidden=false;$("ft").textContent="今日の1件を入れる";$("b").textContent="スプレッドシートに入れる";
   ["ec","ed","eq"].forEach(function(i){$(i).hidden=true});drawMenu();drawChecks()}
 function edit(r){
   editing=r[14];$("d").value=r[0].replace(/\//g,"-");drawWho(r[1]);$("w").value=r[1];route=r[2];$("n").value=num(r[3]);checks=[r[10],r[11],r[12]].map(function(x){return x==="✓"});qty={};
   (r[8]||"").split("、").forEach(function(t){var k=t.lastIndexOf("×"),i=cfg.menu.map(function(m){return m.name}).indexOf(t.slice(0,k));if(k>0&&i>=0)qty[i]=Number(t.slice(k+1))});
   ownCap();if(num(r[15])>0)cap=num(r[15])/100;drawRoutes();drawMenu();$("s").value=num(r[4]);drawChecks();
-  $("ft").textContent="この1件を直す";$("b").textContent="直してスプレッドシートに入れる";$("ec").hidden=false;$("ed").hidden=false;$("eq").hidden=true;
-  $("ft").scrollIntoView({block:"start"});$("status").textContent="直したい所を変えて、オレンジのボタンを押してください";
+  $("ew").textContent="この1件を直しています："+ymd($("d").value)+"・"+r[1]+"・"+r[2]+"・"+yen(r[4]);$("ft").hidden=true;$("b").textContent="直した内容で保存";$("ls").textContent="";
+  [].forEach.call($("menu").querySelectorAll("details"),function(d){d.open=!!d.querySelector(".on")});orig=snap();mode(true);diff();drawList();$("ec").hidden=false;$("ed").hidden=false;$("eq").hidden=true;
+  $("ei").scrollIntoView({block:"start"});$("status").textContent="";
 }
 function say(e){$("status").textContent=/[ぁ-ん]/.test(e.message)?e.message:"つながりませんでした。シートに入ったか確かめてから、もう一度押してください"}
 function drawMenu(){
@@ -199,10 +219,10 @@ function drawMenu(){
   $("menu").textContent="";var box={};
   cfg.menu.forEach(function(m,i){
     if(!box[m.group]){var d=el("details");d.dataset.g=m.group;d.open=m.group in open?open[m.group]:m.group.indexOf("エアコン")===0;d.appendChild(el("summary","",m.group));$("menu").appendChild(d);box[m.group]=d}
-    var it=el("div","it"),name=el("span","",m.name),p=price(m),st=el("span","st"),q=el("b","",qty[i]||0);
+    var it=el("div","it"+(qty[i]?" on":"")),name=el("span","",m.name),p=price(m),st=el("span","st"),q=el("b","",qty[i]||0);
     name.appendChild(el("small","",p===0&&m.price>0&&!inPeriod(m)?"平日は無料":yen(p)+(inPeriod(m)?"（期間の料金）":"")));
     [["−",-1],["＋",1]].forEach(function(x){var b=el("button","",x[0]);b.type="button";b.setAttribute("aria-label",m.name+(x[1]>0?"を増やす":"を減らす"));
-      b.addEventListener("click",function(){qty[i]=Math.max(0,Math.min(30,(qty[i]||0)+x[1]));q.textContent=qty[i];total()});
+      b.addEventListener("click",function(){qty[i]=Math.max(0,Math.min(30,(qty[i]||0)+x[1]));q.textContent=qty[i];it.classList.toggle("on",qty[i]>0);total()});
       if(x[1]>0)st.appendChild(q);st.appendChild(b)});
     it.appendChild(name);it.appendChild(st);box[m.group].appendChild(it);
   });
@@ -217,6 +237,7 @@ function drawList(){
   $("rows").textContent="";if(!list.length)row($("rows"),[data.rows.length?"合う記録がありません":"この月の記録はありません","","","","","","","",""],[0]);
   now.forEach(function(r){
     row($("rows"),["",r[0],r[1],r[2],r[8]||"",r[1]==="自分"?"":r[13]+" "+NAMES.filter(function(n,i){return r[10+i]==="✓"}).join("・"),yen(r[4]),yen(r[5]),yen(r[7])],[1,2,3,4,5]);
+    if(r[14]&&r[14]===editing)$("rows").lastChild.className="now";
     if(r[14]){var b=el("button","zero","直す");b.type="button";b.setAttribute("aria-label",r[0]+"の"+yen(r[4])+"を直す");b.addEventListener("click",function(){edit(r)});$("rows").lastChild.firstChild.appendChild(b)}
   });
   $("more").hidden=list.length<=now.length;$("more").textContent="もっと見る（あと"+(list.length-now.length)+"件）";
@@ -265,17 +286,18 @@ $("kr").addEventListener("input",function(){turn(Number($("kr").value)/100)});
 $("kd").addEventListener("click",function(){turn(cap-cfg.knob.step)});$("ku").addEventListener("click",function(){turn(cap+cfg.knob.step)});
 $("s").addEventListener("input",function(){if(cfg)drawChecks()});
 $("w").addEventListener("change",function(){if(cfg){ownCap();drawChecks()}});
-$("ec").addEventListener("click",function(){reset();$("status").textContent=""});
+$("ec").addEventListener("click",function(){reset();$("status").textContent="";drawList();back("直すのをやめました。記録は変わっていません")});
+["input","change","click"].forEach(function(t){$("f").addEventListener(t,function(){if(editing)setTimeout(function(){if(editing)diff()},0)})});
 $("ed").addEventListener("click",function(){$("ed").hidden=true;$("eq").hidden=false;$("en").focus()});
 $("en").addEventListener("click",function(){$("eq").hidden=true;$("ed").hidden=false});
 $("ey").addEventListener("click",function(){$("ey").disabled=true;$("status").textContent="消しています";
-  call({del:editing}).then(function(){reset();$("status").textContent="消しました"}).catch(say).then(function(){$("ey").disabled=false})});
+  call({del:editing}).then(function(){reset();$("status").textContent="消しました";back("消しました")}).catch(say).then(function(){$("ey").disabled=false})});
 start();
 $("f").addEventListener("submit",function(ev){ev.preventDefault();if(!cfg)return;
   $("b").disabled=true;$("status").textContent="スプレッドシートに入れています";
   var items=Object.keys(qty).filter(function(k){return qty[k]>0}).map(function(k){return[Number(k),qty[k]]});
   var p={date:$("d").value,who:$("w").value,route:route,n:Number($("n").value),sales:Number($("s").value),items:items,checks:checks,cap:cap};if(editing)p.id=editing;
-  view=p.date.slice(0,7);call(p).then(function(){$("status").textContent=editing?"直しました。シートが計算し直しました":"入りました。シートが計算し直しました";var m=$("status").textContent;reset();$("status").textContent=m}).catch(say)
+  view=p.date.slice(0,7);call(p).then(function(){$("status").textContent=editing?"直しました。シートが計算し直しました":"入りました。シートが計算し直しました";var m=$("status").textContent,e=!!editing;reset();$("status").textContent=m;drawList();if(e)back(m)}).catch(say)
     .then(function(){$("b").disabled=false});
 });
 })();
