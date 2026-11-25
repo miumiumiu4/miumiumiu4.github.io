@@ -44,6 +44,8 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:4px 0;font-size:14.5px}
 .it small{color:var(--soft);margin-left:6px;white-space:nowrap}
 .st{display:flex;align-items:center;gap:6px}.st button{min-width:44px;padding:0;background:transparent;border-color:var(--soft)}.st b{min-width:22px;text-align:center}
+.zero{background:transparent;border-color:var(--soft);font-weight:400;font-size:15px}.ask{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px}.ask span{grid-column:1/-1}
+[hidden]{display:none!important}
 </style></head><body>
 <main>
 <h1>入力するだけ。売上と粗利は自動で計算されます</h1>
@@ -58,6 +60,8 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <label for="n">件数（お客様1軒で1件）<input id="n" type="number" min="1" max="20" value="1" required></label>
 <button id="b" type="submit">スプレッドシートに入れる</button>
 <a class="see" id="open" href="https://docs.google.com/spreadsheets/d/1VLcOrRDyhuQAljEL5F4m0mWEC0IlUClondBHjeIPf2s/edit#gid=104" target="_blank" rel="noopener">スプレッドシートを見る</a>
+<button id="z" class="zero" type="button">数字を0にする</button>
+<div id="zq" class="ask" hidden><span>入れた記録を全部消します。本当に0にしますか？</span><button id="zy" type="button">はい、0にする</button><button id="zn" class="zero" type="button">やめる</button></div>
 <p id="status" role="status">スプレッドシートを読んでいます</p>
 </form>
 <section aria-live="polite">
@@ -105,6 +109,11 @@ function show(o){
 }
 var URL_="https://script.google.com/macros/s/AKfycbwIfVLDtXR3P194_S2zM-OBh6kVJTHloUa6drJNNWlf07Cc7yG9UtJiF9dZaC7zaLZpMA/exec";
 function call(p){return fetch(URL_,p?{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p)}:undefined).then(function(r){return r.json()}).then(function(o){if(o.error)throw new Error(o.error);show(o)})}
+$("z").addEventListener("click",function(){$("z").hidden=true;$("zq").hidden=false;$("zn").focus()});
+$("zn").addEventListener("click",function(){$("zq").hidden=true;$("z").hidden=false});
+$("zy").addEventListener("click",function(){$("zy").disabled=true;$("status").textContent="0に戻しています";
+  call({reset:true}).then(function(){$("status").textContent="0円に戻しました"}).catch(function(e){$("status").textContent=/[ぁ-ん]/.test(e.message)?e.message:"つながりませんでした。もう一度押してください"})
+    .then(function(){$("zy").disabled=false;$("zq").hidden=true;$("z").hidden=false})});
 function start(){call().then(function(){$("status").textContent="見本シートとつながっています"}).catch(function(){$("status").textContent="見本シートを読めませんでした。少し待って開き直してください"})}
 var now=new Date();$("d").value=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
 $("d").addEventListener("click",function(){try{this.showPicker()}catch(e){}});
