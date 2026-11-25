@@ -50,6 +50,8 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 .set{border:1px solid var(--line);border-radius:8px;padding:2px 12px 10px}.set summary{font-weight:700}
 .rt{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px;align-items:center;padding:3px 0;font-size:14.5px}.pc{display:flex;align-items:center;gap:4px}.pc input{min-width:0}
 .sf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.sf .bt{grid-column:1/-1;display:flex;gap:8px}.sf .bt button,.sf.new button{font-size:15px}.sf.new{border:0}.sf.new button{grid-column:1/-1}.off{opacity:.7}
+.pick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:8px;text-align:center}.pick.two{grid-template-columns:1fr 1fr;text-align:left}
+#more{width:100%;margin-bottom:18px}
 [hidden]{display:none!important}
 </style></head><body>
 <main>
@@ -84,12 +86,15 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <dl><div><dt>売上</dt><dd id="r1">–</dd></div><div><dt>スタッフの報酬</dt><dd id="r2">–</dd></div><div><dt>ポータルサイト利用料</dt><dd id="r3">–</dd></div><div class="main"><dt>粗利</dt><dd id="r4">–</dd></div></dl>
 <div class="goal"><span id="goal">粗利330万円まで</span><div class="bar"><i id="bar"></i></div></div>
 <h2>月ごと</h2><div class="wrap"><table><thead><tr><th>月</th><th>売上</th><th>報酬</th><th>ポータルサイト利用料</th><th>粗利</th></tr></thead><tbody id="m"></tbody></table></div>
-<h2>入れた記録（歩合などを変える時は「直す」）</h2><div class="wrap"><table><thead><tr><th></th><th class="l">日付</th><th class="l">担当</th><th class="l">入口</th><th class="l">作業内容</th><th class="l">歩合</th><th>売上</th><th>報酬</th><th>粗利</th></tr></thead><tbody id="rows"></tbody></table></div>
+<h2>入れた記録（歩合などを変える時は「直す」）</h2>
+<div class="pick"><button id="vp" class="zero" type="button">前の月</button><b id="vm"></b><button id="vn" class="zero" type="button">次の月</button></div>
+<div class="pick two"><label for="fw">担当<select id="fw"></select></label><label for="fc">予約の入口<select id="fc"></select></label></div>
+<p class="memo" id="vc"></p><div class="wrap"><table><thead><tr><th></th><th class="l">日付</th><th class="l">担当</th><th class="l">入口</th><th class="l">作業内容</th><th class="l">歩合</th><th>売上</th><th>報酬</th><th>粗利</th></tr></thead><tbody id="rows"></tbody></table></div><button id="more" class="zero" type="button" hidden>もっと見る</button>
 <p class="note">見本です。だれでも試せます（1日50件まで。毎晩、0円に戻ります）。粗利＝売上−スタッフの報酬−ポータルサイト利用料−他社へ渡した分（案件共有）。スタッフの報酬は、口コミ・LINE・メルマガの取れた数で変わります。ポータルサイト利用料の割合は入口ごとの見本で、実際の手数料は契約の形で変わります。料金は2026年10月2日のありがとうエアコンお掃除専門店の料金表（税込）がもとで、防カビの単品は2,500円にしています。同じ結果の約束ではありません。申告の帳簿や税金の計算は別に必要です。</p>
 </section></div></main>
 <script>
 (function(){
-var $=function(i){return document.getElementById(i)},cfg=null,route="",qty={},checks=[false,false,false],cap=0,editing="",NAMES=["口コミ","LINE","メルマガ"];
+var $=function(i){return document.getElementById(i)},cfg=null,route="",qty={},checks=[false,false,false],cap=0,view="",data=null,page=20,editing="",NAMES=["口コミ","LINE","メルマガ"];
 var num=function(v){return Number(String(v==null?"":v).replace(/[^0-9.-]/g,""))||0},yen=function(v){return Math.round(num(v)).toLocaleString("ja-JP")+"円"};
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function row(tb,cells,left){var tr=el("tr");cells.forEach(function(c,i){tr.appendChild(el("td",left.indexOf(i)>=0?"l":"",c))});tb.appendChild(tr)}
@@ -164,6 +169,22 @@ function drawMenu(){
     it.appendChild(name);it.appendChild(st);box[m.group].appendChild(it);
   });
 }
+function opts(id,all,list){var v=$(id).value;$(id).textContent="";[all].concat(list).forEach(function(x,i){var o=el("option","",x);o.value=i?x:"";$(id).appendChild(o)});if(list.indexOf(v)>=0)$(id).value=v}
+function uniq(k,first){var o=first.slice();data.rows.forEach(function(r){if(o.indexOf(r[k])<0)o.push(r[k])});return o}
+function drawList(){
+  $("vm").textContent=Number(view.slice(0,4))+"年"+Number(view.slice(5))+"月";
+  opts("fw","全員",uniq(1,cfg.staff.filter(function(x){return!x.off}).map(function(x){return x.name})));opts("fc","全部",uniq(2,cfg.routes.map(function(x){return x.name})));
+  var w=$("fw").value,c=$("fc").value,list=data.rows.filter(function(r){return(!w||r[1]===w)&&(!c||r[2]===c)}),now=list.slice(0,page);
+  $("vc").textContent="この月 "+data.rows.length+"件"+(w||c?"のうち "+list.length+"件":"")+(list.length>now.length?"（"+now.length+"件を表示）":"")+"／全部で "+data.all+"件";
+  $("rows").textContent="";if(!list.length)row($("rows"),[data.rows.length?"合う記録がありません":"この月の記録はありません","","","","","","","",""],[0]);
+  now.forEach(function(r){
+    row($("rows"),["",r[0],r[1],r[2],r[8]||"",r[1]==="自分"?"":r[13]+" "+NAMES.filter(function(n,i){return r[10+i]==="✓"}).join("・"),yen(r[4]),yen(r[5]),yen(r[7])],[1,2,3,4,5]);
+    if(r[14]){var b=el("button","zero","直す");b.type="button";b.setAttribute("aria-label",r[0]+"の"+yen(r[4])+"を直す");b.addEventListener("click",function(){edit(r)});$("rows").lastChild.firstChild.appendChild(b)}
+  });
+  $("more").hidden=list.length<=now.length;$("more").textContent="もっと見る（あと"+(list.length-now.length)+"件）";
+}
+function go(n){var d=new Date(Number(view.slice(0,4)),Number(view.slice(5))-1+n,1),m=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2);
+  $("vp").disabled=$("vn").disabled=true;$("vc").textContent="読んでいます";view=m;call().catch(function(){$("vc").textContent="読めませんでした。もう一度押してください"}).then(function(){$("vp").disabled=$("vn").disabled=false})}
 function show(o){
   var first=!cfg;cfg=o.config;
   if(first){
@@ -174,14 +195,10 @@ function show(o){
   var t=o.total;["r1","r2","r3","r4"].forEach(function(k,i){$(k).textContent=yen(t[i])});
   $("goal").textContent="粗利330万円まで、あと "+yen(Math.max(0,3300000-num(t[3])));$("bar").style.width=Math.max(0,Math.min(100,num(t[3])/33000))+"%";
   $("m").textContent="";o.months.filter(function(r){return num(r[1])>0}).forEach(function(r){row($("m"),[r[0],yen(r[1]),yen(r[2]),yen(r[3]),yen(r[4])],[])});
-  $("rows").textContent="";if(!o.rows.length)row($("rows"),["まだ記録がありません","","","","","","","",""],[0]);
-  o.rows.slice().reverse().forEach(function(r){
-    row($("rows"),["",r[0],r[1],r[2],r[8]||"",r[1]==="自分"?"":r[13]+" "+NAMES.filter(function(n,i){return r[10+i]==="✓"}).join("・"),yen(r[4]),yen(r[5]),yen(r[7])],[1,2,3,4,5]);
-    if(r[14]){var b=el("button","zero","直す");b.type="button";b.setAttribute("aria-label",r[0]+"の"+yen(r[4])+"を直す");b.addEventListener("click",function(){edit(r)});$("rows").lastChild.firstChild.appendChild(b)}
-  });
+  data=o;view=o.view;page=20;drawList();
 }
 var URL_="https://script.google.com/macros/s/AKfycbwIfVLDtXR3P194_S2zM-OBh6kVJTHloUa6drJNNWlf07Cc7yG9UtJiF9dZaC7zaLZpMA/exec";
-function call(p){return fetch(URL_,p?{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p)}:undefined).then(function(r){return r.json()}).then(function(o){if(o.error)throw new Error(o.error);show(o)})}
+function call(p){if(p)p.m=view;return fetch(p?URL_:URL_+(view?"?m="+view:""),p?{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p)}:undefined).then(function(r){return r.json()}).then(function(o){if(o.error)throw new Error(o.error);show(o)})}
 $("z").addEventListener("click",function(){$("z").hidden=true;$("zq").hidden=false;$("zn").focus()});
 $("zn").addEventListener("click",function(){$("zq").hidden=true;$("z").hidden=false});
 $("zy").addEventListener("click",function(){$("zy").disabled=true;$("status").textContent="0に戻しています";
@@ -191,6 +208,9 @@ function start(){call().then(function(){$("status").textContent="見本シート
 var now=new Date();$("d").value=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
 $("d").addEventListener("click",function(){try{this.showPicker()}catch(e){}});
 $("d").addEventListener("change",function(){if(cfg){drawRoutes();drawMenu();drawChecks();if(Object.keys(qty).some(function(k){return qty[k]}))total()}});
+$("vp").addEventListener("click",function(){if(cfg)go(-1)});$("vn").addEventListener("click",function(){if(cfg)go(1)});
+$("fw").addEventListener("change",function(){page=20;drawList()});$("fc").addEventListener("change",function(){page=20;drawList()});
+$("more").addEventListener("click",function(){page+=20;drawList()});
 $("rm").addEventListener("change",function(){if(cfg){drawRates();$("rr").textContent=""}});
 $("rs").addEventListener("click",function(){var x={},bad=false;[].forEach.call($("rl").querySelectorAll("input"),function(n){if(!n.validity.valid)bad=true;x[n.dataset.route]=n.value===""?null:Number(n.value)});
   if(bad){$("rr").textContent="割合は0〜100で、小数は1けたまでです";return}
@@ -211,7 +231,7 @@ $("f").addEventListener("submit",function(ev){ev.preventDefault();if(!cfg)return
   $("b").disabled=true;$("status").textContent="スプレッドシートに入れています";
   var items=Object.keys(qty).filter(function(k){return qty[k]>0}).map(function(k){return[Number(k),qty[k]]});
   var p={date:$("d").value,who:$("w").value,route:route,n:Number($("n").value),sales:Number($("s").value),items:items,checks:checks,cap:cap};if(editing)p.id=editing;
-  call(p).then(function(){$("status").textContent=editing?"直しました。シートが計算し直しました":"入りました。シートが計算し直しました";var m=$("status").textContent;reset();$("status").textContent=m}).catch(say)
+  view=p.date.slice(0,7);call(p).then(function(){$("status").textContent=editing?"直しました。シートが計算し直しました":"入りました。シートが計算し直しました";var m=$("status").textContent;reset();$("status").textContent=m}).catch(say)
     .then(function(){$("b").disabled=false});
 });
 })();
