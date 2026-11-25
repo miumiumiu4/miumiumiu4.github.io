@@ -159,7 +159,7 @@ a.li:hover .t{color:var(--blue)}
     <button class="go" id="rvg" type="button" disabled>振り返りを送る</button>
     <div class="sent" id="rvs"></div>
     <div class="coach" id="coach"></div>
-    <p class="small">80%以上聞いた日の振り返りが、1回1点になります。同じ音声をもう一度80%以上聞き直しても、1点入ります（前の日の分は下の「音声の一覧」から）。いちばん多く振り返った人は「振り返り王」。12月22日の締めに、三浦からささやかなプレゼントがあります。書いた内容は、三浦とAIコーチだけが見ます。振り返りには、AIコーチがひとこと返事をします（朝7時・昼12時半・夜9時ごろ。返事はこの端末にだけ表示されます）。</p>
+    <p class="small">80%以上聞いた日の振り返りが、1回1点になります。同じ音声をもう一度80%以上聞き直しても、1点入ります（前の日の分は下の「音声の一覧」から）。いちばん多く振り返った人は「振り返り王」。12月22日の締めに、三浦からささやかなプレゼントがあります。書いた内容は三浦だけが見ます。振り返りには、三浦からひとこと返事が届きます（朝7時・昼12時半・夜9時ごろ。返事はこの端末にだけ表示されます）。</p>
   </div>
   <div class="panel list" id="list"><h3>📚 音声の一覧</h3><p class="sub">もう一度聞いて、振り返りに使ってください</p><div id="lpast"></div>
     <details><summary id="lsum">これからの音声を見る</summary><div id="lnext"></div></details></div>
@@ -254,13 +254,13 @@ rvg.onclick=function(){var t=rvt.value.trim();if(t.length<10||!mem.n)return;
  var ok=false;try{ok=navigator.sendBeacon&&navigator.sendBeacon(URL,new Blob([body],{type:'text/plain'}))}catch(e){}
  if(!ok){try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:body})}catch(e){}}
  put(RVK,'1');if(window.__drawList)window.__drawList();rvt.value='';rvg.disabled=true;rvShow();
- rvs.textContent='✅ 送りました！ 80%以上聞いた日なら +1点（ランキングは1時間ごとに更新）。AIコーチの返事は、朝7時・昼12時半・夜9時ごろにここに届きます';setTimeout(function(){if(window.__loadCoach)window.__loadCoach()},4000)};
+ rvs.textContent='✅ 送りました！ 80%以上聞いた日なら +1点（ランキングは1時間ごとに更新）。三浦からの返事は、朝7時・昼12時半・夜9時ごろにここに届きます';setTimeout(function(){if(window.__loadCoach)window.__loadCoach()},4000)};
 window.__rvShow=rvShow;rvShow();
-// AIコーチの返事（この端末で送った振り返りの分だけ）
+// 三浦からの返事（この端末で送った振り返りの分だけ）
 var cbx=document.getElementById('coach');
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function loadCoach(){if(!mem.n||!URL||URL.indexOf('{{')===0)return;try{fetch(URL+'?coach=1&n='+encodeURIComponent(mem.n)+'&d='+encodeURIComponent(mem.d)).then(function(r){return r.json()}).then(function(j){var L=(j&&j.list)||[];if(!L.length)return;
- cbx.innerHTML='<h4>🤖 AIコーチからの返事</h4>'+L.map(function(x){return '<div class="c"><p class="me">'+x.day+'日目のあなた：「'+esc(x.text.length>60?x.text.slice(0,60)+'…':x.text)+'」</p>'+(x.reply?'<p class="rep">'+esc(x.reply)+'</p>':'<p class="wait">⏳ 返事を書いています。朝7時・昼12時半・夜9時ごろに届きます。</p>')+'</div>'}).join('');cbx.classList.add('on')}).catch(function(){})}catch(e){}}
+ cbx.innerHTML='<h4>✉️ 三浦からの返事</h4>'+L.map(function(x){return '<div class="c"><p class="me">'+x.day+'日目のあなた：「'+esc(x.text.length>60?x.text.slice(0,60)+'…':x.text)+'」</p>'+(x.reply?'<p class="rep">'+esc(x.reply)+'</p>':'<p class="wait">⏳ 返事を書いています。朝7時・昼12時半・夜9時ごろに届きます。</p>')+'</div>'}).join('');cbx.classList.add('on')}).catch(function(){})}catch(e){}}
 window.__loadCoach=loadCoach;loadCoach();
 // 音声の一覧：配った日まではリンク、これからの日は題と公開日だけ
 var LIST={{LIST}},S0=new Date('2026-11-22T07:00:00+09:00').getTime(),TD=Math.floor((Date.now()-S0)/86400000)+1;
