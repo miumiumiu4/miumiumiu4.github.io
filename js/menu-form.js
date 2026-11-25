@@ -32,8 +32,7 @@
           return stepper(i.code, i.label, i.price, i.unit, note);
         }).join("") + "</fieldset>";
       }).join("") + "</div></details>" +
-      (opts.withDay ? '<div class="field"><label for="mf-day">作業をお願いしたい日</label><select id="mf-day"><option value="unknown">まだ決めていない</option><option value="weekday">平日（月〜金）</option><option value="weekend">土日</option></select>' +
-        '<span class="hint">平日（月〜金）は、防カビの単品が無料です。祝日が月〜金にあたる日も平日として扱います。</span></div>' : "");
+      (opts.withDay ? '<div class="field"><label for="mf-day">作業をお願いしたい日</label><select id="mf-day"><option value="unknown">まだ決めていない</option><option value="weekday">平日（月〜金）</option><option value="weekend">土日</option></select></div>' : "");
     root.innerHTML = html;
 
     var timer = null;
