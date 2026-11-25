@@ -74,6 +74,12 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <details class="set" id="rp"><summary>ポータルサイトの手数料率（月ごと）</summary>
 <label for="rm">月<select id="rm"></select></label><p class="memo">空欄の入口は、いつもの割合（灰色の数字）で計算します。保存すると、その月の記録も計算し直します。</p>
 <div id="rl"></div><button id="rs" type="button">この月の割合を保存</button><p class="memo" id="rr" role="status"></p></details>
+<details class="set" id="pp"><summary>料金の設定（期間で変える）</summary>
+<p class="memo">入力する日付が期間に入る時だけ、この料金が出ます。期間が重なる時は、始まりが新しいほうです。入れた記録の金額は変わりません。</p>
+<label for="pn">作業内容<select id="pn"></select></label>
+<div class="pick two"><label for="pf1">始まり<input id="pf1" type="date"></label><label for="pt1">終わり（空欄はずっと）<input id="pt1" type="date"></label></div>
+<label for="pv">料金（税込・円）<input id="pv" type="number" min="0" max="1000000" step="1"></label>
+<button id="pa" type="button">期間の料金を追加</button><div id="pl"></div><p class="memo" id="pr" role="status"></p></details>
 <details class="set" id="sp"><summary>スタッフの管理</summary>
 <div id="sl"></div>
 <div class="sf new"><input id="sn" type="text" maxlength="12" placeholder="新しいスタッフの名前" aria-label="新しいスタッフの名前"><label class="pc"><input id="sc" type="number" min="60" max="180" step="1" value="75" aria-label="新しいスタッフの歩合">%</label><button id="sa" type="button">追加</button></div>
@@ -99,7 +105,19 @@ var num=function(v){return Number(String(v==null?"":v).replace(/[^0-9.-]/g,""))|
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function row(tb,cells,left){var tr=el("tr");cells.forEach(function(c,i){tr.appendChild(el("td",left.indexOf(i)>=0?"l":"",c))});tb.appendChild(tr)}
 function weekday(){var d=new Date($("d").value+"T00:00:00").getDay();return d>=1&&d<=5}
-function price(m){return m.weekday!=null&&weekday()?m.weekday:m.price}
+function price(m){
+  var d=$("d").value,hit=null;cfg.periods.forEach(function(x){if(x.name===m.name&&x.from<=d&&(!x.to||d<=x.to)&&(!hit||x.from>=hit.from))hit=x});
+  return hit?hit.price:m.weekday!=null&&weekday()?m.weekday:m.price;
+}
+function inPeriod(m){var d=$("d").value;return cfg.periods.some(function(x){return x.name===m.name&&x.from<=d&&(!x.to||d<=x.to)})}
+function ymd(s){return Number(s.slice(0,4))+"年"+Number(s.slice(5,7))+"月"+Number(s.slice(8))+"日"}
+function drawPrices(){
+  var v=$("pn").value;$("pn").textContent="";cfg.menu.forEach(function(m){var o=el("option","",m.name+"（いつもは"+yen(m.price)+"）");o.value=m.name;$("pn").appendChild(o)});if(v)$("pn").value=v;
+  $("pl").textContent="";if(!cfg.periods.length)$("pl").appendChild(el("p","memo","期間の料金はまだありません"));
+  cfg.periods.slice().sort(function(a,b){return a.from<b.from?1:-1}).forEach(function(x){var d=el("div","rt"),b=el("button","zero","消す");b.type="button";b.setAttribute("aria-label",x.name+"の期間の料金を消す");
+    d.appendChild(el("span","",x.name+" "+yen(x.price)+"／"+ymd(x.from)+"〜"+(x.to?ymd(x.to):"ずっと")));b.addEventListener("click",function(){prices({del:x.id},"消しました")});d.appendChild(b);$("pl").appendChild(d)});
+}
+function prices(x,msg){$("pr").textContent="保存しています";return call({prices:x}).then(function(){$("pr").textContent=msg;return true}).catch(function(e){$("pr").textContent=/[ぁ-ん]/.test(e.message)?e.message:"つながりませんでした"})}
 function total(){$("s").value=cfg.menu.reduce(function(a,m,i){return a+(qty[i]||0)*price(m)},0);drawChecks()}
 function drawRoutes(){
   $("c").textContent="";cfg.routes.forEach(function(r){var b=el("button","",r.name);b.type="button";b.setAttribute("aria-pressed",String(r.name===route));
@@ -162,7 +180,7 @@ function drawMenu(){
   cfg.menu.forEach(function(m,i){
     if(!box[m.group]){var d=el("details");d.dataset.g=m.group;d.open=m.group in open?open[m.group]:m.group.indexOf("エアコン")===0;d.appendChild(el("summary","",m.group));$("menu").appendChild(d);box[m.group]=d}
     var it=el("div","it"),name=el("span","",m.name),p=price(m),st=el("span","st"),q=el("b","",qty[i]||0);
-    name.appendChild(el("small","",p===0&&m.price>0?"平日は無料":yen(p)));
+    name.appendChild(el("small","",p===0&&m.price>0&&!inPeriod(m)?"平日は無料":yen(p)+(inPeriod(m)?"（期間の料金）":"")));
     [["−",-1],["＋",1]].forEach(function(x){var b=el("button","",x[0]);b.type="button";b.setAttribute("aria-label",m.name+(x[1]>0?"を増やす":"を減らす"));
       b.addEventListener("click",function(){qty[i]=Math.max(0,Math.min(30,(qty[i]||0)+x[1]));q.textContent=qty[i];total()});
       if(x[1]>0)st.appendChild(q);st.appendChild(b)});
@@ -190,8 +208,8 @@ function show(o){
   if(first){
     for(var i=-2,b=new Date();i<24;i++){var dd=new Date(b.getFullYear(),b.getMonth()+i,1),v=dd.getFullYear()+"-"+("0"+(dd.getMonth()+1)).slice(-2),op=el("option","",dd.getFullYear()+"年"+(dd.getMonth()+1)+"月");op.value=v;if(i===0)op.selected=true;$("rm").appendChild(op)}
     route=cfg.routes[0].name;drawWho();drawRoutes();drawMenu();ownCap();
-  }else{drawWho(editing?$("w").value:"");drawRoutes()}
-  drawChecks();drawRates();drawStaff();
+  }else{drawWho(editing?$("w").value:"");drawRoutes();drawMenu()}
+  drawChecks();drawRates();drawStaff();drawPrices();
   var t=o.total;["r1","r2","r3","r4"].forEach(function(k,i){$(k).textContent=yen(t[i])});
   $("goal").textContent="粗利330万円まで、あと "+yen(Math.max(0,3300000-num(t[3])));$("bar").style.width=Math.max(0,Math.min(100,num(t[3])/33000))+"%";
   $("m").textContent="";o.months.filter(function(r){return num(r[1])>0}).forEach(function(r){row($("m"),[r[0],yen(r[1]),yen(r[2]),yen(r[3]),yen(r[4])],[])});
@@ -216,6 +234,8 @@ $("rs").addEventListener("click",function(){var x={},bad=false;[].forEach.call($
   if(bad){$("rr").textContent="割合は0〜100で、小数は1けたまでです";return}
   $("rs").disabled=true;$("rr").textContent="保存しています";var m=$("rm").options[$("rm").selectedIndex].textContent;
   call({rates:{month:$("rm").value,values:x}}).then(function(){$("rr").textContent=m+"の割合を保存し、計算し直しました"}).catch(function(e){$("rr").textContent=/[ぁ-ん]/.test(e.message)?e.message:"つながりませんでした"}).then(function(){$("rs").disabled=false})});
+$("pa").addEventListener("click",function(){if(!$("pf1").value||$("pv").value===""){$("pr").textContent="始まりの日と料金を入れてください";return}
+  prices({name:$("pn").value,from:$("pf1").value,to:$("pt1").value||null,price:Number($("pv").value)},"追加しました")});
 $("sa").addEventListener("click",function(){$("sa").disabled=true;staff({name:$("sn").value,cap:Number($("sc").value)/100},"追加しました。担当から選べます").then(function(ok){if(ok)$("sn").value="";$("sa").disabled=false})});
 $("kr").addEventListener("input",function(){turn(Number($("kr").value)/100)});
 $("kd").addEventListener("click",function(){turn(cap-cfg.knob.step)});$("ku").addEventListener("click",function(){turn(cap+cfg.knob.step)});
