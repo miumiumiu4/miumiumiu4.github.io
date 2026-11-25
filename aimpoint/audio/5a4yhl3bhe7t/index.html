@@ -109,6 +109,12 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
 .refl .go{margin-top:10px;width:100%;font:inherit;font-size:18px;font-weight:800;color:#e9f7ff;padding:10px;cursor:pointer;border:1px solid var(--blue);background:linear-gradient(90deg,var(--blue2),var(--blue));clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
 .refl .go:disabled{opacity:.4;cursor:default}
 .refl .small{margin:10px 0 0;font-size:13px;color:var(--muted);line-height:1.6}
+.coach{margin-top:16px;display:none}.coach.on{display:block}
+.coach h4{margin:0 0 8px;font-size:17px;font-weight:900;color:#9fe0ff}
+.coach .c{margin:0 0 12px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid #ffd54a;border-radius:4px;background:rgba(3,12,28,.75)}
+.coach .me{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 6px}
+.coach .rep{font-size:17px;line-height:1.8;margin:0;white-space:pre-wrap}
+.coach .wait{font-size:15px;color:var(--muted);margin:0}
 .refl .sent{margin-top:10px;padding:10px 12px;border:1px solid rgba(255,213,74,.6);border-radius:6px;background:rgba(255,213,74,.08);color:#ffe9a8;font-size:15px;line-height:1.6;display:none}
 .r .king{display:inline-block;margin-left:6px;font-size:12px;font-weight:800;padding:0 7px;border-radius:9px;background:#ffd54a;color:#1a1200;vertical-align:middle;white-space:nowrap}
 .list{margin-top:22px;padding:22px 16px 16px}
@@ -152,7 +158,8 @@ a.li:hover .t{color:var(--blue)}
     <textarea id="rvt" rows="3" maxlength="400" placeholder="ひとことでも大丈夫です"></textarea>
     <button class="go" id="rvg" type="button" disabled>振り返りを送る</button>
     <div class="sent" id="rvs"></div>
-    <p class="small">80%以上聞いた日の振り返りが、1回1点になります。いちばん多く振り返った人は「振り返り王」。12月22日の締めに、三浦からささやかなプレゼントがあります。書いた内容は三浦だけが見ます。</p>
+    <div class="coach" id="coach"></div>
+    <p class="small">80%以上聞いた日の振り返りが、1回1点になります。同じ音声をもう一度80%以上聞き直しても、1点入ります（前の日の分は下の「音声の一覧」から）。いちばん多く振り返った人は「振り返り王」。12月22日の締めに、三浦からささやかなプレゼントがあります。書いた内容は三浦だけが見ます。振り返りには、三浦からひとこと返事が届きます（朝7時・昼12時半・夜9時ごろ。返事はこの端末にだけ表示されます）。</p>
   </div>
   <div class="panel list" id="list"><h3>📚 音声の一覧</h3><p class="sub">もう一度聞いて、振り返りに使ってください</p><div id="lpast"></div>
     <details><summary id="lsum">これからの音声を見る</summary><div id="lnext"></div></details></div>
@@ -210,7 +217,7 @@ function open(cb){then=cb;draw3();ask.classList.add('on');
   [].forEach.call(picks.children,function(x){if(taken[x.textContent])re=true});if(re)draw3()}).catch(function(){})}catch(e){}}}
 function done(){if(onlyRn){onlyRn=false;sendRn();finish();return}if(!chosen)return;mem.n=chosen;put('aimpoint_name',mem.n);ask.classList.remove('on');
  if(URL&&URL.indexOf('{{')!==0){try{fetch(URL+'?reserve='+encodeURIComponent(chosen)+'&d='+encodeURIComponent(mem.d)).catch(function(){})}catch(e){}}
- if(window.__loadRank)window.__loadRank();if(window.__rvShow)window.__rvShow();
+ if(window.__loadRank)window.__loadRank();if(window.__rvShow)window.__rvShow();if(window.__loadCoach)window.__loadCoach();
  sendRn();
  var cb=then;then=null;if(cb)cb()}
 more.onclick=draw3;askg.onclick=done;later.onclick=function(){onlyRn=false;mem.rn='1';put('aimpoint_rn_asked','1');finish()};
@@ -247,8 +254,14 @@ rvg.onclick=function(){var t=rvt.value.trim();if(t.length<10||!mem.n)return;
  var ok=false;try{ok=navigator.sendBeacon&&navigator.sendBeacon(URL,new Blob([body],{type:'text/plain'}))}catch(e){}
  if(!ok){try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:body})}catch(e){}}
  put(RVK,'1');if(window.__drawList)window.__drawList();rvt.value='';rvg.disabled=true;rvShow();
- rvs.textContent='✅ 送りました！ 80%以上聞いた日なら +1点（ランキングは1時間ごとに更新）'};
+ rvs.textContent='✅ 送りました！ 80%以上聞いた日なら +1点（ランキングは1時間ごとに更新）。三浦からの返事は、朝7時・昼12時半・夜9時ごろにここに届きます';setTimeout(function(){if(window.__loadCoach)window.__loadCoach()},4000)};
 window.__rvShow=rvShow;rvShow();
+// 三浦からの返事（この端末で送った振り返りの分だけ）
+var cbx=document.getElementById('coach');
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function loadCoach(){if(!mem.n||!URL||URL.indexOf('{{')===0)return;try{fetch(URL+'?coach=1&n='+encodeURIComponent(mem.n)+'&d='+encodeURIComponent(mem.d)).then(function(r){return r.json()}).then(function(j){var L=(j&&j.list)||[];if(!L.length)return;
+ cbx.innerHTML='<h4>✉️ 三浦からの返事</h4>'+L.map(function(x){return '<div class="c"><p class="me">'+x.day+'日目のあなた：「'+esc(x.text.length>60?x.text.slice(0,60)+'…':x.text)+'」</p>'+(x.reply?'<p class="rep">'+esc(x.reply)+'</p>':'<p class="wait">⏳ 返事を書いています。朝7時・昼12時半・夜9時ごろに届きます。</p>')+'</div>'}).join('');cbx.classList.add('on')}).catch(function(){})}catch(e){}}
+window.__loadCoach=loadCoach;loadCoach();
 // 音声の一覧：配った日まではリンク、これからの日は題と公開日だけ
 var LIST=[{"n": 1, "t": "自慢は布団の中でしなさい", "k": "i3sp60eulgun"}, {"n": 2, "t": "頑張る人ほど人が逃げる", "k": "rwb2svczhcb9"}, {"n": 3, "t": "人脈はお腹で育つ", "k": "ojp7roxmi9uw"}, {"n": 4, "t": "財布は配るほど膨らむ", "k": "s0wrnp1u1k1v"}, {"n": 5, "t": "根性は二人で持て", "k": "7i8wzq0ii194"}, {"n": 6, "t": "調子がいい日ほど人は逃げる", "k": "w7kvh90rcw44"}, {"n": 7, "t": "振り返る人ほど前に進む", "k": "r1uc18mcnd4v"}, {"n": 8, "t": "欲しがるほど遠ざかる", "k": "l92ypmoj3z2d"}, {"n": 9, "t": "問題だらけは元気の証拠", "k": "06xabhp05osw"}, {"n": 10, "t": "名前は一番短い贈り物", "k": "bq41rljo2bj1"}, {"n": 11, "t": "思い込みは勝手に育つ", "k": "doycmjxgg4r4"}, {"n": 12, "t": "許すは心の大掃除", "k": "cngtj3a89nit"}, {"n": 13, "t": "チラ見せは最強の招待状", "k": "qlfv7yshnrut"}, {"n": 14, "t": "6つの合言葉はひとつの呼吸", "k": "os7ajb2dbqwi"}, {"n": 15, "t": "無口な職人ほど呼ばれる", "k": "74oqzugyv4ul"}, {"n": 16, "t": "人づきあいは収穫を急ぐな", "k": "lk1nrpzq41vp"}, {"n": 17, "t": "おにぎりの味は標高で決まる", "k": "85s9p1ec7c5g"}, {"n": 18, "t": "笑顔は筋トレで作れ", "k": "0ykcr9tde4o5"}, {"n": 19, "t": "手のひらの小鳥は握るな", "k": "5a4yhl3bhe7t"}, {"n": 20, "t": "旅先の他人は最高の先生", "k": ""}, {"n": 21, "t": "21日目の自分に拍手しろ", "k": ""}, {"n": 22, "t": "想像はまず黒板消しから", "k": ""}, {"n": 23, "t": "発酵する人間関係", "k": ""}, {"n": 24, "t": "先にあいさつした者が勝つ", "k": ""}, {"n": 25, "t": "ほめ言葉は下手なほど届く", "k": ""}, {"n": 26, "t": "三日坊主は若返りの薬", "k": ""}, {"n": 27, "t": "誇りはポケットにしまえ", "k": ""}, {"n": 28, "t": "準備は冷蔵庫から始まる", "k": ""}, {"n": 29, "t": "1か月前の自分は他人", "k": ""}, {"n": 30, "t": "前の夜は何もするな", "k": ""}, {"n": 31, "t": "今夜8時、密室が開く", "k": ""}],S0=new Date('2026-11-22T07:00:00+09:00').getTime(),TD=Math.floor((Date.now()-S0)/86400000)+1;
 function md(n){var d=new Date(S0+(n-1)*86400000+9*3600000);return (d.getUTCMonth()+1)+'/'+d.getUTCDate()}
