@@ -29,7 +29,7 @@ function setup() {
     ['このシートの見方'],
     ['「記録」：1人×1日で1行。どこまで聞いたか・合計で何秒聞いたかが自動で入ります（15秒ごとに更新）。'],
     ['「やる気ランキング」：1時間ごとに自動で並べ直します。'],
-    ['点数：80%以上聞いた日 10点／その日のうちに聞いた +3点／最後まで聞いた +2点／2回以上聞いた +2点／一番長い連続日数 ×1点／振り返り（80%以上聞いた日の分）1回 +1点'],
+    ['点数：80%以上聞いた日 10点／その日のうちに聞いた +3点／最後まで聞いた +2点／聞き直し（同じ音声をもう一度80%以上＝合計1.6回分以上）+1点／一番長い連続日数 ×1点／振り返りの文（80%以上聞いた日の分）1回 +1点（11/26 さとぴー：聞き直しも文章も1点ずつ）'],
     ['振り返り王：その週（または合計）で振り返りをいちばん多く書いた人に、ランキングで「振り返り王」のしるしが付きます。振り返りの文は「（消さない）朝の5分_再生記録のプログラム置き場」の「振り返り」タブ。'],
     ['同じ名前は同じ人としてまとめます（全角・半角・空白の違いはそろえます）。'],
     ['端末の欄に番号が2つ以上ある人は、LINE内と外部ブラウザの両方で聞いたか、同じ名前の別の人です。'],
@@ -69,6 +69,7 @@ function doGet(e) {
   var p = (e && e.parameter) || {};
   if (p.taken) return json_({ names: takenNames_() });
   if (p.rank) return json_(rankJson_(p.n || ''));
+  if (p.coach) return json_(coachJson_(p.n, p.d));
   if (p.reserve) {
     var name = norm_(p.reserve), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
     if (!name) return json_({ ok: false });
@@ -137,21 +138,33 @@ function doPost(e) {
     v[12] = devs.join(',');
     if (isRv) v[13] = '○';
     sh.getRange(row, 1, 1, REC_HEAD.length).setValues([v]);
-    if (isRv) saveReflection_(name, day, rvText, stamp, v[5]);
+    if (isRv) saveReflection_(name, day, rvText, stamp, v[5], dev);
   } finally { lock.releaseLock(); }
   return ContentService.createTextOutput('ok');
 }
 
 // 振り返りの文（11/26 さとぴー：振り返り1回につき1点＋「振り返り王」バッジ。80%以上聞いた日の振り返りだけ点になる）
 // 文はさとぴーだけのファイル（このプログラムの置き場）の「振り返り」タブへ
-function saveReflection_(name, day, text, stamp, pct) {
+function saveReflection_(name, day, text, stamp, pct, dev) {
   var ss = SpreadsheetApp.openById(RN_SS_ID), sh = ss.getSheetByName('振り返り');
-  if (!sh) {
-    sh = ss.insertSheet('振り返り', 0);
-    sh.getRange(1, 1, 1, 5).setValues([['送った日時', 'ニックネーム', '日', 'そのとき聞いていた(%)', '振り返り']]).setFontWeight('bold');
-    sh.setFrozenRows(1); sh.setColumnWidth(5, 520);
-  }
-  sh.appendRow([stamp, name, day, pct, text.replace(/^([=+\-@])/, "'$1")]);
+  if (!sh) { sh = ss.insertSheet('振り返り', 0); sh.setFrozenRows(1); sh.setColumnWidth(5, 520); sh.setColumnWidth(6, 520); }
+  if (sh.getRange(1, 8).getValue() !== '端末') sh.getRange(1, 1, 1, RV_HEAD.length).setValues([RV_HEAD]).setFontWeight('bold');
+  sh.appendRow([stamp, name, day, pct, text.replace(/^([=+\-@])/, "'$1"), '', '', dev || '']);
+}
+
+// AIコーチの返事（11/26 さとぴー：willが1日3回「振り返り」タブを読んでF列に返事を書く。確認なしでそのまま本人に返す）
+// 本人の端末（H列）と同じ端末から開いたときだけ見せる（ニックネームはランキングで他の人にも見えるため）
+var RV_HEAD = ['送った日時', 'ニックネーム', '日', 'そのとき聞いていた(%)', '振り返り', 'AIコーチの返事', '返事を書いた日時', '端末'];
+function coachJson_(n, d) {
+  var name = norm_(n).toLowerCase(), dev = String(d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16), out = [];
+  if (!name || !dev) return { list: out };
+  var sh = SpreadsheetApp.openById(RN_SS_ID).getSheetByName('振り返り');
+  if (!sh || sh.getLastRow() < 2) return { list: out };
+  sh.getRange(2, 1, sh.getLastRow() - 1, RV_HEAD.length).getDisplayValues().forEach(function (v) {
+    if (norm_(v[1]).toLowerCase() !== name || v[7] !== dev) return;
+    out.push({ day: Number(v[2]), at: v[0], text: String(v[4]).replace(/^'/, ''), reply: String(v[5] || ''), rat: v[6] });
+  });
+  return { list: out.slice(-10).reverse() };
 }
 
 function excluded_() {
@@ -177,7 +190,7 @@ function score_(p, from, to) {
     if (x && x.ok && x.rv) rv++;
     if (x && x.ok) { n++; cur++; best = Math.max(best, cur); } else cur = 0;
   }
-  return { s: n * 10 + ontime * 3 + full * 2 + twice * 2 + best + rv, rv: rv, n: n, ontime: ontime, full: full, twice: twice, best: best, min: Math.round(sec / 60) };
+  return { s: n * 10 + ontime * 3 + full * 2 + twice + best + rv, rv: rv, n: n, ontime: ontime, full: full, twice: twice, best: best, min: Math.round(sec / 60) };
 }
 
 // 記録から全員の点数をまとめる（外す名前は除く）
@@ -189,7 +202,7 @@ function snapshot_() {
       if (!k || ex[k] || !(day >= 1 && day <= 31)) return;
       var p = people[k] || (people[k] = { name: String(v[1]), days: {}, last: String(v[8]) });
       var pct = Number(v[5]) || 0;
-      p.days[day] = { rv: v[13] === '○', ok: pct >= 80, ontime: v[9] === '○', full: pct >= 95, twice: !!(v[4] && Number(v[6]) >= Number(v[4]) * 1.5), add: Number(v[6]) || 0 };
+      p.days[day] = { rv: v[13] === '○', ok: pct >= 80, ontime: v[9] === '○', full: pct >= 95, twice: !!(v[4] && Number(v[6]) >= Number(v[4]) * 1.6), add: Number(v[6]) || 0 };
       if (String(v[8]) > p.last) p.last = String(v[8]);
     });
   }
@@ -299,7 +312,7 @@ function rebuildRanking() {
     return [i + 1, x.n, t.s, x.w.s, t.n, t.ontime, t.full, t.twice, t.best, x.st, t.min, x.last];
   });
   out.clear();
-  var head = ['順位', '名前', 'やる気スコア（合計）', '今週の点数', '聞いた日数(80%以上)', 'その日のうちに聞いた', '最後まで聞いた', '2回以上聞いた', '最長連続日数', 'いまの連続日数', '聞いた合計(分)', '最後に聞いた'];
+  var head = ['順位', '名前', 'やる気スコア（合計）', '今週の点数', '聞いた日数(80%以上)', 'その日のうちに聞いた', '最後まで聞いた', '聞き直した', '最長連続日数', 'いまの連続日数', '聞いた合計(分)', '最後に聞いた'];
   out.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold');
   out.setFrozenRows(1);
   if (rows.length) out.getRange(2, 1, rows.length, head.length).setValues(rows);
