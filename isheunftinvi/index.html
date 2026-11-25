@@ -44,7 +44,7 @@ dl{margin:0}
 <div class="field big"><div class="row"><label for="staff">年末のスタッフの人数</label><output id="o-staff"></output></div><input id="staff" type="range" min="0" max="12" step="1" value="10"><p class="hint">1月に1人から始め、月に1人ずつ増えて、この人数になったら横ばいの計算です</p></div>
 <div class="field"><label>自分も現場に出る</label><div class="seg" id="self"><button type="button" data-v="1">出る</button><button type="button" data-v="0">出ない</button></div></div>
 <div class="field"><label>計画に対して</label><div class="seg" id="rate"><button type="button" data-v="100">計画どおり</button><button type="button" data-v="80">8割</button><button type="button" data-v="60">6割</button></div></div>
-<div class="field"><div class="row"><label for="years">続けた年数（2年目からは年末の人数のまま）</label><output id="o-years"></output></div><input id="years" type="range" min="1" max="5" step="1" value="1"></div>
+<div class="field"><div class="row"><label for="years">続けた年数（次の年からは年末の人数のまま）</label><output id="o-years"></output></div><input id="years" type="range" min="1" max="5" step="1" value="1"></div>
 <details id="more"><summary>細かい条件を変える</summary>
 <div class="field"><div class="row"><label for="on">1人の月売上 5〜12月</label><output id="o-on"></output></div><input id="on" type="range" min="20" max="150" step="5" value="70"></div>
 <div class="field"><div class="row"><label for="off">1人の月売上 1〜4月</label><output id="o-off"></output></div><input id="off" type="range" min="0" max="150" step="5" value="30"></div>
@@ -58,11 +58,11 @@ dl{margin:0}
 </section>
 <section aria-live="polite" aria-label="結果">
 <dl class="score">
-<div><dt>1年目の売上</dt><dd id="sales"></dd><span class="sub" id="salesm"></span></div>
-<div class="main"><dt>1年目の利益（税金の前）</dt><dd id="profit"></dd><span class="sub" id="profitm"></span></div>
+<div><dt>スタッフを増やす年の売上</dt><dd id="sales"></dd><span class="sub" id="salesm"></span></div>
+<div class="main"><dt>スタッフを増やす年の利益（税金の前）</dt><dd id="profit"></dd><span class="sub" id="profitm"></span></div>
 </dl>
 <p class="hint" id="next"></p>
-<div class="chart"><h2>1年目の月ごとの利益（万円）</h2><div class="bars" id="bars"></div></div>
+<div class="chart"><h2>スタッフを増やす年の月ごとの利益（万円）</h2><div class="bars" id="bars"></div></div>
 <div class="list"><h2>育っていくお客様リスト</h2><p id="listtext"></p></div>
 </section></div>
 <p class="note">試算の目安で、同じ結果の約束ではありません。利益は、売上×利益率（スタッフの報酬とポータルサイト利用料を引いた残りの目安）から、毎月の費用と月の経費を引いた、税金の前の額です。月の経費は仮の数字です。加盟金の支払い・道具や車を買うお金・自分の生活費は引いていません。スタッフが月に1人ずつ増え、だれも辞めない計算です。キャンペーンは、約1万件のリストに7日間ご案内して売上1,200万円だった1社の実績（2026年9月）の割合をもとに計算しています。売上で、利益ではありません。予約を受けきれる人数には限りがあります。</p>
@@ -87,7 +87,7 @@ if(typeof document!=="undefined"){(function(){
     ids.forEach(function(i){s[i]=+$(i).value;$("o-"+i).textContent=(i==="unit"?n(s[i]):s[i])+u[i]});
     ["self","rate"].forEach(function(g){$(g).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.v===sel[g]))})});
     var c=calc(s),max=Math.max.apply(null,c.months.concat([1]));
-    $("next").textContent="2年目からは年末の人数のまま：売上 "+n(c.next.sales)+"万円／利益 "+n(c.next.profit)+"万円";
+    $("next").textContent="次の年からは年末の人数のまま：売上 "+n(c.next.sales)+"万円／利益 "+n(c.next.profit)+"万円";
     $("sales").textContent=n(c.sales)+"万円";$("salesm").textContent="月の平均 "+n(c.sales/12)+"万円／現場 約"+n(c.jobs)+"件";
     $("profit").textContent=n(c.profit)+"万円";$("profitm").textContent="月の平均 "+n(c.profit/12)+"万円";
     $("bars").innerHTML=c.months.map(function(v,i){return'<div class="'+(i<4?"off":"")+'"><span>'+n(v)+'</span><i style="height:'+Math.max(0,v/max*76)+'px"></i><span>'+(i+1)+"月</span></div>"}).join("");
