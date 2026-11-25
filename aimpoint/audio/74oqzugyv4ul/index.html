@@ -99,6 +99,18 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
 .r.me .pt{color:#ff7cc8}
 .rank .next{margin-top:8px;font-size:15px;color:#ffd6ee;line-height:1.6}
 .rank .empty{text-align:center;color:var(--muted);font-size:15px;padding:10px 0}
+.refl{margin-top:22px;padding:22px 18px 18px;display:none}
+.refl.on{display:block}
+.refl h3{margin:0 0 4px;text-align:center;font-size:21px;font-weight:900;letter-spacing:.04em;text-shadow:0 0 14px rgba(47,184,255,.5)}
+.refl h3 b{display:inline-block;margin-left:6px;font-size:14px;padding:1px 8px;border-radius:10px;background:#ffd54a;color:#1a1200;vertical-align:middle}
+.refl .q{margin:6px 0 10px;font-size:16px;line-height:1.7;text-align:center}
+.refl textarea{width:100%;font:inherit;font-size:17px;line-height:1.7;color:var(--text);padding:10px 12px;background:rgba(3,12,28,.9);border:1px solid var(--line);border-radius:4px;outline:none;resize:vertical}
+.refl textarea:focus{border-color:var(--blue);box-shadow:0 0 10px var(--glow)}
+.refl .go{margin-top:10px;width:100%;font:inherit;font-size:18px;font-weight:800;color:#e9f7ff;padding:10px;cursor:pointer;border:1px solid var(--blue);background:linear-gradient(90deg,var(--blue2),var(--blue));clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.refl .go:disabled{opacity:.4;cursor:default}
+.refl .small{margin:10px 0 0;font-size:13px;color:var(--muted);line-height:1.6}
+.refl .sent{margin-top:10px;padding:10px 12px;border:1px solid rgba(255,213,74,.6);border-radius:6px;background:rgba(255,213,74,.08);color:#ffe9a8;font-size:15px;line-height:1.6;display:none}
+.r .king{display:inline-block;margin-left:6px;font-size:12px;font-weight:800;padding:0 7px;border-radius:9px;background:#ffd54a;color:#1a1200;vertical-align:middle;white-space:nowrap}
 .rank .gift{margin:0 0 6px;text-align:center;font-size:14px;font-weight:700;color:#ffd54a}
 .rank .rsub{margin:-4px 0 8px;font-size:13px;opacity:.75}
 </style>
@@ -118,11 +130,19 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
     <div class="row"><span class="time" id="time">0:00 / -:--</span><button class="rate" id="rate" aria-label="再生速度">速度切替<b id="rv">1×</b></button></div>
   </div>
   <audio id="a" preload="metadata" src="../mp3/74oqzugyv4ul.mp3"></audio>
+  <div class="panel refl" id="refl">
+    <h3>🖊 今日の振り返り<b>+1点</b></h3>
+    <p class="q">今日の音声で、いちばん心に残ったことは？<br>明日、ひとつやってみることは？</p>
+    <textarea id="rvt" rows="3" maxlength="400" placeholder="ひとことでも大丈夫です"></textarea>
+    <button class="go" id="rvg" type="button" disabled>振り返りを送る</button>
+    <div class="sent" id="rvs"></div>
+    <p class="small">80%以上聞いた日の振り返りが、1回1点になります。いちばん多く振り返った人は「振り返り王」。12月22日の締めに、三浦からささやかなプレゼントがあります。書いた内容は三浦だけが見ます。</p>
+  </div>
   <div class="note">
     <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#2fb8ff" stroke-opacity=".6"/><rect x="15" y="22" width="18" height="14" rx="2" fill="#2fb8ff"/><path d="M18 22v-4a6 6 0 0 1 12 0v4" fill="none" stroke="#2fb8ff" stroke-width="2.5"/><circle cx="24" cy="28" r="2" fill="#02060f"/><rect x="23" y="29" width="2" height="4" fill="#02060f"/></svg>
     <div>※こちらの音声は、講座にお申し込みいただいた方にお届けしているものです。録音・転載・複製・第三者への共有や、SNS等への公開はご遠慮ください。</div>
   </div>
-  <div class="panel rank" id="rank"><h3>🏆 鼓膜のオリンピック</h3><p class="rsub">毎朝の音声を聞いた人の今週ランキング</p><p class="gift">🎁 毎週の1位と、合計の1位・2位に三浦からプレゼント</p><div class="at" id="rat"></div>
+  <div class="panel rank" id="rank"><h3>🏆 鼓膜のオリンピック</h3><p class="rsub">毎朝の音声を聞いた人の今週ランキング</p><p class="gift">🎁 毎週の1位と、合計の1位・2位に三浦からプレゼント<br>🖊 振り返り王にも、最後にささやかなプレゼント</p><div class="at" id="rat"></div>
     <div class="tabs"><button type="button" class="on" data-f="w">今週</button><button type="button" data-f="tot">ここまでの合計</button></div>
     <div id="rlist"></div><div class="next" id="rnext"></div>
   </div>
@@ -172,7 +192,7 @@ function open(cb){then=cb;draw3();ask.classList.add('on');
   [].forEach.call(picks.children,function(x){if(taken[x.textContent])re=true});if(re)draw3()}).catch(function(){})}catch(e){}}}
 function done(){if(onlyRn){onlyRn=false;sendRn();finish();return}if(!chosen)return;mem.n=chosen;put('aimpoint_name',mem.n);ask.classList.remove('on');
  if(URL&&URL.indexOf('{{')!==0){try{fetch(URL+'?reserve='+encodeURIComponent(chosen)+'&d='+encodeURIComponent(mem.d)).catch(function(){})}catch(e){}}
- if(window.__loadRank)window.__loadRank();
+ if(window.__loadRank)window.__loadRank();if(window.__rvShow)window.__rvShow();
  sendRn();
  var cb=then;then=null;if(cb)cb()}
 more.onclick=draw3;askg.onclick=done;later.onclick=function(){onlyRn=false;mem.rn='1';put('aimpoint_rn_asked','1');finish()};
@@ -183,13 +203,14 @@ var rk=null,rf='w',rbox=document.getElementById('rank'),rlist=document.getElemen
 var CC=['#ffd54a','#d7e3f0','#e08a4a'];
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function crown(i){return '<svg class="crown" viewBox="0 0 28 22" aria-label="'+(i+1)+'位"><path d="M2 18 L4 6 L10 12 L14 3 L18 12 L24 6 L26 18 Z" fill="'+CC[i]+'" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="18" width="24" height="3" fill="'+CC[i]+'"/></svg>'}
-function line(no,nm,s,st,top,cls){return '<div class="r'+cls+'"><div class="no">'+no+'</div><div class="nm">'+nm+'</div><div class="pt">'+s+'<small>点</small></div><div class="sub"><div class="rb"><i style="width:'+Math.max(3,Math.round(s/top*100))+'%"></i></div>'+(st>=2?'<span class="fire">🔥'+st+'日連続</span>':'')+'</div></div>'}
+function line(no,nm,s,st,top,cls,king){return '<div class="r'+cls+'"><div class="no">'+no+'</div><div class="nm">'+nm+(king?'<span class="king">🖊振り返り王</span>':'')+'</div><div class="pt">'+s+'<small>点</small></div><div class="sub"><div class="rb"><i style="width:'+Math.max(3,Math.round(s/top*100))+'%"></i></div>'+(st>=2?'<span class="fire">🔥'+st+'日連続</span>':'')+'</div></div>'}
 function drawRank(){if(!rk)return;var L=rk[rf]||[],me=rk.me&&rk.me[rf],top=Math.max(L.length?L[0].s:1,me?me.s:1),h='';
  [].forEach.call(rbox.querySelectorAll('.tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-f')===rf)});
  rat.textContent=rk.at+' 時点・1時間ごとに更新'+(rf==='w'?'（今週＝'+rk.wf+'〜'+rk.wt+'日目の音声）':'');
  if(!L.length)h='<div class="empty">まだだれも入っていません。最初の1人になりましょう！</div>';
- L.forEach(function(x,i){var mine=me&&me.r===i+1;h+=line(i<3?crown(i):i+1,esc(x.n)+(mine?'<small>あなた</small>':''),x.s,x.st,top,(i<3?' top':'')+(mine?' me':''))});
- if(me&&me.r>5)h+=line(me.r,'あなた<small>'+esc(mem.n)+'</small>',me.s,rk.me.st,top,' me');
+ var K=rk['rk_'+rf]||[];
+ L.forEach(function(x,i){var mine=me&&me.r===i+1;h+=line(i<3?crown(i):i+1,esc(x.n)+(mine?'<small>あなた</small>':''),x.s,x.st,top,(i<3?' top':'')+(mine?' me':''),K.indexOf(x.n)>=0)});
+ if(me&&me.r>5)h+=line(me.r,'あなた<small>'+esc(mem.n)+'</small>',me.s,rk.me.st,top,' me',K.indexOf(mem.n)>=0);
  rlist.innerHTML=h;
  var t='',done=rk.me&&rk.me.done&&rk.me.done.indexOf(DAY)>=0,plus=DAY===rk.td?15:12;
  if(rk.ex)t='運営メンバーの名前なので、ランキングには入りません。';
@@ -199,6 +220,17 @@ function drawRank(){if(!rk)return;var L=rk[rf]||[],me=rk.me&&rk.me[rf],top=Math.
 [].forEach.call(rbox.querySelectorAll('.tabs button'),function(b){b.onclick=function(){rf=b.getAttribute('data-f');drawRank()}});
 function loadRank(){try{fetch(URL+'?rank=1&n='+encodeURIComponent(mem.n||'')).then(function(r){return r.json()}).then(function(j){rk=j;drawRank()}).catch(function(){})}catch(e){}}
 window.__loadRank=loadRank;loadRank();
+// 振り返り：ニックネームがある人だけに出す。送ったらこの端末に覚えておく
+var rbx=document.getElementById('refl'),rvt=document.getElementById('rvt'),rvg=document.getElementById('rvg'),rvs=document.getElementById('rvs'),RVK='aimpoint_rv_'+DAY;
+function rvShow(){if(!mem.n)return;rbx.classList.add('on');if(get(RVK)){rvs.style.display='block';rvs.textContent='✅ 今日の振り返りは送りました。ありがとうございます！（もう一度送ると、書き足した分も三浦に届きます）'}}
+rvt.addEventListener('input',function(){rvg.disabled=rvt.value.trim().length<10});
+rvg.onclick=function(){var t=rvt.value.trim();if(t.length<10||!mem.n)return;
+ var body=JSON.stringify({t:'rv',n:mem.n,d:mem.d,day:DAY,text:t.slice(0,400),ua:ua});
+ var ok=false;try{ok=navigator.sendBeacon&&navigator.sendBeacon(URL,new Blob([body],{type:'text/plain'}))}catch(e){}
+ if(!ok){try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:body})}catch(e){}}
+ put(RVK,'1');rvt.value='';rvg.disabled=true;rvShow();
+ rvs.textContent='✅ 送りました！ 80%以上聞いた日なら +1点（ランキングは1時間ごとに更新）'};
+window.__rvShow=rvShow;rvShow();
 var ua=/\bLine\//i.test(navigator.userAgent)?'line':'other',max=0,add=0,lastT=0,sentMax=-1;
 a.addEventListener('timeupdate',function(){var t=a.currentTime,d=t-lastT;if(!a.paused&&d>0&&d<3){add+=d;if(t>max)max=t}lastT=t});
 a.addEventListener('seeked',function(){lastT=a.currentTime});
