@@ -406,8 +406,7 @@
               "priceCurrency": "JPY",
               "price": "3000",
               "valueAddedTaxIncluded": true
-            },
-            "description": "平日（月〜金）は単品が無料です。"
+            }
           },
           {
             "@type": "Offer",
@@ -563,14 +562,6 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "駐車場がない場合は、近くのコインパーキングの実費を、別にいただきます。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "平日の防カビ無料は、祝日もですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "平日（月〜金）の予約では、防カビの単品が無料です。祝日を平日として扱うかどうかは、未決定です。"
           }
         },
         {
