@@ -84,7 +84,7 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <dl><div><dt>売上</dt><dd id="r1">–</dd></div><div><dt>スタッフの報酬</dt><dd id="r2">–</dd></div><div><dt>ポータルサイト利用料</dt><dd id="r3">–</dd></div><div class="main"><dt>粗利</dt><dd id="r4">–</dd></div></dl>
 <div class="goal"><span id="goal">粗利330万円まで</span><div class="bar"><i id="bar"></i></div></div>
 <h2>月ごと</h2><div class="wrap"><table><thead><tr><th>月</th><th>売上</th><th>報酬</th><th>ポータルサイト利用料</th><th>粗利</th></tr></thead><tbody id="m"></tbody></table></div>
-<h2>入れた記録（「直す」で、あとから変えられます）</h2><div class="wrap"><table><thead><tr><th>日付</th><th class="l">担当</th><th class="l">入口</th><th class="l">作業内容</th><th class="l">歩合</th><th>売上</th><th>報酬</th><th>粗利</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+<h2>入れた記録（歩合などを変える時は「直す」）</h2><div class="wrap"><table><thead><tr><th></th><th class="l">日付</th><th class="l">担当</th><th class="l">入口</th><th class="l">作業内容</th><th class="l">歩合</th><th>売上</th><th>報酬</th><th>粗利</th></tr></thead><tbody id="rows"></tbody></table></div>
 <p class="note">見本です。だれでも試せます（1日50件まで。毎晩、0円に戻ります）。粗利＝売上−スタッフの報酬−ポータルサイト利用料−他社へ渡した分（案件共有）。スタッフの報酬は、口コミ・LINE・メルマガの取れた数で変わります。ポータルサイト利用料の割合は入口ごとの見本で、実際の手数料は契約の形で変わります。料金は2026年10月2日のありがとうエアコンお掃除専門店の料金表（税込）がもとで、防カビの単品は2,500円にしています。同じ結果の約束ではありません。申告の帳簿や税金の計算は別に必要です。</p>
 </section></div></main>
 <script>
@@ -176,8 +176,8 @@ function show(o){
   $("m").textContent="";o.months.filter(function(r){return num(r[1])>0}).forEach(function(r){row($("m"),[r[0],yen(r[1]),yen(r[2]),yen(r[3]),yen(r[4])],[])});
   $("rows").textContent="";if(!o.rows.length)row($("rows"),["まだ記録がありません","","","","","","","",""],[0]);
   o.rows.slice().reverse().forEach(function(r){
-    row($("rows"),[r[0],r[1],r[2],r[8]||"",r[1]==="自分"?"":r[13]+" "+NAMES.filter(function(n,i){return r[10+i]==="✓"}).join("・"),yen(r[4]),yen(r[5]),yen(r[7]),""],[1,2,3,4]);
-    if(r[14]){var b=el("button","zero","直す");b.type="button";b.setAttribute("aria-label",r[0]+"の"+yen(r[4])+"を直す");b.addEventListener("click",function(){edit(r)});$("rows").lastChild.lastChild.appendChild(b)}
+    row($("rows"),["",r[0],r[1],r[2],r[8]||"",r[1]==="自分"?"":r[13]+" "+NAMES.filter(function(n,i){return r[10+i]==="✓"}).join("・"),yen(r[4]),yen(r[5]),yen(r[7])],[1,2,3,4,5]);
+    if(r[14]){var b=el("button","zero","直す");b.type="button";b.setAttribute("aria-label",r[0]+"の"+yen(r[4])+"を直す");b.addEventListener("click",function(){edit(r)});$("rows").lastChild.firstChild.appendChild(b)}
   });
 }
 var URL_="https://script.google.com/macros/s/AKfycbwIfVLDtXR3P194_S2zM-OBh6kVJTHloUa6drJNNWlf07Cc7yG9UtJiF9dZaC7zaLZpMA/exec";
