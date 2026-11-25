@@ -11,7 +11,7 @@ main{max-width:1180px;margin:0 auto;padding-block:22px;padding-left:max(20px,env
 h1{font-size:28px;margin:0;padding-bottom:10px;border-bottom:3px solid var(--orange);text-wrap:balance}
 h2{font-size:17px;margin:0 0 8px}
 .grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:28px;margin-top:18px}
-form{display:grid;gap:12px}
+form{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 label{display:grid;gap:4px;font-size:15px}
 input,select,button{font:inherit;font-size:17px;min-height:44px;border-radius:6px;border:1px solid var(--soft);padding:0 12px}
 input,select{background:var(--white);color:var(--navy);width:100%}
@@ -50,7 +50,7 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 .set{border:1px solid var(--line);border-radius:8px;padding:2px 12px 10px}.set summary{font-weight:700}
 .rt{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px;align-items:center;padding:3px 0;font-size:14.5px}.pc{display:flex;align-items:center;gap:4px}.pc input{min-width:0}
 .sf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.sf .bt{grid-column:1/-1;display:flex;gap:8px}.sf .bt button,.sf.new button{font-size:15px}.sf.new{border:0}.sf.new button{grid-column:1/-1}.off{opacity:.7}
-.pick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:8px;text-align:center}.pick.two{grid-template-columns:1fr 1fr;text-align:left}
+.pick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:8px;text-align:center}.pick.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));text-align:left}.pick label{min-width:0}.set label{margin-top:8px}.set select,.set input{min-width:0}
 #more{width:100%;margin-bottom:18px}
 [hidden]{display:none!important}
 </style></head><body>
