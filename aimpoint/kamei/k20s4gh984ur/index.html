@@ -142,7 +142,7 @@ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 
     <div class="mini"><button id="mplay" type="button" aria-label="再生"><svg viewBox="0 0 24 24" id="mico"><path d="M8 5l12 7-12 7z"/></svg></button><span id="mtime">0:00 / -:--</span></div>
     <textarea id="mtext" maxlength="1000" placeholder="聞いて思ったこと・質問を書いてください"></textarea>
     <button class="send" id="msend" type="button" disabled>メモを送る</button>
-    <p class="priv">メモは、三浦とAIコーチだけが読みます。ほかの方には見えません。コーチの返事は1日3回（朝・昼・夜）この欄に届きます。</p>
+    <p class="priv">メモとお返事は、三浦と運営スタッフ、AIコーチ（AIのサービスを使っています）が読みます。ほかの方には見えません。お返事は、三浦が目を通してからこの欄にお届けします。</p>
     <div class="msgs" id="msgs"></div>
   </section>
   <section class="pane" id="p-rank" hidden>
@@ -278,7 +278,7 @@ text.addEventListener('input',function(){send.disabled=!text.value.trim();put(DR
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function draw(){if(!list.length){box.innerHTML='<p class="empty">まだメモはありません。聞いていて浮かんだことを、ひとことでどうぞ。</p>';return}
  box.innerHTML='<h3>これまでのメモ</h3>'+list.map(function(m){return '<div class="bub me"><small>DAY '+esc(m.day)+'・'+esc(m.pos)+'　'+esc(m.at)+'</small>'+esc(m.t)+'</div>'+
-  (m.re?'<div class="bub co"><small>AIコーチ　'+esc(m.reAt)+'</small>'+esc(m.re)+'</div>':'<div class="wait">'+(m.local?'送っています…':'コーチの返事待ち（1日3回、朝・昼・夜に届きます）')+'</div>')}).join('')}
+  (m.re?'<div class="bub co"><small>AIコーチ　'+esc(m.reAt)+'</small>'+esc(m.re)+'</div>':'<div class="wait">'+(m.local?'送っています…':'お返事を準備しています（三浦が目を通してからお届けします）')+'</div>')}).join('')}
 function seen(){var n=list.filter(function(m){return m.re}).length;put('kamei_memo_seen',String(n));bdg.classList.remove('on')}
 function badge(){var n=list.filter(function(m){return m.re}).length-(Number(get('kamei_memo_seen'))||0);
  if(n>0&&document.getElementById('p-memo').hidden){bdg.textContent=n;bdg.classList.add('on')}}

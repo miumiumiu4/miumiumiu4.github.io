@@ -14,9 +14,13 @@ var REC = '記録', NICK = 'ニックネーム', WEEK = '今週のランキン�
 var REC_HEAD = ['キー', 'ニックネーム', '日', '聞いた日（日本時間）', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)', 'はじめて聞いた', '最後に聞いた', 'LINE内', '外部ブラウザ', '端末'];
 var CONSULT_HEAD = ['月', '順位', 'ニックネーム', 'その月の点数', '招待した日', '受けた日（三浦さんが記入）', 'メモ'];
 var MEMO = 'メモとコーチ';
-// メモ（2026-11-25 さとぴー）：聞きながら書いたメモを1行ずつ残し、AIコーチ（will）が1日数回読んで「コーチの返事」列に書く → その人のページにだけ出る。
+// メモ（2026-11-25 さとぴー）：聞きながら書いたメモを1行ずつ残し、AIコーチが下書きを「コーチの返事（下書き）」列に書く → 三浦さんがOKしたものだけ、その人のページに出る。
 // だれのメモかは「端末」（その人の端末だけが持つ推測できない記号）で分ける。ほかの人のメモは返さない。
-var MEMO_HEAD = ['受付日時', '端末', 'ニックネーム', '日', '再生位置', 'メモ', 'コーチの返事', '返事日時', '読んだ（三浦さん用）'];
+// 直し（2026-11-25 さとぴー「全部確認」）：コーチの返事は下書き。三浦さんが「送ってOK」に印を付けたものだけ、その人のページに出す。
+//   AIコーチは「コーチの返事」が空の行にだけ下書きを書く（印が付いた行・三浦さんが直した行は上書きしない）。
+var MEMO_HEAD = ['受付日時', '端末', 'ニックネーム', '日', '再生位置', 'メモ', 'コーチの返事（下書き）', '下書き日時', '読んだ（三浦さん用）', '送ってOK（三浦さん）', '届けた日時'];
+var OK_COL = 10, SENT_COL = 11;
+var NOTICE_HOURS = [9, 13, 21];   // OK待ちの件数を三浦さんにメールで知らせる時刻（下書きの時刻が決まったら合わせる）
 var REST_MONTHS = 3, INVITES = 3, SHOW = 5;
 var STAFF = '除外（スタッフ）';   // ここに書いたニックネームは、ランキング・招待に出さない（さとぴー・スタッフのテスト用）
 
@@ -43,7 +47,7 @@ function setup() {
   sheet_(NICK, ['ニックネーム', '端末', '選んだ日時']);
   sheet_(WEEK); sheet_(MONTH);
   sheet_(CONSULT, CONSULT_HEAD);
-  sheet_(MEMO, MEMO_HEAD);
+  memoSheet_();
   sheet_(STAFF, ['ランキング・招待に出さないニックネーム（さとぴー・スタッフ）']);
   var h = sheet_(README);
   h.clear();
@@ -57,11 +61,13 @@ function setup() {
     ['「無料コンサル」：招待した人の一覧。受けたら「受けた日」を書いてください。一度招待した人は3か月お休みで、次の順位の人に回ります。'],
     ['招待された人のページには「あなたは今月の無料コンサルの対象です」と日程を選ぶボタンが出ます（その月の末日まで）。'],
     ['ニックネームと本人のつながりは、このシートにもありません（本人が無料コンサルや面談に来たときに分かります）。'],
-    ['']
+    ['「メモとコーチ」：コーチの返事は下書きです。読んで良ければ「送ってOK」に印を付けると、その人のページに出ます。直したいときは返事を書き直してから印を付けてください。印を外すと、ページからも消えます。']
   ]);
   ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('rebuild').timeBased().everyHours(1).create();
   ScriptApp.newTrigger('monthlyInvite').timeBased().onMonthDay(1).atHour(6).create();
+  ScriptApp.newTrigger('onMemoEdit').forSpreadsheet(ss).onEdit().create();
+  NOTICE_HOURS.forEach(function (h) { ScriptApp.newTrigger('reviewNotice').timeBased().everyDays(1).atHour(h).create(); });
   rebuild();
   Logger.log('シート: ' + ss.getUrl());
 }
@@ -269,18 +275,48 @@ function memo_(p) {
       if (r[1] === dev && r[0] instanceof Date && now - r[0] < 60000) recent++;
     });
     if (recent >= 5) return json_({ ok: false, wait: true });
-    sh.appendRow([now, dev, p.st ? '（スタッフ）' + norm_(p.n) : norm_(p.n), day, Math.floor(pos / 60) + ':' + ('0' + pos % 60).slice(-2), "'" + text, '', '', '']);
+    sh.appendRow([now, dev, p.st ? '（スタッフ）' + norm_(p.n) : norm_(p.n), day, Math.floor(pos / 60) + ':' + ('0' + pos % 60).slice(-2), "'" + text, '', '', '', false, '']);
   } finally { lock.releaseLock(); }
   return json_({ ok: true });
 }
-// その端末のメモだけを返す（新しい順に50件）
+// メモのシート。前からあるシートにも「送ってOK」「届けた日時」の列を足し、OKの列をチェックボックスにする
+function memoSheet_() {
+  var sh = sheet_(MEMO, MEMO_HEAD);
+  sh.getRange(1, 1, 1, MEMO_HEAD.length).setValues([MEMO_HEAD]).setFontWeight('bold');
+  var rows = Math.max(sh.getMaxRows() - 1, 1);
+  sh.getRange(2, OK_COL, rows, 1).insertCheckboxes();
+  return sh;
+}
+// 三浦さんが「送ってOK」に印を付けた／外したとき、「届けた日時」を入れる／消す
+function onMemoEdit(e) {
+  var r = e && e.range;
+  if (!r || r.getSheet().getName() !== MEMO || r.getColumn() > OK_COL || r.getLastColumn() < OK_COL || r.getRow() < 2) return;
+  var sh = r.getSheet(), n = r.getNumRows(), row0 = r.getRow();
+  var ok = sh.getRange(row0, OK_COL, n, 1).getValues();
+  var sent = sh.getRange(row0, SENT_COL, n, 1).getValues();
+  for (var i = 0; i < n; i++) sent[i][0] = ok[i][0] === true ? (sent[i][0] || new Date()) : '';
+  sh.getRange(row0, SENT_COL, n, 1).setValues(sent);
+}
+// 1日数回、下書きがあるのにまだOKしていない件数を三浦さんに知らせる（0件なら送らない）
+function reviewNotice() {
+  var sh = memoSheet_(), last = sh.getLastRow(), wait = 0;
+  if (last < 2) return;
+  sh.getRange(2, 1, last - 1, OK_COL).getValues().forEach(function (r) {
+    if (String(r[6] || '').trim() && r[OK_COL - 1] !== true) wait++;
+  });
+  if (!wait) return;
+  MailApp.sendEmail(Session.getEffectiveUser().getEmail(), '【加盟前音声】コーチの返事、OK待ちが' + wait + '件あります',
+    'シート「' + MEMO + '」で、返事を読んで良ければ「送ってOK」に印を付けてください。\n' + ss_().getUrl());
+}
+// その端末のメモだけを返す（新しい順に50件）。返事は「送ってOK」に印がある行だけ返す
 function memos_(d) {
   var dev = dev_(d), sh = sheet_(MEMO, MEMO_HEAD), last = sh.getLastRow(), out = [];
   if (dev.length < 8 || last < 2) return out;
-  sh.getRange(2, 1, last - 1, 8).getValues().forEach(function (r) {
+  sh.getRange(2, 1, last - 1, SENT_COL).getValues().forEach(function (r) {
     if (r[1] !== dev) return;
+    var ok = r[OK_COL - 1] === true && String(r[6] || '').trim() !== '', sent = r[SENT_COL - 1];
     out.push({ at: r[0] instanceof Date ? fmt_(r[0], 'M/d HH:mm') : String(r[0]), day: r[3], pos: String(r[4]), t: String(r[5]),
-      re: String(r[6] || ''), reAt: r[7] instanceof Date ? fmt_(r[7], 'M/d HH:mm') : String(r[7] || '') });
+      re: ok ? String(r[6]) : '', reAt: ok ? (sent instanceof Date ? fmt_(sent, 'M/d HH:mm') : String(sent || '')) : '' });
   });
   return out.reverse().slice(0, 50);
 }
