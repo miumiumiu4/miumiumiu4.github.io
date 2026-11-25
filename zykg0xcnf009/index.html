@@ -33,13 +33,14 @@ th{color:var(--soft);font-weight:400}
 a{color:var(--cream)}
 .note{font-size:12.5px;color:var(--soft);margin:0}
 @media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}h1{font-size:22px}dl{grid-template-columns:1fr 1fr}}
+input[type=date]{cursor:pointer}
 </style></head><body>
 <main>
 <h1>入力するだけ。売上と粗利は自動で計算されます</h1>
 <div class="grid">
 <form id="f">
 <h2>今日の1件を入れる</h2>
-<label for="d">日付<input id="d" type="date" min="2027-05-01" max="2027-12-31" required></label>
+<label for="d">日付<input id="d" type="date" min="2026-11-01" max="2028-12-31" required></label>
 <label for="w">担当<select id="w"><option>自分</option><option>スタッフA（見本）</option><option>スタッフB（見本）</option><option>スタッフC（見本）</option></select></label>
 <label for="c">予約の入口<select id="c"><option>集客サイト</option><option>ユアマイスター</option><option>くらしのマーケット</option><option>ミツモア</option><option>おうちにプロ</option><option>ゼヒトモ</option><option>ジモティー</option><option>お客様リスト</option></select></label>
 <label for="n">台数・件数<input id="n" type="number" min="1" max="20" value="1" required></label>
@@ -66,7 +67,8 @@ function show(o){
   $("rows").textContent="";if(!o.rows.length)row($("rows"),["まだ記録がありません","","","","",""],[0]);o.rows.slice(-5).reverse().forEach(function(r){row($("rows"),[r[0],r[1],r[2],r[3],yen(r[4]),yen(r[7])],[1,2])});
 }
 function call(opt){return fetch(URL_,opt).then(function(r){return r.json()}).then(function(o){if(o.error)throw new Error(o.error);show(o)})}
-$("d").value="2027-06-05";
+var now=new Date();$("d").value=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
+$("d").addEventListener("click",function(){try{this.showPicker()}catch(e){}});
 call().then(function(){$("status").textContent="見本シートとつながっています"}).catch(function(){$("status").textContent="見本シートを読めませんでした。少し待って開き直してください"});
 $("f").addEventListener("submit",function(ev){ev.preventDefault();
   $("b").disabled=true;$("status").textContent="見本シートに入れています";
