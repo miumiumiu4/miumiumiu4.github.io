@@ -13,6 +13,10 @@ var TZ = 'Asia/Tokyo';
 var REC = '記録', NICK = 'ニックネーム', WEEK = '今週のランキング', MONTH = '今月のランキング', CONSULT = '無料コンサル', README = '見方';
 var REC_HEAD = ['キー', 'ニックネーム', '日', '聞いた日（日本時間）', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)', 'はじめて聞いた', '最後に聞いた', 'LINE内', '外部ブラウザ', '端末'];
 var CONSULT_HEAD = ['月', '順位', 'ニックネーム', 'その月の点数', '招待した日', '受けた日（三浦さんが記入）', 'メモ'];
+var MEMO = 'メモとコーチ';
+// メモ（2026-11-25 さとぴー）：聞きながら書いたメモを1行ずつ残し、AIコーチ（will）が1日数回読んで「コーチの返事」列に書く → その人のページにだけ出る。
+// だれのメモかは「端末」（その人の端末だけが持つ推測できない記号）で分ける。ほかの人のメモは返さない。
+var MEMO_HEAD = ['受付日時', '端末', 'ニックネーム', '日', '再生位置', 'メモ', 'コーチの返事', '返事日時', '読んだ（三浦さん用）'];
 var REST_MONTHS = 3, INVITES = 3, SHOW = 5;
 var STAFF = '除外（スタッフ）';   // ここに書いたニックネームは、ランキング・招待に出さない（さとぴー・スタッフのテスト用）
 
@@ -39,6 +43,7 @@ function setup() {
   sheet_(NICK, ['ニックネーム', '端末', '選んだ日時']);
   sheet_(WEEK); sheet_(MONTH);
   sheet_(CONSULT, CONSULT_HEAD);
+  sheet_(MEMO, MEMO_HEAD);
   sheet_(STAFF, ['ランキング・招待に出さないニックネーム（さとぴー・スタッフ）']);
   var h = sheet_(README);
   h.clear();
@@ -81,6 +86,7 @@ function takenNames_() {
 // ?taken=1 → 使用中の名前 ／ ?reserve=名前&d=端末 → 控えに書く ／ ?rank=1&n=名前 → 今週の上位5人・あなた・招待
 function doGet(e) {
   var p = (e && e.parameter) || {};
+  if (p.memos) return json_({ memos: memos_(p.d) });
   if (p.taken) return json_({ names: takenNames_() });
   if (p.reserve) {
     var name = norm_(p.reserve), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
@@ -114,6 +120,7 @@ function doPost(e) {
   var p;
   try { p = JSON.parse(e.postData.contents); } catch (err) { return ContentService.createTextOutput('ng'); }
   if (p.kind === 'consult') return consultNote_(p);
+  if (p.kind === 'memo') return memo_(p);
   var name = norm_(p.n), day = Math.floor(Number(p.day)), dev = String(p.d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
   var dur = Math.min(Math.max(Number(p.dur) || 0, 0), 3600);
   var max = Math.min(Math.max(Number(p.max) || 0, 0), dur || 3600);
@@ -245,4 +252,35 @@ function consultNote_(p) {
     }
   } finally { lock.releaseLock(); }
   return ContentService.createTextOutput('ng');   // 招待の行がない（招待されていない）ときは書かない
+}
+
+// ===== メモとコーチの返事 =====
+function dev_(d) { return String(d || '').replace(/[^a-z0-9]/gi, '').slice(0, 16); }
+function memo_(p) {
+  var dev = dev_(p.d), text = String(p.t || '').replace(/\r/g, '').trim().slice(0, 1000);
+  var day = Math.floor(Number(p.day)) || '', pos = Math.max(0, Math.floor(Number(p.pos) || 0));
+  if (dev.length < 8 || !text) return json_({ ok: false });
+  var lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    var sh = sheet_(MEMO, MEMO_HEAD), now = new Date();
+    // 同じ端末から1分に5件まで（いたずら防止）
+    var last = sh.getLastRow(), recent = 0;
+    if (last >= 2) sh.getRange(Math.max(2, last - 30), 1, Math.min(last - 1, 31), 2).getValues().forEach(function (r) {
+      if (r[1] === dev && r[0] instanceof Date && now - r[0] < 60000) recent++;
+    });
+    if (recent >= 5) return json_({ ok: false, wait: true });
+    sh.appendRow([now, dev, p.st ? '（スタッフ）' + norm_(p.n) : norm_(p.n), day, Math.floor(pos / 60) + ':' + ('0' + pos % 60).slice(-2), "'" + text, '', '', '']);
+  } finally { lock.releaseLock(); }
+  return json_({ ok: true });
+}
+// その端末のメモだけを返す（新しい順に50件）
+function memos_(d) {
+  var dev = dev_(d), sh = sheet_(MEMO, MEMO_HEAD), last = sh.getLastRow(), out = [];
+  if (dev.length < 8 || last < 2) return out;
+  sh.getRange(2, 1, last - 1, 8).getValues().forEach(function (r) {
+    if (r[1] !== dev) return;
+    out.push({ at: r[0] instanceof Date ? fmt_(r[0], 'M/d HH:mm') : String(r[0]), day: r[3], pos: String(r[4]), t: String(r[5]),
+      re: String(r[6] || ''), reAt: r[7] instanceof Date ? fmt_(r[7], 'M/d HH:mm') : String(r[7] || '') });
+  });
+  return out.reverse().slice(0, 50);
 }
