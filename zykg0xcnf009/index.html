@@ -47,6 +47,9 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 .zero{background:transparent;border-color:var(--soft);font-weight:400;font-size:15px}.ask{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px}.ask span{grid-column:1/-1}
 .kl{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px}.kl output{font-size:22px;font-weight:800;color:var(--orange)}
 .knob{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:10px;align-items:center}.knob button{padding:0;background:transparent;border-color:var(--soft);font-size:20px}.knob input{padding:0;border:0;background:transparent;accent-color:var(--orange)}
+.set{border:1px solid var(--line);border-radius:8px;padding:2px 12px 10px}.set summary{font-weight:700}
+.rt{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px;align-items:center;padding:3px 0;font-size:14.5px}.pc{display:flex;align-items:center;gap:4px}.pc input{min-width:0}
+.sf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.sf .bt{grid-column:1/-1;display:flex;gap:8px}.sf .bt button,.sf.new button{font-size:15px}.sf.new{border:0}.sf.new button{grid-column:1/-1}.off{opacity:.7}
 [hidden]{display:none!important}
 </style></head><body>
 <main>
@@ -66,6 +69,13 @@ details{border-top:1px solid var(--line);padding:4px 0}summary{cursor:pointer;mi
 <button id="ed" class="zero" type="button" hidden>この1件を消す</button>
 <div id="eq" class="ask" hidden><span>この1件を消します。よろしいですか？</span><button id="ey" type="button">はい、消す</button><button id="en" class="zero" type="button">やめる</button></div>
 <a class="see" id="open" href="https://docs.google.com/spreadsheets/d/1VLcOrRDyhuQAljEL5F4m0mWEC0IlUClondBHjeIPf2s/edit#gid=104" target="_blank" rel="noopener">スプレッドシートを見る</a>
+<details class="set" id="rp"><summary>ポータルサイトの手数料率（月ごと）</summary>
+<label for="rm">月<select id="rm"></select></label><p class="memo">空欄の入口は、いつもの割合（灰色の数字）で計算します。保存すると、その月の記録も計算し直します。</p>
+<div id="rl"></div><button id="rs" type="button">この月の割合を保存</button><p class="memo" id="rr" role="status"></p></details>
+<details class="set" id="sp"><summary>スタッフの管理</summary>
+<div id="sl"></div>
+<div class="sf new"><input id="sn" type="text" maxlength="12" placeholder="新しいスタッフの名前" aria-label="新しいスタッフの名前"><label class="pc"><input id="sc" type="number" min="60" max="180" step="1" value="75" aria-label="新しいスタッフの歩合">%</label><button id="sa" type="button">追加</button></div>
+<p class="memo">％は、3つ取れた時の歩合の最初の数字です。外しても、過去の記録は名前つきで残ります。だれでも開ける見本なので、本名は入れないでください。毎晩はじめの形に戻ります。</p><p class="memo" id="sr" role="status"></p></details>
 <button id="z" class="zero" type="button">数字を0にする</button>
 <div id="zq" class="ask" hidden><span>入れた記録を全部消します。本当に0にしますか？</span><button id="zy" type="button">はい、0にする</button><button id="zn" class="zero" type="button">やめる</button></div>
 <p id="status" role="status">スプレッドシートを読んでいます</p>
@@ -90,11 +100,35 @@ function drawRoutes(){
   $("c").textContent="";cfg.routes.forEach(function(r){var b=el("button","",r.name);b.type="button";b.setAttribute("aria-pressed",String(r.name===route));
     b.addEventListener("click",function(){route=r.name;drawRoutes();drawChecks()});$("c").appendChild(b)});
   var r=cfg.routes.filter(function(x){return x.name===route})[0];
-  $("cm").textContent=r?"ポータルサイト利用料 "+Math.round(r.rate*1000)/10+"%"+(r.memo?"（"+r.memo+"）":"")+(r.recv<1?"／受け取りは売上の"+Math.round(r.recv*1000)/10+"%（残りは渡した会社の分）":""):"";
+  $("cm").textContent=r?"ポータルサイト利用料 "+Math.round(rateOf(r,ym())*1000)/10+"%"+(ym()+"|"+r.name in cfg.month?"（"+Number(ym().slice(5))+"月の割合）":"")+(r.memo?"（"+r.memo+"）":"")+(r.recv<1?"／受け取りは売上の"+Math.round(r.recv*1000)/10+"%（残りは渡した会社の分）":""):"";
 }
 function turn(v){var k=cfg.knob,n=Math.round((v-k.min)/k.step);cap=Math.round((k.min+Math.max(0,Math.min(Math.round((k.max-k.min)/k.step),n))*k.step)*10000)/10000;drawChecks()}
 function pct(v){return Math.round(v*10000)/100+"%"}
-function ownCap(){cap=cfg.cap[cfg.who.indexOf($("w").value)]||cfg.pay.start}
+function ownCap(){var m=cfg.staff.filter(function(x){return x.name===$("w").value})[0];cap=m&&m.cap||cfg.pay.start}
+function rateOf(x,ym){var k=ym+"|"+x.name;return k in cfg.month?cfg.month[k]:x.rate}
+function ym(){return $("d").value.slice(0,7).replace("-","/")}
+function drawWho(keep){
+  var now=keep||$("w").value;$("w").textContent="";
+  cfg.staff.filter(function(x){return!x.off||x.name===keep}).forEach(function(x){var o=el("option","",x.name+(x.off?"（外した）":""));o.value=x.name;$("w").appendChild(o)});
+  if(cfg.staff.some(function(x){return x.name===now&&(!x.off||x.name===keep)}))$("w").value=now;
+}
+function drawRates(){
+  var m=$("rm").value;$("rl").textContent="";
+  cfg.routes.forEach(function(x,i){var d=el("label","rt"),p=el("span","pc"),n=el("input"),k=m.replace("-","/")+"|"+x.name;
+    n.type="number";n.min=0;n.max=100;n.step=0.1;n.dataset.route=x.name;n.placeholder=Math.round(x.rate*1000)/10;n.id="rate"+i;if(k in cfg.month)n.value=Math.round(cfg.month[k]*1000)/10;
+    d.htmlFor=n.id;d.appendChild(el("span","",x.name));p.appendChild(n);p.appendChild(document.createTextNode("%"));d.appendChild(p);$("rl").appendChild(d)});
+}
+function drawStaff(){
+  $("sl").textContent="";
+  cfg.staff.forEach(function(x){if(x.name==="自分")return;
+    var b=el("div","sf"+(x.off?" off":"")),n=el("input"),p=el("label","pc"),c=el("input"),t=el("div","bt"),ok=el("button","zero","保存"),off=el("button","zero",x.off?"戻す":"外す");
+    n.type="text";n.maxLength=12;n.value=x.name;n.setAttribute("aria-label",x.name+"の名前");c.type="number";c.min=60;c.max=180;c.step=1;c.value=Math.round(x.cap*100);c.setAttribute("aria-label",x.name+"の歩合");
+    ok.type=off.type="button";p.appendChild(c);p.appendChild(document.createTextNode("%"));
+    ok.addEventListener("click",function(){staff({from:x.name,name:n.value,cap:Number(c.value)/100,off:x.off},"保存しました")});
+    off.addEventListener("click",function(){staff({from:x.name,name:x.name,cap:x.cap,off:!x.off},x.off?"戻しました":"外しました。過去の記録は残っています")});
+    t.appendChild(ok);t.appendChild(off);if(x.off)t.appendChild(el("span","memo","外したスタッフ"));b.appendChild(n);b.appendChild(p);b.appendChild(t);$("sl").appendChild(b)});
+}
+function staff(x,msg){$("sr").textContent="保存しています";return call({staff:x}).then(function(){$("sr").textContent=msg;return true}).catch(function(e){$("sr").textContent=/[ぁ-ん]/.test(e.message)?e.message:"つながりませんでした"})}
 function drawChecks(){
   var w=$("w").value;$("kf").hidden=w==="自分";$("k").textContent="";
   NAMES.forEach(function(n,i){var b=el("button","",(checks[i]?"✓ ":"")+n);b.type="button";b.setAttribute("aria-pressed",String(checks[i]));
@@ -103,14 +137,14 @@ function drawChecks(){
   var v=cfg.pay.start+(cap-cfg.pay.start)/3*checks.filter(Boolean).length;
   $("km").textContent="歩合 "+pct(v)+" → 報酬は売上の "+pct(v*cfg.pay.base);
   var x=num($("s").value),q=cfg.routes.filter(function(z){return z.name===route})[0];
-  if(x>0&&q){var a=Math.round(x*v*cfg.pay.base),g=x-a-Math.round(x*q.rate)-(x-Math.round(x*q.recv));
+  if(x>0&&q){var a=Math.round(x*v*cfg.pay.base),g=x-a-Math.round(x*rateOf(q,ym()))-(x-Math.round(x*q.recv));
     $("km").textContent+="（"+yen(x)+"なら "+yen(a)+"）／この1件の粗利 "+(g<0?"−":"")+yen(Math.abs(g))+(g<0?"。報酬と利用料が売上を超えています":"")}
 
 }
-function reset(){editing="";qty={};checks=[false,false,false];$("s").value=0;$("n").value=1;ownCap();$("ft").textContent="今日の1件を入れる";$("b").textContent="スプレッドシートに入れる";
+function reset(){editing="";qty={};checks=[false,false,false];$("s").value=0;$("n").value=1;drawWho();ownCap();$("ft").textContent="今日の1件を入れる";$("b").textContent="スプレッドシートに入れる";
   ["ec","ed","eq"].forEach(function(i){$(i).hidden=true});drawMenu();drawChecks()}
 function edit(r){
-  editing=r[14];$("d").value=r[0].replace(/\//g,"-");$("w").value=r[1];route=r[2];$("n").value=num(r[3]);checks=[r[10],r[11],r[12]].map(function(x){return x==="✓"});qty={};
+  editing=r[14];$("d").value=r[0].replace(/\//g,"-");drawWho(r[1]);$("w").value=r[1];route=r[2];$("n").value=num(r[3]);checks=[r[10],r[11],r[12]].map(function(x){return x==="✓"});qty={};
   (r[8]||"").split("、").forEach(function(t){var k=t.lastIndexOf("×"),i=cfg.menu.map(function(m){return m.name}).indexOf(t.slice(0,k));if(k>0&&i>=0)qty[i]=Number(t.slice(k+1))});
   ownCap();if(num(r[15])>0)cap=num(r[15])/100;drawRoutes();drawMenu();$("s").value=num(r[4]);drawChecks();
   $("ft").textContent="この1件を直す";$("b").textContent="直してスプレッドシートに入れる";$("ec").hidden=false;$("ed").hidden=false;$("eq").hidden=true;
@@ -131,7 +165,12 @@ function drawMenu(){
   });
 }
 function show(o){
-  if(!cfg){cfg=o.config;cfg.who.forEach(function(w){$("w").appendChild(el("option","",w))});route=cfg.routes[0].name;drawRoutes();drawMenu();ownCap();drawChecks()}
+  var first=!cfg;cfg=o.config;
+  if(first){
+    for(var i=-2,b=new Date();i<24;i++){var dd=new Date(b.getFullYear(),b.getMonth()+i,1),v=dd.getFullYear()+"-"+("0"+(dd.getMonth()+1)).slice(-2),op=el("option","",dd.getFullYear()+"年"+(dd.getMonth()+1)+"月");op.value=v;if(i===0)op.selected=true;$("rm").appendChild(op)}
+    route=cfg.routes[0].name;drawWho();drawRoutes();drawMenu();ownCap();
+  }else{drawWho(editing?$("w").value:"");drawRoutes()}
+  drawChecks();drawRates();drawStaff();
   var t=o.total;["r1","r2","r3","r4"].forEach(function(k,i){$(k).textContent=yen(t[i])});
   $("goal").textContent="粗利330万円まで、あと "+yen(Math.max(0,3300000-num(t[3])));$("bar").style.width=Math.max(0,Math.min(100,num(t[3])/33000))+"%";
   $("m").textContent="";o.months.filter(function(r){return num(r[1])>0}).forEach(function(r){row($("m"),[r[0],yen(r[1]),yen(r[2]),yen(r[3]),yen(r[4])],[])});
@@ -151,7 +190,13 @@ $("zy").addEventListener("click",function(){$("zy").disabled=true;$("status").te
 function start(){call().then(function(){$("status").textContent="見本シートとつながっています"}).catch(function(){$("status").textContent="見本シートを読めませんでした。少し待って開き直してください"})}
 var now=new Date();$("d").value=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
 $("d").addEventListener("click",function(){try{this.showPicker()}catch(e){}});
-$("d").addEventListener("change",function(){if(cfg){drawMenu();if(Object.keys(qty).some(function(k){return qty[k]}))total()}});
+$("d").addEventListener("change",function(){if(cfg){drawRoutes();drawMenu();drawChecks();if(Object.keys(qty).some(function(k){return qty[k]}))total()}});
+$("rm").addEventListener("change",function(){if(cfg){drawRates();$("rr").textContent=""}});
+$("rs").addEventListener("click",function(){var x={},bad=false;[].forEach.call($("rl").querySelectorAll("input"),function(n){if(!n.validity.valid)bad=true;x[n.dataset.route]=n.value===""?null:Number(n.value)});
+  if(bad){$("rr").textContent="割合は0〜100で、小数は1けたまでです";return}
+  $("rs").disabled=true;$("rr").textContent="保存しています";var m=$("rm").options[$("rm").selectedIndex].textContent;
+  call({rates:{month:$("rm").value,values:x}}).then(function(){$("rr").textContent=m+"の割合を保存し、計算し直しました"}).catch(function(e){$("rr").textContent=/[ぁ-ん]/.test(e.message)?e.message:"つながりませんでした"}).then(function(){$("rs").disabled=false})});
+$("sa").addEventListener("click",function(){$("sa").disabled=true;staff({name:$("sn").value,cap:Number($("sc").value)/100},"追加しました。担当から選べます").then(function(ok){if(ok)$("sn").value="";$("sa").disabled=false})});
 $("kr").addEventListener("input",function(){turn(Number($("kr").value)/100)});
 $("kd").addEventListener("click",function(){turn(cap-cfg.knob.step)});$("ku").addEventListener("click",function(){turn(cap+cfg.knob.step)});
 $("s").addEventListener("input",function(){if(cfg)drawChecks()});
