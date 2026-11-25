@@ -10,7 +10,7 @@ function ss_() { return SpreadsheetApp.openById(SS_ID); }
 var REC = '記録', RANK = 'やる気ランキング', README = '見方';
 var EXCL = 'ランキングから外す名前'; // さとぴー本人・テスト・スタッフ。記録は残すが、ランキングとプレゼント選考には出さない
 var REC_HEAD = ['キー', '名前', '日', '一番先まで聞いた(秒)', '音声の長さ(秒)', '進み(%)', '聞いた合計(秒)',
-  'はじめて聞いた', '最後に聞いた', '配った日のうちに聞いた', 'LINE内で聞いた', '外部ブラウザで聞いた', '端末'];
+  'はじめて聞いた', '最後に聞いた', '配った日のうちに聞いた', 'LINE内で聞いた', '外部ブラウザで聞いた', '端末', '振り返りを書いた'];
 
 function setup() {
   var ss = ss_();
@@ -25,11 +25,12 @@ function setup() {
   }
   var h = ss.getSheetByName(README) || ss.insertSheet(README, ss.getSheets().length);
   h.clear();
-  h.getRange(1, 1, 9, 1).setValues([
+  h.getRange(1, 1, 10, 1).setValues([
     ['このシートの見方'],
     ['「記録」：1人×1日で1行。どこまで聞いたか・合計で何秒聞いたかが自動で入ります（15秒ごとに更新）。'],
     ['「やる気ランキング」：1時間ごとに自動で並べ直します。'],
-    ['点数：80%以上聞いた日 10点／その日のうちに聞いた +3点／最後まで聞いた +2点／2回以上聞いた +2点／一番長い連続日数 ×1点'],
+    ['点数：80%以上聞いた日 10点／その日のうちに聞いた +3点／最後まで聞いた +2点／2回以上聞いた +2点／一番長い連続日数 ×1点／振り返り（80%以上聞いた日の分）1回 +1点'],
+    ['振り返り王：その週（または合計）で振り返りをいちばん多く書いた人に、ランキングで「振り返り王」のしるしが付きます。振り返りの文は「（消さない）朝の5分_再生記録のプログラム置き場」の「振り返り」タブ。'],
     ['同じ名前は同じ人としてまとめます（全角・半角・空白の違いはそろえます）。'],
     ['端末の欄に番号が2つ以上ある人は、LINE内と外部ブラウザの両方で聞いたか、同じ名前の別の人です。'],
     ['先送りして最後まで飛ばした分は「聞いた」に入りません（再生して進んだところだけ数えます）。'],
@@ -94,6 +95,8 @@ function doPost(e) {
   var max = Math.min(Math.max(Number(p.max) || 0, 0), dur || 3600);
   var add = Math.min(Math.max(Number(p.add) || 0, 0), 120);
   var line = p.ua === 'line';
+  var isRv = p.t === 'rv', rvText = isRv ? String(p.text || '').replace(/\r/g, '').trim().slice(0, 400) : '';
+  if (isRv && rvText.length < 10) return ContentService.createTextOutput('ng');
   if (!name || !(day >= 1 && day <= 31)) return ContentService.createTextOutput('ng');
 
   var key = name.toLowerCase() + '|' + day;
@@ -117,7 +120,7 @@ function doPost(e) {
       }
     }
     if (!row) {
-      sh.appendRow([key, name, day, 0, 0, 0, 0, stamp, stamp, '', '', '', '']);
+      sh.appendRow([key, name, day, 0, 0, 0, 0, stamp, stamp, '', '', '', '', '']);
       row = sh.getLastRow();
     }
     cache.put(key, String(row), 21600);
@@ -132,9 +135,23 @@ function doPost(e) {
     var devs = String(v[12] || '').split(',').filter(String);
     if (dev && devs.indexOf(dev) < 0 && devs.length < 5) devs.push(dev);
     v[12] = devs.join(',');
+    if (isRv) v[13] = '○';
     sh.getRange(row, 1, 1, REC_HEAD.length).setValues([v]);
+    if (isRv) saveReflection_(name, day, rvText, stamp, v[5]);
   } finally { lock.releaseLock(); }
   return ContentService.createTextOutput('ok');
+}
+
+// 振り返りの文（11/26 さとぴー：振り返り1回につき1点＋「振り返り王」バッジ。80%以上聞いた日の振り返りだけ点になる）
+// 文はさとぴーだけのファイル（このプログラムの置き場）の「振り返り」タブへ
+function saveReflection_(name, day, text, stamp, pct) {
+  var ss = SpreadsheetApp.openById(RN_SS_ID), sh = ss.getSheetByName('振り返り');
+  if (!sh) {
+    sh = ss.insertSheet('振り返り', 0);
+    sh.getRange(1, 1, 1, 5).setValues([['送った日時', 'ニックネーム', '日', 'そのとき聞いていた(%)', '振り返り']]).setFontWeight('bold');
+    sh.setFrozenRows(1); sh.setColumnWidth(5, 520);
+  }
+  sh.appendRow([stamp, name, day, pct, text.replace(/^([=+\-@])/, "'$1")]);
 }
 
 function excluded_() {
@@ -153,13 +170,14 @@ function todayDay_() {
 
 // 1人分の点数（from〜to日目の音声だけで数える）
 function score_(p, from, to) {
-  var n = 0, ontime = 0, full = 0, twice = 0, best = 0, cur = 0, sec = 0;
+  var n = 0, ontime = 0, full = 0, twice = 0, best = 0, cur = 0, sec = 0, rv = 0;
   for (var d = from; d <= to; d++) {
     var x = p.days[d];
     if (x) { sec += x.add; if (x.ontime) ontime++; if (x.full) full++; if (x.twice) twice++; }
+    if (x && x.ok && x.rv) rv++;
     if (x && x.ok) { n++; cur++; best = Math.max(best, cur); } else cur = 0;
   }
-  return { s: n * 10 + ontime * 3 + full * 2 + twice * 2 + best, n: n, ontime: ontime, full: full, twice: twice, best: best, min: Math.round(sec / 60) };
+  return { s: n * 10 + ontime * 3 + full * 2 + twice * 2 + best + rv, rv: rv, n: n, ontime: ontime, full: full, twice: twice, best: best, min: Math.round(sec / 60) };
 }
 
 // 記録から全員の点数をまとめる（外す名前は除く）
@@ -171,7 +189,7 @@ function snapshot_() {
       if (!k || ex[k] || !(day >= 1 && day <= 31)) return;
       var p = people[k] || (people[k] = { name: String(v[1]), days: {}, last: String(v[8]) });
       var pct = Number(v[5]) || 0;
-      p.days[day] = { ok: pct >= 80, ontime: v[9] === '○', full: pct >= 95, twice: !!(v[4] && Number(v[6]) >= Number(v[4]) * 1.5), add: Number(v[6]) || 0 };
+      p.days[day] = { rv: v[13] === '○', ok: pct >= 80, ontime: v[9] === '○', full: pct >= 95, twice: !!(v[4] && Number(v[6]) >= Number(v[4]) * 1.5), add: Number(v[6]) || 0 };
       if (String(v[8]) > p.last) p.last = String(v[8]);
     });
   }
@@ -191,8 +209,11 @@ function snapshot_() {
       if (x[f].s <= 0) return;
       if (i < 5) snap[f].push({ n: x.n, s: x[f].s, st: x.st });
       var m = snap.me[x.k] || (snap.me[x.k] = { st: x.st, done: x.done });
-      m[f] = { r: i + 1, s: x[f].s };
+      m[f] = { r: i + 1, s: x[f].s, rv: x[f].rv };
     });
+    // 振り返り王：その期間に振り返りをいちばん多く書いた人（同数なら全員）
+    var top = 0; list.forEach(function (x) { top = Math.max(top, x[f].rv); });
+    snap['rk_' + f] = top ? list.filter(function (x) { return x[f].rv === top; }).map(function (x) { return x.n; }) : [];
   });
   return { snap: snap, list: list, order: order };
 }
@@ -205,7 +226,7 @@ function saveSnap_(snap) {
 function rankJson_(name) {
   var c = CacheService.getScriptCache().get('rank'), snap;
   if (c) snap = JSON.parse(c); else { snap = snapshot_().snap; saveSnap_(snap); }
-  var k = norm_(name).toLowerCase(), out = { td: snap.td, wf: snap.wf, wt: snap.wt, at: snap.at, w: snap.w, tot: snap.tot, me: null };
+  var k = norm_(name).toLowerCase(), out = { td: snap.td, wf: snap.wf, wt: snap.wt, at: snap.at, w: snap.w, tot: snap.tot, rk_w: snap.rk_w || [], rk_tot: snap.rk_tot || [], me: null };
   if (k) {
     if (snap.me[k]) out.me = snap.me[k];
     else if (excluded_()[k]) out.ex = true;
@@ -256,12 +277,16 @@ function writePrize_(r) {
   r.order('tot').slice(0, 2).forEach(function (x, i) {
     if (x.tot.s > 0) rows.push(['ここまでの合計' + (td >= 31 ? '・確定' : '・途中'), (i + 1) + '位', x.n, x.tot.s, names[x.k] || '（お名前なし）']);
   });
+  (r.snap.rk_tot || []).forEach(function (n) {
+    var x = r.list.filter(function (y) { return y.n === n; })[0];
+    rows.push(['振り返り王（12/22の締め）' + (td >= 31 ? '・確定' : '・途中'), '振り返り王', n, x ? x.tot.rv + '回' : '', x ? (names[x.k] || '（お名前なし）') : '']);
+  });
   var sh = ss.getSheetByName('プレゼント候補') || ss.insertSheet('プレゼント候補', 0);
   sh.clear();
   sh.getRange(1, 1, 1, 5).setValues([['大会', '順位', 'ニックネーム', '点数', 'お名前']]).setFontWeight('bold');
   sh.setFrozenRows(1);
   if (rows.length) sh.getRange(2, 1, rows.length, 5).setValues(rows);
-  sh.getRange(1, 7).setValue('更新: ' + Utilities.formatDate(new Date(), TZ, 'M/d HH:mm') + '　プレゼント：毎週の1位、合計の1位・2位（ランキングから外す名前は入りません）');
+  sh.getRange(1, 7).setValue('更新: ' + Utilities.formatDate(new Date(), TZ, 'M/d HH:mm') + '　プレゼント：毎週の1位、合計の1位・2位、振り返り王（最後にささやかなもの）（ランキングから外す名前は入りません）');
 }
 
 function rebuildRanking() {
