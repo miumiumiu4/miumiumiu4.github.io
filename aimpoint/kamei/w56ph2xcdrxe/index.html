@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="format-detection" content="telephone=no">
+<title>あなた専用の資料｜ありがとうグループ</title>
+<style>
+:root{color-scheme:dark;--navy:#082344;--deep:#051830;--line:#2b4a74;--orange:#f07a12;--dark:#c25600;--cream:#fff1e3;--white:#fff;--soft:#b9c9de}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--white);font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;font-size:16px;line-height:1.7;font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--deep);border-bottom:3px solid var(--orange)}
+.in{max-width:780px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header .in{padding-block:8px}
+.brand{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--soft);align-items:center}
+.brand button{font:inherit;font-size:13px;min-height:32px;background:transparent;color:var(--white);border:1px solid var(--soft);border-radius:6px;padding:0 10px;cursor:pointer}
+.board{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-top:6px}
+.board button{font:inherit;font-size:15px;font-weight:700;min-height:36px;border:1px solid var(--line);border-radius:4px;background:#0c2a50;color:var(--soft);cursor:pointer;padding:0}
+.board button.done{color:var(--orange)}.board button[aria-current=step]{background:var(--orange);color:var(--white);border-color:var(--orange)}
+main{padding-block:18px 40vh}
+h2{font-size:20px;margin:26px 0 12px;line-height:1.4;text-wrap:balance;border-left:6px solid var(--orange);padding-left:12px;scroll-margin-top:110px}
+.b{display:flex;gap:10px;margin:0 0 10px;align-items:flex-start;animation:in .3s ease-out}
+.b>i{flex:none;width:40px;height:40px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:15px}
+.b>div{background:var(--white);color:var(--navy);border-radius:4px 14px 14px 14px;padding:10px 14px;max-width:36em;min-width:0}
+.b b{color:var(--dark)}
+.me{display:flex;justify-content:flex-end;margin:4px 0 14px}.me span{background:var(--orange);border-radius:14px 4px 14px 14px;padding:8px 14px;font-weight:700}
+.ask{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px 50px}
+.ask button,.btn{font:inherit;font-weight:700;min-height:46px;border-radius:8px;border:2px solid var(--orange);background:transparent;color:var(--white);padding:6px 16px;cursor:pointer;text-align:left}
+.btn.main{background:var(--orange)}.ask button.lg{font-size:18px;min-height:56px;padding:10px 20px;border-width:3px}.ask button.sm{font-size:14px;min-height:42px;border-width:1px}
+.ask button:disabled{opacity:.4;cursor:default}
+:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.note{font-size:12.5px;color:var(--soft);margin:2px 0 12px 50px}
+.num{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:4px 0 12px 50px}
+.num div{background:var(--white);color:var(--navy);border-radius:8px;padding:10px 12px;font-size:13px;min-width:0}.num div.o{background:var(--orange);color:var(--white)}
+.num strong{display:block;font-size:25px;line-height:1.25}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 12px 50px;font-size:14px}.flow span{background:#0f315c;border:1px solid var(--line);border-radius:6px;padding:4px 10px}.flow span:last-child{background:var(--orange);border-color:var(--orange);font-weight:700}
+.w{background:var(--deep);border:2px solid var(--orange);border-radius:12px;padding:14px;margin:6px 0 16px;animation:in .3s ease-out}
+.w h3{margin:0 0 4px;font-size:17px}.w .cap{min-height:3.4em;margin:8px 0;padding:8px 12px;background:var(--cream);color:var(--navy);border-radius:8px;font-size:14.5px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px}.row output{font-size:22px;font-weight:800;color:var(--orange)}
+input[type=range]{width:100%;accent-color:var(--orange);height:30px;margin:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.seg button{font:inherit;font-size:14px;min-height:40px;flex:1 1 auto;border:1px solid var(--soft);border-radius:6px;background:transparent;color:var(--white);cursor:pointer;padding:0 10px}
+.seg button[aria-pressed=true]{background:var(--orange);border-color:var(--orange);font-weight:700}
+.sc{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.sc div{background:var(--white);color:var(--navy);border-radius:8px;padding:8px 10px;font-size:12.5px;min-width:0}.sc div.o{background:var(--orange);color:var(--white)}.sc strong{display:block;font-size:20px;line-height:1.3;white-space:nowrap}
+.bars{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;height:86px;align-items:end;margin-top:10px;font-size:10px;text-align:center}.bars i{display:block;background:var(--orange);border-radius:2px 2px 0 0;min-height:2px;transition:height .3s}
+.hl{outline:3px solid var(--cream);outline-offset:3px;border-radius:6px}
+.tb{overflow-x:auto;margin-top:8px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--soft);font-weight:400}td.l,th.l{text-align:left}tr.new td{background:#143a6b}
+.hb{display:grid;grid-template-columns:8.5em 1fr 6.5em;gap:8px;align-items:center;font-size:13px;margin-top:4px}.hb i{height:14px;background:var(--orange);border-radius:3px;min-width:2px;transition:width .4s}.hb span:last-child{text-align:right}
+.goal{height:14px;background:var(--line);border-radius:7px;overflow:hidden;margin:4px 0 2px}.goal i{display:block;height:100%;background:var(--orange);transition:width .4s}
+.play{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{min-height:42px;font-size:15px}
+footer{color:var(--soft);font-size:12.5px;padding-bottom:30px}
+.tryex{background:var(--cream);color:var(--navy);border-radius:10px;padding:10px 14px;margin:8px 0}.tryex>b{font-size:15px}.trycalc{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-variant-numeric:tabular-nums}.trycalc small{display:block;font-size:12.5px;color:#6b5a45}.trycalc.last{border-top:2px solid var(--navy);margin-top:4px;padding-top:8px;font-weight:800}.trycalc.last .v{font-size:27px;line-height:1.2;color:#b04a00}.trycalc .v{white-space:nowrap;font-size:18px;font-weight:700}.trycalc.zero .v{color:#b04a00;animation:pop .5s}.trycalc.zero>span:first-child{text-decoration:line-through;text-decoration-color:#b04a00}.trycalc.zero small{text-decoration:none;display:block}.trypre{font-weight:700;margin:6px 0}.trym{margin-top:18px;font-weight:800;font-size:17px;border-top:1px solid var(--line);padding-top:12px}@keyframes pop{40%{transform:scale(1.5)}100%{transform:none}}.trycalc.zero .v{display:inline-block}.trygl{margin:10px 0}.trygl summary{cursor:pointer;font-weight:700}.trygl p{margin:8px 0;font-size:15px}.trybig{background:var(--orange);color:#fff;border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;font-weight:700}.trybig output{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums}.tryrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}.tryrow>div:first-child{min-width:0}.tryrow small{display:block;color:var(--soft);font-size:13px}.trybt{display:flex;align-items:center;gap:10px;flex:none}.trybt button{width:54px;height:54px;font:inherit;font-size:24px;font-weight:800;border-radius:10px;border:2px solid var(--orange);background:transparent;color:#fff;cursor:pointer}.trybt button:active{background:var(--orange)}.trybt b{min-width:1.4em;text-align:center;font-size:21px}.cl{display:grid;gap:10px;margin-top:8px}.cl video,.cl .fv{width:100%;max-width:360px;border-radius:8px;background:#051830;margin:0}.cl .fv{max-width:100%}.bub{height:104px;overflow:hidden}.bub .b{margin:0;animation:fade .35s ease-out}.bub .b>div{font-size:18px;font-weight:700;line-height:1.45;padding:8px 12px}.bub .b b{color:#c25600;font-weight:900}@keyframes fade{from{opacity:0}to{opacity:1}}@media(min-width:760px){.cl{grid-template-columns:minmax(0,340px) minmax(0,1fr)}.cl.ph{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bub{height:auto;max-height:430px;display:flex;flex-direction:column;justify-content:flex-start}.bub .b{margin:0 0 10px}}@media(max-width:400px){.bub .b>i{width:32px;height:32px}}.gap{font-size:22px!important;font-weight:900;line-height:1.3!important}.sub2{margin:0 0 6px;font-size:14px;color:inherit;opacity:.85}.pt{font-size:12.5px;color:var(--soft);margin-top:2px}
+.fr{margin:0 0 14px 50px}.fr label{font-size:14px;color:var(--soft)}.fr textarea{width:100%;font:inherit;border-radius:8px;border:1px solid var(--soft);padding:8px 10px;background:var(--white);color:var(--navy);display:block;margin-top:4px}.fr .ask{margin-left:0}
+.vl{display:grid;gap:10px;margin:4px 0 16px 50px}.vd{font:inherit;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;background:var(--white);color:var(--navy);border:2px solid var(--white);border-radius:10px;padding:8px 14px 8px 8px;cursor:pointer}.vp{width:52px;height:52px;border-radius:8px;background:var(--navy);color:var(--white);display:grid;place-items:center;font-size:20px}.vt{font-weight:700}.vm{font-size:12.5px;color:#4a5d78;white-space:nowrap}.vd.seen .vp{background:var(--orange)}
+.fv{background:#000;border-radius:8px;aspect-ratio:16/9;max-width:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;margin-top:8px}.vl2{font-size:12px;color:var(--soft);margin-bottom:auto}.face{position:absolute;right:14px;bottom:14px;width:84px;height:84px;border-radius:50%;border:4px solid var(--orange);background:#0f315c;display:grid;place-items:center;font-weight:800}.fv{position:relative}.vc{padding-right:104px;font-size:17px;font-weight:700;line-height:1.6;text-shadow:0 1px 3px #000}
+footer details{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}footer summary{cursor:pointer}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.b,.w{animation:none}}
+@media(max-width:620px){.two{grid-template-columns:minmax(0,1fr)}.b>div{max-width:none}.ask,.note,.num,.flow,.vl,.fr{margin-left:0}.vd{grid-template-columns:44px minmax(0,1fr)}.vp{width:44px;height:44px;grid-row:span 2}.fv{aspect-ratio:4/3}.vc{font-size:15.5px}.num strong{font-size:22px}.hb{grid-template-columns:7em 1fr 5.5em;font-size:12px}}
+
+/* 案1の色（ほぼ黒の紺・冷たい水色の光・あたたかいオレンジの光・細い大きな見出し・角を切ったパネル）× 案3の形（光る枠の問い・左に丸のある縦の選択肢・下線の行・光る枠の丸いボタン・細い格子） */
+:root{color-scheme:dark;--navy:#04050d;--deep:#070a16;--line:rgba(140,200,255,.22);--orange:#ff7a2a;--dark:#ff9a52;--cream:#0b1222;--white:#eef3ff;--soft:#9fb4cf;--ice:#7fd3ff}
+body{background:#04050d;color:#eef3ff;font-size:18px;line-height:1.75}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(rgba(127,211,255,.045) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,rgba(127,211,255,.045) 1px,transparent 1px) 0 0/28px 28px,radial-gradient(circle at 85% 10%,rgba(63,140,220,.18),transparent 45%),radial-gradient(circle at 10% 95%,rgba(255,122,42,.12),transparent 40%)}
+header{background:rgba(4,5,13,.92);border-bottom:1px solid rgba(127,211,255,.35);backdrop-filter:blur(8px)}
+.brand{color:#9fb4cf}.brand button{border-color:rgba(127,211,255,.5);color:#cfe6ff}
+.goal{background:rgba(255,255,255,.08)}.goal i{background:linear-gradient(90deg,#7fd3ff,#ff7a2a);box-shadow:0 0 10px rgba(255,122,42,.7)}
+h2{font-weight:300;font-size:24px;letter-spacing:.02em;border-left:0;padding-left:0;color:#f4f8ff}
+h2::before{content:"";display:block;width:56px;height:2px;margin-bottom:8px;background:linear-gradient(90deg,#ff7a2a,transparent);box-shadow:0 0 8px #ff7a2a}
+.b>i{background:transparent!important;color:#ff9a52;border:2px solid #ff7a2a;box-shadow:0 0 12px rgba(255,122,42,.6),inset 0 0 8px rgba(255,122,42,.35)}
+.b>div{background:rgba(9,14,28,.88);color:#eef3ff;border:1.5px solid rgba(255,122,42,.75);border-radius:14px;box-shadow:0 0 14px rgba(255,122,42,.22);font-size:18px}
+.b b{color:#ffab6b}
+.me span{background:linear-gradient(135deg,rgba(255,122,42,.95),rgba(255,84,0,.9));color:#fff;box-shadow:0 0 16px rgba(255,122,42,.55);border-radius:14px 4px 14px 14px}
+.ask{flex-direction:column;flex-wrap:nowrap;gap:2px;margin-left:50px}
+.ask button,.ask button:first-child{position:relative;display:flex;align-items:center;gap:14px;width:100%;min-height:56px;background:transparent!important;border:0;border-bottom:1px solid rgba(200,220,255,.28);border-radius:0;padding:8px 6px 8px 0;color:#eef3ff;font-size:17.5px;font-weight:700;overflow:hidden}
+.ask button::before{content:"";flex:none;width:30px;height:30px;border-radius:50%;border:2px solid #ff7a2a;box-shadow:0 0 10px rgba(255,122,42,.55),inset 0 0 6px rgba(255,122,42,.3);transition:background .2s}
+.ask button.lg{font-size:19.5px;color:#fff}.ask button.lg::before{width:36px;height:36px;border-color:#ff9a52}
+.ask button.sm{font-size:15px;color:#9fb4cf;min-height:48px;border-width:0 0 1px}.ask button.sm::before{width:22px;height:22px;border-color:rgba(255,122,42,.55);box-shadow:none}
+.ask button:hover::before,.ask button:focus-visible::before{background:rgba(255,122,42,.35)}
+.ask button::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(127,211,255,.45) 50%,transparent 70%);transform:translateX(-110%);pointer-events:none}
+.ask button:active::after,.ask button.hit::after{animation:sweep .55s ease-out}
+@keyframes sweep{to{transform:translateX(110%)}}
+.w{background:linear-gradient(160deg,rgba(18,28,48,.92),rgba(6,9,18,.95));border:0;border-radius:0;clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);box-shadow:inset 0 0 0 1px rgba(127,211,255,.35),inset 0 0 40px rgba(63,140,220,.08);animation:rise .5s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.w h3,.gap{color:#f4f8ff}.gap{font-weight:300!important;font-size:25px!important;letter-spacing:.02em}.sub2{color:#7fd3ff;opacity:1}
+.note,.pt,footer{color:#9fb4cf}
+.btn{border:2px solid #ff7a2a;border-radius:999px;background:transparent;color:#ffd3b3;box-shadow:0 0 12px rgba(255,122,42,.4),inset 0 0 10px rgba(255,122,42,.15)}
+.btn.main{background:rgba(255,122,42,.14);color:#fff}
+.seg button{border-radius:999px;border-color:rgba(127,211,255,.5);color:#dbeaff}.seg button[aria-pressed=true]{background:rgba(255,122,42,.22);border-color:#ff7a2a;box-shadow:0 0 12px rgba(255,122,42,.5);color:#fff}
+.sc div{background:rgba(9,14,28,.9)!important;color:#eef3ff!important;border:1px solid rgba(127,211,255,.4);border-radius:10px}.sc div.o{border-color:#ff7a2a;box-shadow:0 0 14px rgba(255,122,42,.35)}.sc div.o strong{color:#ffab6b;text-shadow:0 0 12px rgba(255,122,42,.7);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{text-shadow:0 0 22px rgba(255,122,42,1);transform:scale(1.03)}}
+.sc strong{display:inline-block}
+.bars i{background:linear-gradient(#ff9a52,rgba(255,122,42,.35));box-shadow:0 0 8px rgba(255,122,42,.5)}
+.tryex{background:rgba(9,14,28,.9);color:#eef3ff;border:1px solid rgba(127,211,255,.35);border-radius:0;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.trycalc{border-bottom:1px solid rgba(200,220,255,.18)}.trycalc small{color:#9fb4cf}.trycalc.last{border-top:2px solid rgba(255,122,42,.8)}
+.trycalc.last .v{color:#ffab6b;text-shadow:0 0 14px rgba(255,122,42,.8);animation:pulse 2.4s ease-in-out infinite;display:inline-block}
+.trycalc.zero .v{color:#7fd3ff}.trycalc.zero>span:first-child{text-decoration-color:#7fd3ff}
+.trypre{color:#7fd3ff}.trym{border-top-color:rgba(127,211,255,.3)}
+.trybt button{border-radius:50%;border-color:#ff7a2a;box-shadow:0 0 10px rgba(255,122,42,.4)}
+.trygl summary{color:#7fd3ff}.trygl p b{color:#ffab6b}
+.fv{background:#02030a;box-shadow:inset 0 0 0 1px rgba(127,211,255,.3)}.face{border-color:#ff7a2a;box-shadow:0 0 14px rgba(255,122,42,.6)}
+.cl video{border-radius:0!important;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.bub .b>div{font-size:18px}.bub .b b{color:#ffab6b}
+.fr textarea{background:#0b1222;color:#eef3ff;border-color:rgba(127,211,255,.5)}
+input[type=range]{accent-color:#ff7a2a}
+.w[style*="fff1e3"]{background:linear-gradient(160deg,rgba(40,22,8,.95),rgba(10,8,14,.95))!important;color:#eef3ff!important;box-shadow:inset 0 0 0 1px rgba(255,122,42,.6)}
+.w[style*="fff1e3"] p{border-color:rgba(255,122,42,.3)!important}
+.w[style*="fff1e3"] b{color:#ffab6b!important}
+:focus-visible{outline:3px solid #7fd3ff}
+@media (prefers-reduced-motion:reduce){.w,.ask button::after,.sc div.o strong,.trycalc.last .v,.trycalc.zero .v{animation:none!important}}
+@media (max-width:620px){.ask{margin-left:0}}
+
+
+/* ===== 2026-11-26 作り直し：足した形 ===== */
+.brand button{display:none}
+.pt#pt{margin-top:4px}
+.ask button.sm{order:9}
+.ask button:disabled{opacity:.35}
+.stage{display:grid;gap:10px;margin-top:8px}
+.stage video{width:100%;max-width:360px;display:block;background:#02030a;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.stage .bub{height:116px;overflow:hidden}
+.stage .bub .b{margin:0;animation:fade .35s ease-out}
+.stage .bub .b>div{font-size:18px;font-weight:700;line-height:1.5;padding:8px 12px}
+.stage .bub .b>i{width:36px;height:36px;font-size:12px!important}
+.stage.novid .bub{height:128px}
+@media(min-width:760px){
+ .stage.hasvid{grid-template-columns:minmax(0,340px) minmax(0,1fr);align-items:start}
+ .stage .bub{height:auto;max-height:460px;display:flex;flex-direction:column;justify-content:flex-start}
+ .stage.novid .bub{height:auto;max-height:none}
+ .stage .bub .b{margin:0 0 10px;transition:opacity .3s}
+ .stage .bub .b.dim{opacity:.38}
+}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px;margin-top:10px}
+.tiles div{background:rgba(9,14,28,.9);color:#eef3ff;border:1px solid rgba(127,211,255,.4);border-radius:10px;padding:8px 10px;font-size:13px;min-width:0;line-height:1.5}
+.tiles div.o{border-color:#ff7a2a;box-shadow:0 0 14px rgba(255,122,42,.35)}
+.tiles strong{display:inline-block;font-size:26px;line-height:1.3;white-space:nowrap}
+.tiles div.o strong{color:#ffab6b;text-shadow:0 0 12px rgba(255,122,42,.7);animation:pulse 2.4s ease-in-out infinite}
+.tiles div small{display:block;color:#9fb4cf;font-size:12px}
+.bars span{color:#9fb4cf}
+.bars i.off{background:linear-gradient(#9fb4cf,rgba(159,180,207,.3));box-shadow:none}
+.three{counter-reset:n;margin:8px 0 0;padding:0;list-style:none}
+.three li{counter-increment:n;display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(200,220,255,.18);font-weight:700}
+.three li::before{content:counter(n);flex:none;width:28px;height:28px;border-radius:50%;border:2px solid #ff7a2a;display:grid;place-items:center;color:#ffab6b;font-size:15px;box-shadow:0 0 10px rgba(255,122,42,.5)}
+.warm{background:linear-gradient(160deg,rgba(40,22,8,.95),rgba(10,8,14,.95))!important;box-shadow:inset 0 0 0 1px rgba(255,122,42,.6)!important}
+.warm p.cond{font-size:15.5px;font-weight:700;border-top:1px solid rgba(255,122,42,.3);padding-top:8px;margin-bottom:0}
+.story p{margin:6px 0;border-bottom:1px solid rgba(255,122,42,.3);padding-bottom:6px}
+.story p b{display:block;font-size:13px;color:#ffab6b}
+.story p.end{border:0;font-weight:700;margin-top:10px}
+.rw .row output{font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.chips button{font:inherit;font-size:15.5px;font-weight:700;min-height:44px;min-width:5.4em;padding:6px 12px;border-radius:999px;border:1px solid rgba(127,211,255,.5);background:transparent;color:#dbeaff;cursor:pointer}
+.chips button[aria-pressed=true]{background:rgba(255,122,42,.22);border-color:#ff7a2a;box-shadow:0 0 12px rgba(255,122,42,.5);color:#fff}
+.w h4{margin:14px 0 4px;font-size:16px;font-weight:700;color:#7fd3ff}
+.fld{display:block;margin:10px 0 0;font-size:14px;color:#9fb4cf}
+.fld input,.fld select,.fld textarea{display:block;width:100%;margin-top:4px;font:inherit;font-size:16px;padding:10px;border-radius:8px;border:1px solid rgba(127,211,255,.5);background:#0b1222;color:#eef3ff}
+.two2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.msg{margin:10px 0 0;font-size:15px;color:#ffd3b3}
+.btn{font-size:16px;min-height:46px;padding:6px 20px;cursor:pointer;font-weight:700}
+.btn[disabled]{opacity:.45}
+.rowbtn{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.use{font-size:13.5px;color:#cfe0f5;margin:0 0 12px 50px}
+#brief{white-space:pre-wrap;font-size:13px;color:#cfe0f5;border-top:1px solid rgba(127,211,255,.3);margin-top:14px;padding-top:10px}
+@media(max-width:620px){.use{margin-left:0}.tiles strong{font-size:23px}}
+@media (prefers-reduced-motion:reduce){.tiles div.o strong,.stage .bub .b{animation:none!important}}
+
+.tiles div>span{display:block}
+.stage{scroll-margin-top:96px}
+.stage video{max-height:calc(100svh - 250px);width:auto;max-width:100%;margin:0 auto}
+@media(min-width:760px){.stage video{max-height:calc(100svh - 130px);margin:0}}
+.ask button.lg{padding:8px 6px 8px 0;border-width:0 0 1px;min-height:60px}
+@media(max-width:759px){.stage .bub{height:156px}.stage video{max-height:calc(100svh - 290px)}}
+
+/* 2026-11-26 夜：スマホで左右に揺れない・数字がはみ出さない */
+html,body{max-width:100%;overflow-x:hidden}
+body{overflow-wrap:anywhere}
+.in{width:100%}
+.w,.tiles,.tiles div,.stage,.tryex,.b>div{min-width:0;max-width:100%}
+.tiles strong.txt{font-size:17px;white-space:normal;line-height:1.45}
+.tiles strong.long{font-size:20px}
+@media(max-width:620px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tiles strong{font-size:22px}.tiles strong.long{font-size:17px}.tiles strong.txt{font-size:16px}.gap{font-size:22px!important}.trycalc .v{font-size:17px}.trycalc.last .v{font-size:23px}}
+.seg button{padding:6px 8px;line-height:1.35}
+.bars{min-width:0}.bars span{overflow:hidden}
+.tb{max-width:100%}
+@keyframes pulse{50%{text-shadow:0 0 22px rgba(255,122,42,1)}}
+.trycalc.last .v,.tiles div.o strong{transform:none!important}
+
+.tryopen>summary{display:inline-block;list-style:none;padding:10px 18px;border:2px solid #ff7a2a;border-radius:999px;color:#ffd3b3;font-weight:700;box-shadow:0 0 12px rgba(255,122,42,.4)}.tryopen>summary::-webkit-details-marker{display:none}.tryopen[open]>summary{margin-bottom:10px}
+</style></head><body>
+<header><div class="in"><div class="brand"><span>ありがとうグループ　あなた専用の資料</span></div><div class="goal" style="margin-top:8px"><i id="pg" style="width:0"></i></div><div class="pt" id="pt">質問に答えるたびに、資料が出ます</div></div></header>
+<main><div class="in" id="log" aria-live="polite"></div></main>
+<footer><div class="in">数字は、1社の例と、計算のための仮の数字をもとにした試算です。同じ結果をお約束するものではありません。利益は税金を払う前の目安です。<div id="brief" hidden></div></div></footer>
+<script>(function(){
+"use strict";
+/* ===== 会話型の加盟資料（2026-11-26 作り直し） =====
+   1場面＝5拍：選ぶ → 受け止め → 予想 → アハ（数字か画面＋理由1つ）→ 引き（次の問い）
+   動画の受け口は SLOT。src が空の所は、吹き出しと数字だけで意味が通る形で出す。
+   記録は track()。LOG_API が空のあいだは、どこにも送らない。 */
+var QS=new URLSearchParams(location.search);
+var FAST=QS.get("fast")==="1";
+var LOG_API="";   /* 記録の受け口（Apps Script）。公開の時に入れる。空なら送らない */
+var BOOK_API=window.BOOK_API||"";  /* 予約の仕組み（三浦のカレンダーの空き）。公開の時に入れる。空なら見本の日にち */
+var GUA=true;     /* 全額返金保証の表示。外す時は false */
+var TOKEN=(QS.get("k")||"").replace(/[^A-Za-z0-9_-]/g,"").slice(0,40);
+
+var $=function(i){return document.getElementById(i)},log=$("log");
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function man(v){v=Math.round(v);var o=Math.floor(v/10000),r=v%10000;return o>0?o+"億"+(r?r.toLocaleString("ja-JP")+"万円":"円"):v.toLocaleString("ja-JP")+"万円"}
+function yen(v){return Math.round(v).toLocaleString("ja-JP")+"円"}
+function txt(d,s){String(s).split("**").forEach(function(p,i){if(p)d.appendChild(i%2?el("b","",p):document.createTextNode(p))})}
+function add(e){log.appendChild(e);return e}
+function show(e){if(!FAST)e.scrollIntoView({block:"center",behavior:"smooth"})}
+var SKIP=null;function wait(n){return new Promise(function(ok){setTimeout(ok,FAST?0:n)})}
+/* 読む時間。画面（吹き出しのあたり）をさわると、待たずに次へ進む */
+function readWait(len){if(FAST)return Promise.resolve();return new Promise(function(ok){var t=setTimeout(fin,Math.min(15000,Math.max(2500,len*120)));function fin(){clearTimeout(t);SKIP=null;ok()}SKIP=fin})}
+document.addEventListener("click",function(e){if(SKIP&&!e.target.closest("button,input,textarea,select,video,summary,a"))SKIP()});
+var STILL=FAST||matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+/* ---- 答えと記録 ---- */
+var A={},EV=[],SEEN=[],VID={},START=new Date(),SID=Math.random().toString(36).slice(2,10),lastT=Date.now(),LINES=[];
+function track(type,key,val,extra){var now=Date.now(),e={t:new Date(now).toISOString(),type:type,key:key,val:val==null?"":String(val),sec:Math.round((now-lastT)/1000)};if(extra)for(var k in extra)e[k]=extra[k];EV.push(e);
+  if(type==="押した"||type==="書いた")lastT=now;
+  if(LOG_API){try{var body=JSON.stringify({k:TOKEN,sid:SID,ev:e,ua:navigator.userAgent.slice(0,120)});if(!(navigator.sendBeacon&&navigator.sendBeacon(LOG_API,new Blob([body],{type:"text/plain"}))))fetch(LOG_API,{method:"POST",mode:"no-cors",keepalive:true,headers:{"Content-Type":"text/plain"},body:body})}catch(x){}}}
+
+/* ---- 会話の部品 ---- */
+async function say(s){var b=el("div","b"),d=el("div");b.appendChild(el("i","","三浦"));b.firstChild.style.fontSize="13px";txt(d,s);b.appendChild(d);add(b);LINES.push(s.replace(/\*\*/g,""));show(b);await readWait(s.replace(/\*\*/g,"").length)}
+function note(s,c){var p=add(el("p",c||"note",s));return p}
+function h2(a,b){add(el("h2","",a));if(b)add(el("p","note",b));LINES.push("＝＝"+a+"｜"+(b||"")+"＝＝")}
+function me(t){var m=el("div","me");m.appendChild(el("span","",t));add(m);show(m)}
+function cls(l){return /独立したい$|店を持ちたい$|形を変えたい$|^空いている日にちを見る/.test(l)?"lg":/^スタッフから|^メールで相談/.test(l)?"sm":""}
+function ask(key,o,opt){opt=opt||{};return new Promise(function(ok){var box=el("div","ask");box.dataset.key=key;o.forEach(function(l,i){var b=el("button",cls(l),l);b.type="button";b.addEventListener("click",function(){if(box.dataset.done)return;box.dataset.done="1";b.classList.add("hit");track("押した",key,l);setTimeout(function(){box.remove();if(!opt.quiet)me(l);ok({l:l,i:i})},FAST?0:300)});box.appendChild(b)});add(box);show(box)})}
+function free(key,label){return new Promise(function(ok){var d=el("div","fr"),l=el("label","",label),t=el("textarea"),r=el("div","rowbtn"),a=el("button","btn main","これで進む"),b=el("button","btn","選ぶのに戻る");t.rows=2;t.maxLength=200;t.id="t"+Math.random().toString(36).slice(2);l.htmlFor=t.id;a.type=b.type="button";d.dataset.key=key;d.appendChild(l);d.appendChild(t);r.appendChild(a);r.appendChild(b);d.appendChild(r);add(d);show(d);
+  a.addEventListener("click",function(){var v=t.value.trim();if(!v){t.focus();return}d.remove();track("書いた",key,v);me(v);ok(v)});b.addEventListener("click",function(){d.remove();ok("")})})}
+var OWNW="この中にない（自分で書く）";
+/* 選ぶ（「この中にない」付き）。返すのは {l:押した言葉, v:書いた言葉か押した言葉, own:自分で書いたか} */
+async function pick(key,o,noOwn){for(;;){var x=await ask(key,noOwn?o:o.concat([OWNW]));if(x.l!==OWNW){A[key]=x.l;return{l:x.l,v:x.l,own:false}}var v=await free(key,"ひとことで大丈夫です");if(v){A[key]="【自分の言葉】"+v;return{l:OWNW,v:v,own:true}}}}
+function card(c){var w=add(el("div","w"+(c?" "+c:"")));return w}
+function head(w,a,b){w.appendChild(el("h3","gap",a));if(b)w.appendChild(el("p","sub2",b));LINES.push("【"+a+"｜"+(b||"")+"】")}
+function fine(w,s){w.appendChild(el("p","pt",s||"しくみを見ていただくための例の数字です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。"))}
+/* 数字のタイル。数は0から増えて止まる */
+async function tiles(w,list){var g=el("div","tiles"),T=[];list.forEach(function(x){var d=el("div",x[2]||"");d.appendChild(el("span","",x[0]));var s=el("strong",typeof x[1]==="number"?(man(x[1]).length>8?"long":""):(String(x[1]).length>6?"txt":""),typeof x[1]==="number"?"0万円":x[1]);d.appendChild(s);if(x[3])d.appendChild(el("small","",x[3]));g.appendChild(d);if(typeof x[1]==="number")T.push([s,x[1]]);LINES.push("［"+x[0]+" "+(typeof x[1]==="number"?man(x[1]):x[1])+"］")});w.appendChild(g);show(w);
+  if(T.length&&!STILL)for(var k=1;k<=28;k++){var e=1-Math.pow(1-k/28,3);T.forEach(function(x){x[0].textContent=man(x[1]*e)});await wait(38)}
+  T.forEach(function(x){x[0].textContent=man(x[1])});return g}
+function bars(w,ms,cap){var mx=Math.max.apply(null,ms.concat([1])),b=el("div","bars"),L=el("div","bars");b.style.height="96px";L.style.height="auto";ms.forEach(function(v,i){var k=el("i",i<4?"off":"");k.style.height="2px";b.appendChild(k);L.appendChild(el("span","",(i+1)+"月"));setTimeout(function(){k.style.height=Math.max(2,v/mx*92)+"px"},STILL?0:120+i*70)});w.appendChild(el("div","row",cap||"月ごとの利益（灰色は、仕事が少ない1月〜4月）"));w.appendChild(b);w.appendChild(L)}
+function nextBtn(w,label){return new Promise(function(ok){var b=el("button","btn main",label||"続きへ");b.type="button";b.dataset.next="1";b.style.marginTop="10px";w.appendChild(b);b.addEventListener("click",function(){b.remove();ok()});if(FAST)setTimeout(function(){if(b.parentNode){b.remove();ok()}},0)})}
+
+/* ---- 動画の受け口 ----
+   src：動画ファイル（空＝まだ無い）。voice：声入りか。end：途中で止める秒。
+   cue：[秒, 吹き出しの文]。動画が無い間は cue の文を、同じ場所で順に出す。 */
+var CUE={"f1": [[0, "同じ入力画面の、残る利益の所だけを見ます。"], [3.92, "残る利益とは、売上から、"], [6.17, "スタッフと予約サイトに払うお金を引いた残りです。"], [10.58, "どんぶりのままでいい。いつもの作業を、押すだけ。"], [15, "ほら、売上じゃなくて、残った分が出ました。"], [18.92, "30件入れた月なら、箱は2つに分かれます。"], [22.83, "左は、税金に取っておく、8万2,998円。"], [26.75, "右は、手元に残る目安。19万3,662円。"], [30.67, "使っていい額の見当が、つくようになります。"]], "f0": [[0, "これは、お店の売上を入れる画面です。"], [2.75, "お客様の家で作業が終わったら、その場で、"], [5.75, "スマートフォンで押すだけ。"], [7.67, "壁掛けエアコンを1台。押すと、8,900円。"], [12.5, "お掃除機能付きのエアコンを1台。"], [15.83, "ほら、もう合計23,800円。"], [19, "売上から先に出ていく、スタッフに払うお金も、予約サイトに払うお金も、"], [23.33, "画面が引いてくれました。この1件で、"], [26.17, "お店に6,842円残っています。"], [29.17, "30件入れた月の例です。売上は71万4,000円。"], [35.42, "残ったお金は、27万6,660円。"], [39.67, "税金の分は、最初から分けてくれています。"], [43.25, "これは、使わないお金。"], [45.17, "右が、手元に残る目安。19万3,662円。"], [50.17, "ここから、お店の経費や生活費を考えます。"], [54.92, "今月の目標まで、あといくらか。"], [57.58, "それも、棒で見えています。"], [59.92, "独立して苦しくなる。腕のせいじゃないんです。"], [63.25, "いくらまで使っていいか、知らないだけ。"], [66.08, "数字が苦手？　そのままでいい。"], [69, "だから、最初から用意してあります。"]], "k1_60": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の6割だった年にします。"], [7.83, "計画の6割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "k3_80": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の8割だった年にします。"], [7.83, "計画の8割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "k1_100": [[0, "これは、人数を入れると、1年の売上と利益の目安が出る、"], [5, "利益の診断アプリの画面です。"], [7.58, "白い箱が、売上。"], [9.17, "オレンジの箱が、利益。"], [11.17, "利益とは、スタッフと予約サイトに払うお金、"], [15.08, "毎月の費用と経費を引いた、税金の前の残りです。"], [19.33, "スタッフは0人。自分だけが現場に出る1年です。"], [23.58, "計画どおりなら、このくらい。"], [29.17, "下の棒は、月ごとの利益です。"], [31.75, "1月から4月は、仕事が少ない月。"], [34.75, "5月から12月が、忙しい月です。"]], "k5_80": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の8割だった年にします。"], [7.83, "計画の8割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "k10_80": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の8割だった年にします。"], [7.83, "計画の8割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "k5_60": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の6割だった年にします。"], [7.83, "計画の6割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "fx": [[0, "これは、入力した数字が集まる所です。"], [3.33, "どんな付け方をしている人も、最後に見たいのは、"], [7.58, "残る利益ですよね。"], [9.25, "30件入れた月の例です。売上、報酬、利用料、粗利。"], [13.92, "4つの数字が、もう並んでいます。"], [16.92, "税金に取っておく分も、手元に残る目安も、その下に。"], [21.58, "今月の目標まで、あといくらかも、棒で見えます。"], [25.83, "あちこち探さなくていい。だから、続くんです。"]], "k10_60": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の6割だった年にします。"], [7.83, "計画の6割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "f2": [[0, "同じ入力画面で、計算がどう動くかを見ます。"], [3.92, "歩合とは、売上のうち、スタッフに払う割合のことです。"], [8.75, "お客様に口コミを書いていただけたら、口コミを押す。"], [13.42, "スタッフの歩合が上がりました。"], [16.17, "お知らせの登録も2つ押します。"], [18.92, "払うお金も、残る利益も、もう計算し直されています。"], [23.58, "次は、予約がどこから来たか。"], [26.17, "一度伺ったお客様の、お客様リストを押します。"], [30.25, "ほら、予約サイトの手数料が消えて、"], [33.42, "残る利益が13,982円になりました。"], [36.92, "数式は、1つも組んでいません。"], [39.67, "あなたは、押しただけです。"]], "f3": [[0, "これは、入力した数字が集まる所です。"], [3.33, "粗利とは、お店に残る利益のことです。"], [6.67, "30件入れた月の例。売上71万4,000円、"], [10.75, "報酬29万4,540円、利用料14万2,800円、"], [15.42, "粗利27万6,660円。"], [17.67, "月末の報告を待たなくていい。"], [20.25, "入れた日に、もう自分の目で見えています。"], [23.92, "下には、月ごとの表。1か月ずつ、自動で並びます。"], [28.33, "最後の確認は、今までどおり、税理士さんやご家族に。"], [33, "見るのは、あなた自身です。"]], "k3_100": [[0, "これは、人数を入れると、1年の売上と利益の目安が出る、"], [4.92, "利益の診断アプリの画面です。"], [7.5, "白い箱が、売上。"], [9.83, "オレンジの箱が、利益。"], [12.17, "利益とは、スタッフと予約サイトに払うお金、"], [15.92, "毎月の費用と経費を引いた、税金の前の残りです。"], [20, "年末のスタッフを、3人にします。"], [23.17, "1月から1人ずつ増える計算です。"], [26.33, "計画どおりなら、売上は、2,630万円。"], [31.5, "利益は、875万円。"], [34.08, "下の棒は、月ごとの利益です。"], [37.42, "1月から4月は、仕事が少ない月。"], [41.25, "5月から12月が、忙しい月です。"]], "k3_60": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の6割だった年にします。"], [7.83, "計画の6割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "k1_80": [[0, "さきほどと同じ、利益の診断アプリです。"], [3.5, "仕事の量が、計画の8割だった年にします。"], [7.83, "計画の8割なら、売上も利益も、このくらい。"], [14.25, "毎月の費用は、変えずに引いています。"]], "h1": [[0, "これは、利益の診断アプリの画面です。"], [3.33, "1月から、毎月1人ずつ仲間が増える計算です。"], [7.42, "スタッフ2人で、止めてみます。"], [11.75, "初年度の利益の目安は、689万円。"], [17.42, "3人なら？"], [21.5, "875万円。"], [25.58, "5人なら？"], [29.08, "1,220万円。税金を払う前の、例の数字です。"], [35.67, "1月から4月は、仕事が少ない月。"], [38.67, "この間に覚えて、5月から12月の忙しい月を、"], [42.75, "仲間と迎える形です。"]], "k10_100": [[0, "これは、人数を入れると、1年の売上と利益の目安が出る、"], [5, "利益の診断アプリの画面です。"], [7.58, "白い箱が、売上。"], [9.17, "オレンジの箱が、利益。"], [11.17, "利益とは、スタッフと予約サイトに払うお金、"], [15.08, "毎月の費用と経費を引いた、税金の前の残りです。"], [19.33, "年末のスタッフを、10人にします。"], [22.5, "1月から1人ずつ増える計算です。"], [28, "計画どおりなら、このくらい。"], [33.58, "下の棒は、月ごとの利益です。"], [36.17, "1月から4月は、仕事が少ない月。"], [39.17, "5月から12月が、忙しい月です。"]], "f4": [[0, "同じ入力画面を、練習に使ってみます。"], [3.33, "独立する前でも、料金の例が入っているので、押せば動きます。"], [8.92, "防カビを1つ。壁掛けエアコンを、2台。"], [12.42, "20,300円です。"], [14.75, "1台減らすと、11,400円。"], [17.5, "上の数字を、残る利益に切りかえます。"], [20.83, "売上ではなく、お店に残るほうです。"], [24, "まちがえても、減らすボタンで戻せます。"], [27.5, "始めてから覚えるんじゃない。"], [30.08, "さわってから、始めるんです。"]], "k5_100": [[0, "これは、人数を入れると、1年の売上と利益の目安が出る、"], [5, "利益の診断アプリの画面です。"], [7.58, "白い箱が、売上。"], [9.17, "オレンジの箱が、利益。"], [11.17, "利益とは、スタッフと予約サイトに払うお金、"], [15.08, "毎月の費用と経費を引いた、税金の前の残りです。"], [19.33, "年末のスタッフを、5人にします。"], [22.33, "1月から1人ずつ増える計算です。"], [26.58, "計画どおりなら、このくらい。"], [32.17, "下の棒は、月ごとの利益です。"], [34.75, "1月から4月は、仕事が少ない月。"], [37.75, "5月から12月が、忙しい月です。"]]};
+CUE.fx[5]=[16.92,"税金に取っておく分も、手元に残る目安も、すぐ下に。"];
+var SLOT={
+ f0:{src:"media/f0_voice.mp4?v=1127a",voice:1,asks:1,len:"約56.7秒",place:"立場のすぐ後：最初の資料（売上を入れる画面）。最後はお金の管理の問い→すぐ選択肢",cue:[[0, "独立して潰れる人、腕のせいじゃないんです。"], [2.95, "稼いだお金をいくら使っていいか、知らないだけなんです。"], [6.14, "数字が苦手なのは、当たり前です。"], [8.31, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [14.17, "たとえば、壁掛けエアコン1台。8,900円。"], [18.0, "お掃除機能付き1台。売上は23,800円。"], [22.46, "スタッフに払うお金は9,818円。"], [25.81, "予約サイトから入った仕事なので、手数料は売上の3割（30%）。7,140円です。"], [31.41, "この1件で、お店に残るお金は6,842円です。"], [35.53, "いいところは3つ。①計算はしなくていい。押すだけで、お店に残るお金が出ます。"], [41.88, "②税金用のお金と、手元に残るお金の目安を、最初から分けてくれます。"], [46.82, "③今月の目標まで、あといくらかが、棒で見えます。"], [50.46, "数字は例で、同じ結果をお約束するものではありません。"], [53.53, "では、今、お店のお金は、どうやって管理していますか？"]]},
+ f1:{src:"media/f1_voice.mp4?v=1127a",voice:1,asks:1,len:"約65.1秒",place:"お金の管理＝どんぶり勘定 の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "どんぶり勘定で、と選ばれましたね。そのままで大丈夫です。"], [3.82, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [9.74, "いつもの作業を押すだけ。壁掛けエアコン1台、お掃除機能付き1台。"], [14.99, "この1件で、お店に残るお金は6,842円。スタッフに払うお金と予約サイトの手数料は、もう引いてあります。"], [23.63, "次は、ひと月。1件17,000円の仕事を30件、売上51万円の月にします。"], [31.05, "お店に残るお金は197,610円。箱が2つに分かれます。"], [36.34, "左は、税金用に取っておくお金。59,283円。使わないお金です。"], [43.21, "右は、手元に残るお金の目安。138,327円。ここから、経費や生活費を考えます。"], [50.93, "今月の目標まで、あといくらかも、棒で見えています。"], [54.2, "どんぶりの中に仕切りが入るだけで、使っていい額の見当がつきます。"], [58.29, "数字は例で、同じ結果をお約束するものではありません。"], [61.57, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
+ f2:{src:"media/f2_voice.mp4?v=1127a",voice:1,asks:1,len:"約41.6秒",place:"お金の管理＝ノートやエクセル の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "ノートやエクセル、と選ばれましたね。"], [2.24, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [7.49, "壁掛け＋お掃除機能付きの1件。予約サイトから入った仕事なら、手数料は売上の3割（30%）。"], [14.0, "この1件で、お店に残るお金は6,842円。"], [18.02, "次は、一度伺ったお客様の「お客様リスト」から入った仕事。お客様リストの手数料は0%です。"], [25.13, "予約サイトの手数料がかからないので、お店に残るお金は13,982円に増えました。"], [31.4, "数式は、1つも組んでいません。押しただけです。"], [34.6, "数字は例で、同じ結果をお約束するものではありません。"], [38.11, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
+ f3:{src:"media/f3_voice.mp4?v=1127a",voice:1,asks:1,len:"約43.1秒",place:"お金の管理＝税理士さん・家族 の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "税理士さんやご家族にまかせている、と選ばれましたね。"], [3.43, "これは、加盟した方が自分のお店で使う、売上を入れる画面の「数字が集まる所」です。"], [9.14, "1件17,000円の仕事を30件入れた月の例。売上は510,000円。"], [15.47, "スタッフに払うお金は210,390円。"], [18.85, "予約サイトに払うお金は102,000円。"], [22.12, "お店に残るお金は197,610円。"], [25.67, "月末の報告を待たなくていい。入れた当日に、ご自分の目で見られます。"], [29.94, "下には、月ごとの表が自動で並びます。"], [32.8, "最後の確認は、今までどおり、税理士さんやご家族に。"], [36.18, "数字は例で、同じ結果をお約束するものではありません。"], [39.63, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
+ f4:{src:"media/f4_voice.mp4?v=1127a",voice:1,asks:1,len:"約35.4秒",place:"お金の管理＝まだ独立していない の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "まだ独立していない、と選ばれましたね。"], [2.38, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [7.89, "独立する前でも、料金の例が入っているので、押せば動きます。"], [11.51, "防カビ1つ、壁掛けエアコン2台。売上は20,300円。"], [16.5, "1台減らすと、売上は11,400円。"], [20.04, "上の数字を、お店に残るお金に切りかえます。"], [23.16, "まちがえても、減らすボタンで戻せます。"], [25.36, "始めてから覚えるのではなく、さわってから始められます。"], [28.76, "数字は例で、同じ結果をお約束するものではありません。"], [32.02, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
+ fx:{src:"media/fx_voice.mp4?v=1127a",voice:1,asks:1,len:"約40.4秒",place:"お金の管理＝この中にない の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "ご自分のやり方を、教えていただきましたね。"], [2.54, "これは、加盟した方が自分のお店で使う、売上を入れる画面の「数字が集まる所」です。"], [7.97, "どんな付け方をしていても、最後に見たいのは、お店に残るお金だと思います。"], [12.34, "1件17,000円の仕事を30件入れた月の例。売上・スタッフに払うお金・予約サイトに払うお金・お店に残るお金。4つの数字が、もう並んでいます。"], [23.44, "税金用に取っておくお金も、手元に残るお金の目安も、すぐ下に。"], [27.56, "今月の目標まで、あといくらかも、棒で見えます。"], [30.67, "あちこち探さなくていい。だから、続けられます。"], [33.57, "数字は例で、同じ結果をお約束するものではありません。"], [36.76, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
+ s1a:{src:"media/s1a.mp4",voice:1,len:"68.8秒",place:"人数＝自分ひとりで：①ひとりの1年 ②動けなくなったら",cue:[[0,"自分ひとりで、と選ばれましたね。"],[4.03,"人を雇わずに、一人親方として1年続けた場合を見てみます。"],[10.35,"前提は、自分が現場に出ること。毎月の費用と経費を引いた、税金を払う前の残りで見ます。"],[17.37,"売上は、1年で680万円。"],[21.58,"残るのは、およそ290万円。"],[25.89,"月にならすと、約24万円です。"],[30.02,"1月から4月は仕事が少なく、月8万円ほど。"],[35.93,"5月から12月の忙しい月は、月32万円ほどです。"],[42.8,"ここで、1つだけ考えておきたいことがあります。"],[46.71,"もし、けがや事故で、現場に出られなくなったら。"],[51.16,"動けない月の収入は、0になります。"],[54.28,"毎月の費用は、止まりません。棒の「−10」は、費用と経費が月およそ10万円出ていく、という意味です。"],[58.11,"柱が1本の家は、柱が折れると、家ごと傾きます。"],[63.44,"では、もしスタッフがひとりでもいたら、どうなると思いますか？"]]},
+ s1b:{src:"media/s1b.mp4",voice:1,len:"52.1秒",place:"人数＝自分ひとりで：③④スタッフが1人いたら",cue:[[0,"スタッフが、ひとりいたら。"],[3.85,"つまみを、1人に動かします。"],[6.51,"前提は、1月からスタッフが1人、あなたと一緒に現場に出る形です。"],[13.03,"売上は、1,360万円。"],[16.37,"残るのは、およそ494万円。"],[20.53,"月にならすと、約41万円です。"],[24.44,"そして、あなたが休んだ月にも、スタッフの現場の分は入ってきます。"],[29.86,"忙しい月なら、毎月の費用を払っても、月11万円ほど残る計算です。"],[37.48,"柱が、2本になった家です。"],[40.52,"どれも例の数字で、同じ結果をお約束するものではありません。"],[44.98,"では、もし計画の6割しか仕事が入らなかったら、どうなるでしょう？"]]},
+ k3_100:{src:"media/k3_100.mp4",voice:1,place:"人数＝3人：計画どおりの1年"},
+ k5_100:{src:"media/k5_100.mp4",place:"人数＝5人：計画どおりの1年"},
+ k10_100:{src:"media/k10_100.mp4",place:"人数＝10人：計画どおりの1年"},
+ e20:{src:"media/e20.mp4",voice:1,len:"108.5秒",place:"人数＝20人：20人がそろった年（最後は6割の問い）",cue:[[0,"20人、と選ばれましたね。"],[4.1,"では、20人のお店を見てみます。"],[7.81,"前提は、1月に1人で始めて、月に2人ずつ、スタッフを増やす形です。"],[16.19,"そうすると、10か月目に、20人がそろいます。"],[21.28,"ここで見るのは、20人が、1年じゅうそろった年です。"],[26.75,"あなたも現場に出て、毎月の費用と経費を引いた、税金を払う前の残りで見ます。"],[33.63,"売上は、1億4,280万円。"],[37.98,"残るのは、およそ4,370万円。"],[43.03,"月にならすと、約364万円です。"],[48.16,"ただ、ここまで来ると、増やすのは、人ではありません。"],[54.54,"教える人です。"],[55.9,"20人に、あなたひとりで、全部を教えることは、できません。"],[60.25,"自動車の教習所を、思い出してください。"],[63.54,"生徒が増えたとき、校長先生が、全員のとなりに乗ることは、ありませんよね。"],[70.14,"教習所は、先生を増やします。"],[72.85,"お店も、同じです。"],[74.75,"まず、ひとりを、教えられる人に育てる。"],[78.82,"その人が、次の人を教える。"],[81.96,"先生が増えるほど、人は、無理なく増やせます。"],[85.82,"そして、教えるのは、体力ではありません。"],[89.52,"自分が、どこでつまずいて、どう直したか。"],[93.29,"覚えている人ほど、良い先生になれます。"],[96.66,"数字は例で、同じ結果を、お約束するものではありません。"],[101.42,"では、もし計画の6割しか仕事が入らなかったら、どうなるでしょう？"]]},
+ h1:{src:"media/h1.mp4",rest:14.5,place:"人が動く時期のクイズの答え（スタッフ2人・3人・5人）"},
+ kime:{src:"",place:"面談に申し込む直前：決めの動画（選んだ人数ごとに1本。kime_1・kime_3・kime_5・kime_10・kime_20）"}
+};
+/* 後半の動画（三浦が話す2〜3分）。src を入れると、書いてある場所に出る。空の間は出ない */
+var LONG={a1:["101万円より、大事な数字","収入を増やしたい人が、最初に見る数字の話です","きっかけ＝収入を増やしたい：答え合わせのすぐ後"],a2:["売れるほど、休めない","時間の自由は、売上の高さでは決まらない話です","きっかけ＝時間の自由：答え合わせのすぐ後"],a3:["一番元気な日に、決めておく","体が動くうちに、次の形を作る話です","きっかけ＝体が動くうちに：答え合わせのすぐ後"],a4:["ヒットより、点数板","自分の力を試すなら、残るお金という点数板を持つ話です","きっかけ＝自分の力を試したい：答え合わせのすぐ後"],
+ b1:["腕より先に、月が決まる","本業にする人が知っておく、仕事の中身と始める月の話です","進め方（これから始める人）：答え合わせのすぐ後"],b5:["腕に、時間を返そう","技術がある人が、次に決めることの話です","進め方（店主・職人）：答え合わせのすぐ後"],
+ c1:["値段は、最後でいい","始めるお金が心配な人へ、払う時期の話です","不安＝お金のこと：答え合わせのすぐ後"],c9:["説得より、予告編","家族に、どう話すかの話です","不安＝家族のこと：答え合わせのすぐ後"],c7:["安くするだけでは、忘れられる","お客様が来続ける、順番の話です","不安＝お客様が来るかどうか：答え合わせのすぐ後"],c8:["20人に会って、1人でいい","人を雇えるか、教えられるかの話です","不安＝人を雇うこと・教えること：答え合わせのすぐ後"],d5:["怖がりは、才能","慎重な人が、先に引いておく線の話です","不安＝うまくいかなかった時のこと：答え合わせのすぐ後"],b3:["加盟しても、社長はあなた","加盟は、雇われることではないという話です","不安＝加盟すると自由がなくなること：答え合わせのすぐ後"],c10:["暇な月が、店を作る","仕事が少ない月の過ごし方の話です","不安＝体力のこと：答え合わせのすぐ後"],
+ d4:["社長修行は、現場から","スタッフから始めたい人への話です","進め方＝スタッフから始めたい：面接の前の質問の最初"]};
+Object.keys(LONG).forEach(function(k){SLOT[k]={src:"",len:"2〜3分の台本が入る前提",place:LONG[k][2],long:1}});
+async function more(id){var s=SLOT[id];if(!s||!s.src||SEEN.indexOf(id)>=0)return;var w=card();head(w,LONG[id][0],LONG[id][1]);await stage(w,id)}
+["3","5","10"].forEach(function(n){["80","60"].forEach(function(p){SLOT["k"+n+"_"+p]={src:"media/k"+n+"_"+p+".mp4",place:"人数＝"+n+"人：計画の"+p.charAt(0)+"割の1年"}})});
+/* 数字の前提が変わったので、古い数字を話す・映す動画は外してある（新しい動画が届いたら src を入れる） */
+["s1a","s1b","e20","k3_100","k5_100","k10_100","h1","k3_80","k3_60","k5_80","k5_60","k10_80","k10_60"].forEach(function(k){if(SLOT[k]){SLOT[k].old=SLOT[k].src;SLOT[k].src="";SLOT[k].voice=0;delete SLOT[k].cue;delete SLOT[k].asks;SLOT[k].len="作り直し待ち"}});
+function hot(d,t){t.split(/([0-9][0-9,.]*(?:万[0-9,]*)?(?:円|人|割|件|台|年|月|つ|本|%|日)?)/).forEach(function(x,i){if(x)d.appendChild(i%2?el("b","",x):document.createTextNode(x))})}
+function bubble(side,t){var wide=matchMedia("(min-width:760px)").matches;if(!wide)side.textContent="";[].forEach.call(side.children,function(c){c.classList.add("dim")});var r=el("div","b"),d=el("div");r.appendChild(el("i","","三浦"));hot(d,t);r.appendChild(d);side.appendChild(r);while(side.children.length>1&&side.scrollHeight>side.clientHeight+2)side.firstChild.remove()}
+/* 動画（あれば）＋決まった場所の吹き出し。無ければ吹き出しだけを同じ場所で順に出す */
+async function stage(w,id,opt){opt=opt||{};if(SEEN.indexOf(id)>=0)throw new Error("同じ映像が2回 "+id);SEEN.push(id);
+  var s=SLOT[id]||{},cue=opt.cue||s.cue||CUE[id]||[],end=s.end||1e9,src=s.src,box=el("div","stage "+(src?"hasvid":"novid")),side=el("div","bub");box.dataset.slot=id;
+  cue=cue.filter(function(c){return c[0]<end});cue.forEach(function(c){LINES.push("〔"+id+"〕"+c[1])});
+  VID[id]=0;track("動画","開始",id);var marks=[25,50,75,100];function prog(p){VID[id]=Math.max(VID[id],p);while(marks.length&&VID[id]>=marks[0]){track("動画",marks[0]+"%",id);marks.shift()}}
+  if(src){var v=el("video");v.playsInline=true;v.controls=true;v.preload="auto";v.muted=!s.voice;box.appendChild(v);box.appendChild(side);w.appendChild(box);if(!FAST)box.scrollIntoView({block:"start",behavior:"smooth"});
+    var skip=el("button","btn","続きへ");skip.type="button";skip.dataset.next="1";skip.style.marginTop="8px";w.appendChild(skip);var last=-1;
+    await new Promise(function(ok){var fin=false;function done(){if(fin)return;fin=true;try{v.pause()}catch(e){}skip.remove();if(tb)tb.remove();ok()}
+      v.ontimeupdate=function(){var k=-1;for(var q=0;q<cue.length;q++)if(cue[q][0]<=v.currentTime+.05)k=q;if(k!==last&&k>=0){last=k;bubble(side,cue[k][1])}var dur=Math.min(end,v.duration||end);if(dur>0&&dur<1e8)prog(Math.min(100,Math.round(v.currentTime/dur*100)));if(v.currentTime>=end){prog(100);done()}};
+      var tried=false;function start(){var p=v.play();if(p&&p.catch)p.catch(function(er){if(fin||er&&er.name==="AbortError")return;if(cue[0]&&last<0)bubble(side,cue[0][1]);v.muted=true;var q=v.play(),chk=function(){setTimeout(function(){if(fin)return;if(v.paused)tapBtn("▶ 動画を再生する");else if(s.voice&&v.muted)tapBtn("音を出して見る")},400)};if(q&&q.then)q.then(chk,chk);else chk()})}
+      var tb=null;function tapBtn(label){if(fin)return;if(tb)tb.remove();tb=el("button","btn main",label);tb.type="button";tb.style.margin="8px 8px 0 0";w.insertBefore(tb,skip);tb.onclick=function(){v.muted=!s.voice;if(label.indexOf("音")===0)v.currentTime=0;v.play();tb.remove();tb=null}}
+      v.onended=function(){prog(100);done()};
+      v.onerror=function(){if(fin)return;if(!tried){tried=true;fetch(src).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){if(fin)return;v.src=URL.createObjectURL(new Blob([b],{type:"video/mp4"}));v.load();start()}).catch(function(){cue.forEach(function(c){bubble(side,c[1])});done()});return}cue.forEach(function(c){bubble(side,c[1])});done()};skip.onclick=done;
+      if(FAST){cue.forEach(function(c){bubble(side,c[1])});done();return}
+      v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.src=src;start()});
+    if(s.rest!=null){try{v.currentTime=s.rest}catch(e){}}
+    /* 話した文を、あとから読み返せるように */
+    var dt=el("details","trygl"),sm=el("summary","","話した内容を、もう一度読む");dt.appendChild(sm);cue.forEach(function(c){var pp=el("p","");hot(pp,c[1]);dt.appendChild(pp)});w.appendChild(dt)}
+  else{box.appendChild(side);w.appendChild(box);if(!FAST)box.scrollIntoView({block:"center",behavior:"smooth"});
+    for(var i=0;i<cue.length;i++){bubble(side,cue[i][1]);prog(Math.round((i+1)/cue.length*100));if(opt.at&&opt.at[i])await opt.at[i]();await readWait(cue[i][1].length)}
+    prog(100)}}
+function sikumi(w,kind,open){var D={form:[["売上","お客様からいただく料金です（例：壁掛けエアコン1台 8,900円）。"],["スタッフに払うお金","作業したスタッフに払うお金です。ここでは売上の約4割（41.25%。口コミなどがそろって、多めに払う場合）で計算しています。"],["予約サイトに払うお金","予約サイトとは、お客様がお店を探して予約する、インターネットのサイトです。予約サイトから来たお客様の分は、売上の30%を手数料として払います。前にご利用いただいたお客様（お店のお客様リスト）からのご予約なら、手数料は0円です。"],["お店に残るお金","売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金を引く前。お店では粗利と呼びます）。ここから、お店の経費や生活費を考えます。"],["税金用","あとで慌てないように、先に分けておくお金の目安です。ここでは、お店に残るお金の3割にしています。正しい額は、税理士さんに確かめます。"],["手元に残る目安","お店に残るお金から、税金用を分けた残りです。"]],
+ profit:[["自分の現場の分","あなたが現場に出た分です。売上は、5月から12月の忙しい月は月80万円、1月から4月の暇な月は月40万円、1年で800万円で計算しています。予約サイトに払うお金や経費を引いて、約7割（年560万円）が残る計算です。三浦がひとりで現場に出た時の数字をもとにしています。"],["スタッフの分","スタッフが現場に出た分です。スタッフ1人が、忙しい月は月30件、暇な月は月13件、1件17,000円の仕事をすると、年の売上は約496万円。スタッフに約4割、予約サイトに3割を払って、お店に残るお金は約143万円。ガソリンや材料などの経費（月に約2万6千円）を引いて、1人あたり年に約112万円が残る計算です。初年度は、研修と慣れの期間があるので、控えめの数字にしています。"],["利益","自分の現場の分と、スタッフの分を、合わせた残りです。税金は、まだ払っていません。"],["計画の8割・6割","仕事の量が計画より少なかった年です。売上も利益も、同じ割合で少なくなる計算です。"]]}[kind];
+  var G=el("details","trygl"),gs=el("summary","","この計算のしくみ");G.open=!!open;G.appendChild(gs);D.forEach(function(x){var p=el("p","");p.appendChild(el("b","",x[0]));p.appendChild(document.createTextNode("："+x[1]));G.appendChild(p)});w.appendChild(G)}
+
+/* ---- 1年の数字（公開中の利益の診断アプリと同じ式） ---- */
+/* 数字の前提は、ここ1か所。
+   自分の現場の分：売上は 忙しい月（5〜12月）月80万円・暇な月（1〜4月）月40万円＝年800万円。その約7割（selfRate）が残る＝年560万円。
+   スタッフの分（1人あたり）：忙しい月 月30件・暇な月 月13件・1件1.7万円＝年 約496万円。
+     スタッフに約4割・予約サイトに3割を払った残り（keep＝28.75%）＝年 約143万円。経費（exp＝月 約2.56万円）を引いて、年 約112万円。
+   addSelf:true＝自分の分とスタッフの分を足す。8割・6割は全体にそのまま掛ける。 */
+var PLAN={mode:"unit",selfBusy:80,selfSlow:40,selfRate:.7,jobBusy:30,jobSlow:13,price:1.7,keep:.2875,exp:(496.4*.2875-112)/12,addSelf:true};
+function year(staff,rate,full){var r=rate/100,ms=[],selfP=0,staffP=0,selfS=0,staffS=0;
+  for(var m=1;m<=12;m++){var busy=m>4,a=(PLAN.addSelf||staff===0)?(busy?PLAN.selfBusy:PLAN.selfSlow)*r:0,bs=(busy?PLAN.jobBusy:PLAN.jobSlow)*PLAN.price*staff*r,b=bs*PLAN.keep-PLAN.exp*staff*r;
+    selfS+=a;selfP+=a*PLAN.selfRate;staffP+=b;staffS+=bs;ms.push(a*PLAN.selfRate+b)}
+  return{sales:selfS+staffS,profit:selfP+staffP,ms:ms,selfP:selfP,staffP:staffP,selfS:selfS,staffS:staffS}}
+function STAFFBUSY(){return Math.round((PLAN.jobBusy*PLAN.price*PLAN.keep-PLAN.exp)*10)/10}
+function R(v){return Math.round(v)}
+function PRO(){return(A["立場"]||"").indexOf("すでに")===0}
+function OWN(){return(A["立場"]||"").indexOf("すでに自分で店")===0}
+function clean(k){return(A[k]||"").replace("【自分の言葉】","")}
+function SIZE(){var n=A["人数"],st={"自分ひとりで":0,"3人":3,"5人":5,"10人":10,"20人":20}[n];return{n:n,st:st,solo:st===0,full:false,calc:st===0?1:st,name:st===0?"スタッフ1人":n,k:"k"+st}}
+function route(){var f=function(m,k){return m[A[k]]||""},a=f({"収入を増やしたい":"収入を育てる","時間の自由がほしい":"時間を取り戻す","体が動くうちに、次の形を作りたい":"体を守る","自分の力を試したい":"腕を試す"},"きっかけ")||(A["きっかけ"]?"自分の言葉の":""),b=OWN()?"店主の":PRO()?"職人の":f({"転職・本業として":"本業の","まずは副業から":"続けながらの","独立・開業として":"独立の","まだ決めていない":"これから決める"},"立場"),c=f({"自分ひとりで":"身軽なひとり","3人":"少数精鋭の社長","5人":"教える社長","10人":"任せる社長","20人":"組織を作る社長"},"人数"),w=A["進め方"]||"",d=w.indexOf("1年以内")===0?"1年の駆け足・":w.indexOf("3年")===0?"3年でじっくり・":"";return d+a+(a&&(b||c)?"・":"")+b+c+"ルート"}
+async function routeCard(first){var w=card("rw"),t=el("div","row"),n=route();w.appendChild(el("h3","",first?"あなたの道に、名前が付きました":"あなたの道の名前が、変わりました"));t.appendChild(el("span","","道の名前"));t.appendChild(el("output","",n));w.appendChild(t);A["道の名前"]=n;LINES.push("［道の名前 "+n+"］");show(w);await wait(1100)}
+var STEPS=9,stepN=0;function prog(){stepN++;$("pg").style.width=Math.min(100,stepN/STEPS*100)+"%"}
+/* 予想クイズ：選ぶ→受け止め。返すのは選んだ番号 */
+async function quiz(key,q,opts,recv){await say(q);var x=await ask(key,opts);A[key]=x.l;await say(typeof recv==="function"?recv(x.l,x.i):"「"+x.l+"」と予想されたのですね。"+recv);return x.i}
+function diff(g,a,u){return g===a?"予想と、ぴったり同じでした。":g<a?"予想より、"+(a-g).toLocaleString("ja-JP")+u+"多い数字です。":"予想より、"+(g-a).toLocaleString("ja-JP")+u+"少ない数字です。"}
+
+/* ===== 場面 ===== */
+async function sStart(){
+  await say("資料のご請求、ありがとうございます。ありがとうグループの三浦です。");
+  await say("紙の資料をお送りする代わりに、**会話の形で**ご覧いただけるようにしました。");
+  note("質問に答えるたびに、資料が出ます。押すだけです。お名前はいりません。途中でやめても大丈夫です。吹き出しは、読める速さで1つずつ出ます。画面をタップすると、次の吹き出しへ早く進めます。");
+  await ask("はじめる",["はい、始めます"]);
+  await say("では、始めますね。最初に、きっかけを聞かせてください。")}
+
+var MIURA1="2019年8月、三浦の店だけの例で、税金を払う前の数字です。手数料が今より安かったころなので、同じ結果をお約束するものではありません。";
+async function sReason(){
+  await say("今回、資料を見てみようと思ったのは、どんな理由からですか？");
+  var x=await pick("きっかけ",["収入を増やしたい","時間の自由がほしい","体が動くうちに、次の形を作りたい","自分の力を試したい"]);prog();
+  var w,g;
+  if(x.l==="時間の自由がほしい"){
+    await say("自分で使える時間を、増やしたいのですね。");
+    g=await quiz("予想:1日の件数","1つ、予想してみてください。一人でお店をする場合、1日に伺えるお客様は、**何件までが目安**だと思いますか？",["3件","5件","8件"],"答えは、こちらです。");
+    w=card();head(w,"売れるほど、休めない","一人でお店をする時の、1日の目安です");await tiles(w,[["1日に伺える目安","3件","o"],["1台にかかる時間","約1時間〜1時間20分"]]);
+    await say(["目安は、**3件**です。予想と、ぴったり同じでした。","目安は、**3件**です。5件という予想より、2件少ない数です。","目安は、**3件**です。8件という予想より、5件少ない数です。"][g]);
+    await say("理由は1つ。エアコンを中まで分解して洗うので、慣れても1台およそ1時間から1時間20分かかるからです。休めば、休んだ日の売上は止まります。");
+    await more("a2");
+    await say("時間の自由は、売上の高さより、**「自分が休んでも回るか」**で決まります。回し方は、立場で変わります。")}
+  else if(x.l==="体が動くうちに、次の形を作りたい"){
+    await say("元気なうちに、先の準備をしておきたいのですね。");
+    g=await quiz("予想:お店そのもの","1つ、予想してみてください。一人で現場に出るお店では、何が**「お店そのもの」**だと思いますか？",["道具","自分の体","お店の名前"],"私の答えは、こちらです。");
+    w=card();head(w,"一番元気な日に、決めておく","一人で現場に出るお店の話です");await tiles(w,[["一人で現場に出るお店では","体が、お店そのもの","o"],["1日の目安","3件（夏は暑い中）"]]);
+    await say(g===1?"私の答えも、**自分の体**です。":"私の答えは、**自分の体**です。");
+    await say("理由は1つ。現場に出るのが自分だけなので、体が止まると、お店も止まるからです。1日3件、夏は暑い中での作業です。");
+    await more("a3");
+    await say("だから、動けるうちに、次の形を決めておきます。次の形は、立場で変わります。")}
+  else{
+    var power=x.l==="自分の力を試したい";
+    await say(x.own?"「"+x.v+"」がきっかけなのですね。":power?"自分の力がどこまで通じるか、確かめてみたいのですね。":"今より収入を増やしたい、というお気持ちからなのですね。");
+    g=await quiz("予想:最初の月","1つ、予想してみてください。私が一人でお店を始めた最初の月、売上は**101万円**でした。予約サイトの手数料やガソリン代などを払ったあと、**手元に残ったお金（税金を払う前）**は、いくらだったと思いますか？",["約90万円","約69万円","約50万円"],"答えは、こちらです。");
+    w=card();head(w,power?"ヒットより、点数板":"101万円より、大事な数字","三浦が一人で始めた、最初の月の数字です");await tiles(w,[["売上",101],["手元に残ったお金",69,"o"],["出ていったお金",32]]);fine(w,MIURA1);
+    await say("手元に残ったのは、**69万円**でした。"+diff([90,69,50][g],69,"万円"));
+    await say("理由は1つ。予約サイトに払う手数料や、ガソリン代などで、32万円が出ていったからです。予約サイトとは、お客様がお店を探して予約する、インターネットのサイトのことです。");
+    await more(power?"a4":"a1");
+    await say(power?"野球でいえば、売上はヒットの数、残るお金が点数です。点数板があると、力がどこで伸びているかが見えます。点数板の作り方は、立場で変わります。":"収入を増やす時に先に見るのは、売上より、**残るお金**です。残り方は、立場で変わります。")}}
+
+async function sPos(){
+  await say("エアコンクリーニングは、今のあなたにとって、どれに近いですか？");
+  var x=await pick("立場",["転職・本業として","まずは副業から","独立・開業として","すでに自分で店をやっている（もっと伸ばしたい）","すでに職人として働いている（雇われ・下請け）","まだ決めていない"]);prog();
+  await say({"転職・本業として":"次の本業として、考えていらっしゃるのですね。","まずは副業から":"今のお仕事を続けながら、小さく始めたいのですね。","独立・開業として":"自分のお店を持つことを、考えていらっしゃるのですね。","すでに自分で店をやっている（もっと伸ばしたい）":"もうご自分のお店を動かしていらっしゃるのですね。洗う技術の話は省いて、お金、お客様の集め方、人に任せることを中心にお話しします。","すでに職人として働いている（雇われ・下請け）":"職人として、現場に立っていらっしゃるのですね。洗う技術の話は省いて、お金、お客様の集め方、人に任せることを中心にお話しします。","まだ決めていない":"立場は、まだ決めていないのですね。決める前の材料として、ご覧ください。"}[x.l]||"「"+x.v+"」という立場なのですね。");
+  await routeCard(true)}
+
+async function sForm(){
+  h2("最初の資料です","加盟した方が自分のお店で使う、売上を入れる画面を、お見せします");
+  await say("売上は、全部がお店に残るわけではありません。作業したスタッフに払うお金、お客様を紹介してくれた予約サイトに払う手数料、あとから来る税金。売上から、先に出ていくお金があります。");
+  await say("この引き算を、自分で計算しなくていいように作ったのが、**加盟した方が自分のお店で使う「売上を入れる画面」**です。作業が終わったら、あなたやスタッフが、スマートフォンで作業の内容を押すだけ。**いくら残って、いくらまで使っていいか**が、押した瞬間に分かります。");
+  var g=await quiz("予想:1件で残るお金","先に、予想してみてください。スタッフが、壁掛けエアコン1台と、お掃除機能付きエアコン1台を洗いました。売上は**23,800円**。ここから、スタッフに払うお金（売上の約4割）と、予約サイトに払う手数料（売上の3割）が、先に出ていきます。**お店に残るお金**は、いくらだと思いますか？ お店に残るお金とは、売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金は、まだ引いていません）。",["約17,000円","約12,000円","約6,800円"],"実際の画面に、入れてみます。");
+  var w=card();head(w,"計算は、しなくていい","加盟した方が使う、売上を入れる画面です。スタッフに払うお金から税金用まで、画面が計算するので、あなたは押すだけです");await stage(w,"f0");
+  await tiles(w,[["売上",yenS(23800)],["スタッフに払うお金（約4割）",yenS(9818)],["予約サイトの手数料（3割）",yenS(7140)],["お店に残るお金",yenS(6842),"o",["予想は約17,000円。1万円ほど少ない数字でした","予想は約12,000円。5,000円ほど少ない数字でした","予想と、ほぼ同じでした"][g]]]);
+  fine(w,"画面の数字は、しくみを見ていただくための例です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");
+  await tryit(true)}
+
+async function sMoney(){
+  await say("今、お店のお金は、どうやって管理していますか？（これから始める方は、今のご自分のお金の管理で大丈夫です）");
+  var o=["なんとなく・どんぶり勘定","ノートやエクセルでつけている","税理士さん・家族にまかせている"];if(!OWN())o.push("まだ独立していない");
+  var x=await pick("お金の管理",o);prog();var g,w,id;
+  if(x.l==="ノートやエクセルでつけている"){id="f2";
+    await say("ご自分で、手をかけて付けていらっしゃるのですね。ノートやエクセルだと、スタッフに払う割合や、予約サイトの手数料の計算式を、自分で組みますよね。");
+    g=await quiz("予想:お客様リスト","では、予想してみてください。さきほどと同じ仕事（売上23,800円）を、一度伺ったお客様（お客様リスト）からのご予約で入れると、お店に残るお金は6,842円から、いくらになると思いますか？",["変わらない（6,842円）","約1万円","約1万4,000円"],"画面で、押してみます。");
+    w=card();head(w,"数式は、もう組まなくていい","計算式は画面の中に入っているので、あなたは押すだけ。売上を入れる画面の続きです");await stage(w,id);
+    await tiles(w,[["予約サイトからの仕事で、お店に残るお金",yenS(6842),"","手数料30%（7,140円）を払う"],["お客様リストからの仕事で、お店に残るお金",yenS(13982),"o",["予想は6,842円のまま。7,140円多い数字でした","予想は約1万円。4,000円ほど多い数字でした","予想と、ほぼ同じでした"][g]]])}
+  else if(x.l==="税理士さん・家族にまかせている"){id="f3";
+    await say("数字のことは、信頼できる人にまかせていらっしゃるのですね。");
+    g=await quiz("予想:いつ見られるか","では、予想してみてください。売上を入れる画面で入れた数字は、**いつ**、ご自分の目で見られると思いますか？",["月末","次の日","入れた当日に"],"画面で、お見せします。");
+    w=card();head(w,"月末を、待たなくていい","まかせたままで、ご自分でも入れた当日に見られる。数字が集まる画面です");await stage(w,id);
+    await tiles(w,[["ご自分の目で見られるのは","入れた当日に","o",g===2?"予想どおりでした":"予想は「"+["月末","次の日"][g]+"」。もっと早く見られます"],["1件17,000円×30件の月・売上",yenS(510000)],["お店に残るお金",yenS(197610)]])}
+  else if(x.l==="まだ独立していない"){id="f4";
+    await say("まだ、お店のお金を管理する前なのですね。");
+    g=await quiz("予想:独立前に使えるか","では、予想してみてください。売上を入れる画面は、**独立する前の人**にも、さわれると思いますか？",["さわれる","さわれない"],"画面で、お見せします。");
+    w=card();head(w,"独立の前なら、まちがえていい","始める前に練習できる。売上を入れる画面の続きです");await stage(w,id);
+    await tiles(w,[["独立する前の人も","さわれる","o",g===0?"予想どおりでした":"予想は「さわれない」。料金の例が入っているので、押せば動きます"],["防カビ1つ＋壁掛け2台の売上",yenS(20300)]])}
+  else{id=x.own?"fx":"f1";
+    await say(x.own?"「"+x.v+"」という付け方なのですね。":"なんとなくの感覚で、回していらっしゃるのですね。");
+    g=await quiz("予想:使っていいお金","では、予想してみてください。1件17,000円の仕事を30件入れた月（売上51万円）。スタッフと予約サイトに払ったあと、お店に残るお金は197,610円でした。このうち、**使っていい目安**は、いくらだと思いますか？",["全部（197,610円）","約14万円","約7万円"],"画面で、お見せします。");
+    w=card();if(x.own)head(w,"探し物は、1枚で終わる","売上、税金用、目標が並ぶ。数字が集まる画面です");else head(w,"どんぶりは、直さなくていい","どんぶり勘定のままで、使っていい額が見える。売上を入れる画面の続きです");await stage(w,id);
+    await tiles(w,[["お店に残るお金",yenS(197610)],["税金用に取っておくお金（使わない）",yenS(59283)],["手元に残るお金の目安（使っていい目安）",yenS(138327),"o",["予想は全部。59,283円少ない数字でした","予想と、ほぼ同じでした","予想は約7万円。7万円ほど多い数字でした"][g]]])}
+  fine(w,"画面の数字は、しくみを見ていただくための例です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");
+  A._asked=true}
+
+/* さわれる計算。保存も送信もしない */
+function yenS(v){return Math.round(v).toLocaleString("ja-JP")+"円"}
+async function tryit(inline){var MN3=[["壁掛け",8900],["お掃除機能付き",14900],["3点セット（防カビ・室外機・ドレン）",7000]],q=[1,1,0],rt=0,w=card("try");head(w,"自分で、押してみる","今の動画と同じ計算を、あなたの指で試せます（押さずに、下の質問へ進んでも大丈夫です）。押した数字は、このページの中だけで計算します");
+  if(inline){var dd=el("details","trygl tryopen"),sm=el("summary","","ここを押すと開きます：自分の指で、計算を動かす");dd.appendChild(sm);w.appendChild(dd);w=dd}
+  w.appendChild(el("p","trypre","スタッフが現場に行った場合の計算です（あなたは現場に入らず、お店を回す側）。"));
+  function receipt(rows){var box=el("div","tryex"),o={};rows.forEach(function(x){var d=el("div","trycalc"+(x[3]?" "+x[3]:"")),a=el("span","",x[1]),b=el("span","v","0円"),s=el("small","",x[2]||"");a.appendChild(s);d.appendChild(a);d.appendChild(b);box.appendChild(d);o[x[0]]={d:d,v:b,s:s}});return[box,o]}
+  var r1=receipt([["s","お客様からいただく売上",""],["p","− スタッフに払うお金","売上の約4割"],["f","− 予約サイトに払うお金","売上の30%"],["g","＝ お店に残るお金","ガソリン代などの経費を引く前","last"]]);w.appendChild(r1[0]);
+  var hint=el("p","pt","さきほどの画面と同じ、壁掛け1台とお掃除機能付き1台から始まります。下の「＋」「−」を押すと、上の引き算が動きます。");w.appendChild(hint);
+  var rg=el("div","seg tryseg");w.appendChild(el("div","row","どこから来たお客様？"));w.appendChild(el("p","pt","予約サイト＝お客様がお店を探して予約するサイト（売上の30%を手数料として払う）。お客様リスト＝前に伺ったお客様（手数料は0円）。"));["予約サイト（手数料30%）","お客様リスト（手数料0%）"].forEach(function(x,i){var b=el("button","",x);b.type="button";b.addEventListener("click",function(){rt=i;draw(true)});rg.appendChild(b)});w.appendChild(rg);
+  var ns=[];MN3.forEach(function(x,i){var d=el("div","tryrow"),t=el("div"),g=el("div","trybt"),a=el("button","","−"),n=el("b","","0"),c=el("button","","＋");t.appendChild(el("span","",x[0]));t.appendChild(el("small","",yen(x[1])));a.type=c.type="button";a.setAttribute("aria-label",x[0]+"を減らす");c.setAttribute("aria-label",x[0]+"を増やす");g.appendChild(a);g.appendChild(n);g.appendChild(c);d.appendChild(t);d.appendChild(g);w.appendChild(d);ns.push(n);a.addEventListener("click",function(){q[i]=Math.max(0,q[i]-1);draw(true)});c.addEventListener("click",function(){q[i]=Math.min(3,q[i]+1);draw(true)})});
+  function slide(id,l,a,b,v){var d=el("div","row"),t=el("label","",l),o=el("output",""),s=el("input");s.type="range";s.min=a;s.max=b;s.value=v;s.id=id;t.htmlFor=id;d.appendChild(t);d.appendChild(o);w.appendChild(d);w.appendChild(s);s.addEventListener("input",function(){draw(false)});return[s,o]}
+  w.appendChild(el("div","trym","お店の仕事を、1か月続けたら"));w.appendChild(el("p","pt","ここからは、1件あたり17,000円（お客様1件の平均の金額）で計算します。上の1件の例とは別の、平均の数字です。"));
+  var A1=slide("try-n","月に何件？",10,60,30),B1=slide("try-l","お客様リストからのご予約は？",0,100,33);
+  var r2=receipt([["S","1か月の売上","1件17,000円 × 件数"],["P","− スタッフに払うお金","売上の約4割"],["F","− 予約サイトに払うお金",""],["G","＝ お店に残るお金","ガソリン代などの経費を引く前","last"],["T","− 税金用に取っておくお金","残るお金の3割を目安に"],["K","＝ 手元に残るお金の目安","","last"]]);w.appendChild(r2[0]);
+  sikumi(w,"form",true);fine(w,"しくみを見ていただくための例です。割合も金額も、お店によって変わります。同じ結果をお約束するものではありません。");
+  var O=Object.assign({},r1[1],r2[1]),cur={},tm=0;Object.keys(O).forEach(function(k){cur[k]=0});
+  function draw(anim){var sale=MN3.reduce(function(a,x,i){return a+x[1]*q[i]},0),pay=Math.round(sale*.4125),fee=Math.round(sale*.3),n=+A1[0].value,l=Math.round(n*B1[0].value/100),U=17000,T={s:sale,p:pay,f:rt?0:fee,S:U*n,P:Math.round(U*.4125)*n,F:Math.round(U*.3)*(n-l)};T.g=T.s-T.p-T.f;T.G=T.S-T.P-T.F;T.T=Math.round(T.G*.3);T.K=T.G-T.T;
+    ns.forEach(function(e,i){e.textContent=q[i]});A1[1].textContent=n+"件";B1[1].textContent=l+"件";[].forEach.call(rg.children,function(b,i){b.setAttribute("aria-pressed",String(i===rt))});
+    O.f.s.textContent=rt?"お客様リストから来た方なので、0円":"売上の30%";O.f.d.classList.toggle("zero",!!rt&&sale>0);O.F.s.textContent=l?"予約サイトの"+(n-l)+"件分。お客様リストの"+l+"件は0円":"売上の30%";
+    var F0=Object.assign({},cur),id=++tm,step=0,keys=["s","p","f","g","S","P","F","G","T","K"],max=anim&&!STILL?20:1;(function tick(){if(id!==tm)return;step++;keys.forEach(function(k,i){var u=max===1?1:Math.max(0,Math.min(1,(step-Math.min(i,3)*3)/(max-9))),e=1-Math.pow(1-u,3);cur[k]=F0[k]+(T[k]-F0[k])*e;O[k].v.textContent=yen(cur[k])});if(step<max)setTimeout(tick,30)})()}
+  draw(false);if(!inline){show(w);await nextBtn(w)}}
+
+/* 人数 → 計画どおり → 8割・6割 */
+var E={"3人":["3人で、社長が変わる","3人。ここで、社長の仕事が変わります。洗う人から、数字を見る人へ。"],"5人":["5人目から、先生が増える","5人。ここから、教える人をもう一人、育て始めます。"],"10人":["社長は、一番働かなくていい","10人。社長は、一番働く人から、一番育てる人に変わります。"],"20人":["増やすのは、人より先生","20人。ここまで来ると、増やすのは人ではなく、教える人です。"]};
+function opts3(a,pos){a=R(a);var r5=function(v){return Math.max(5,Math.round(v/5)*5)},L=[[a,r5(a*1.4),r5(a*2)],[r5(a*.65),a,r5(a*1.5)],[r5(a*.45),r5(a*.7),a]][pos];return L}
+async function sSize(){
+  if(!A._asked){await say("1件の数字の次は、**1年の数字**です。")}
+  await say("仮に、人に任せるなら、**何人の組織**にしたいですか？");
+  var x=await ask("人数",["自分ひとりで","3人","5人","10人","20人"]);A["人数"]=x.l;prog();var q=SIZE();
+  if(q.solo)await solo();else await team(q);
+  await lower(q);
+  await gua(false);
+  await say("ここまでが、数字です。");
+  await say("でも、**この数字になるためのやり方**、知りたくないですか？ 面談で、全部お話しします。")}
+
+async function team(q){var n=q.n,y=year(q.st,100),mon=R(y.profit/12),z=opts3(mon,{3:1,5:2,10:0,20:1}[q.st]);
+  await say({"3人":"3人くらいの、顔がよく見える組織ですね。","5人":"5人で動く組織を、思い描いていらっしゃるのですね。","10人":"10人の組織まで、広げたいのですね。","20人":"20人という、大きな組織をめざしたいのですね。"}[n]);
+  await say(E[n][1]);
+  await say("前提を2つ。あなたも現場に出て、スタッフ"+n+"と一緒に1年回した場合です。そして初年度は、研修と慣れの期間があるので、スタッフの分は控えめの数字にしています。");
+  var g=await quiz("予想:月に残るお金","予想してみてください。スタッフ"+n+"の組織の1年、計画どおりなら、**お店の利益は、平均して月にいくら**になると思いますか？ 利益とは、あなたの現場の分とスタッフの分を合わせて、払うお金と経費を引いた残りです（税金を払う前）。",z.map(function(v){return"約"+v+"万円"}),"数字で、確かめます。");
+  var w=card();head(w,E[n][0],"あなたとスタッフ"+n+"の、1年の売上と利益の目安です");
+  await stage(w,q.k+"_100",{cue:[[0,"これは、あなたとスタッフ"+n+"の、1年の売上と利益の目安です。"],[5,"あなたの現場の分。売上は年"+man(y.selfS)+"。約7割の、"+man(y.selfP)+"が残ります。"],[12,"スタッフの分。1人が、忙しい月は月30件、暇な月は月13件、1件17,000円の仕事をすると、年の売上は約496万円。払うお金と経費を引いて、年に約112万円がお店に残ります。"+n+"で、"+man(y.staffP)+"です。"],[20,"合わせて、1年の利益は"+man(y.profit)+"。月にならすと、約"+mon+"万円です。"],[27,"5月から12月が忙しい月、1月から4月は仕事が少ない月です。"]]});
+  await tiles(w,[["あなたの現場の分の利益",y.selfP],["スタッフ"+n+"の分の利益",y.staffP],["合わせた1年の利益（税金の前）",y.profit,"o"],["1か月あたりの利益（平均）",y.profit/12,"o"],["1年の売上（合わせて）",y.sales]]);bars(w,y.ms);sikumi(w,"profit",false);fine(w);
+  A["見た数字:計画どおり"]=man(y.profit);
+  await say("計画どおりなら、お店の利益は、月の平均で**およそ"+mon+"万円**でした。"+diff(z[g],mon,"万円"));
+  await say("理由は1つ。あなたの現場の分（年"+man(y.selfP)+"）に、スタッフ1人あたり年に約112万円が、人数の分だけ重なるからです。")}
+
+async function solo(){
+  await say("人には任せず、ご自分ひとりで続けたいのですね。");
+  var y=year(0,100),mon=R(y.profit/12),w=card();head(w,"ひとりは、止まると0","人を雇わない一人親方としての、1年の収支です");
+  await stage(w,"s1a",{cue:[[0,"自分ひとりで、と選ばれましたね。"],[4,"これは、人を雇わずに、一人親方として1年続けた場合の、売上と利益の目安です。"],[10,"前提は、あなたが現場に出ること。予約サイトに払うお金や経費を引いた、税金を払う前の残りで見ます。"],[18,"売上は、1年で"+man(y.sales)+"。残るのは、約7割の、およそ"+man(y.profit)+"。月にならすと、約"+mon+"万円です。"],[27,"1月から4月は仕事が少なく、月"+R(PLAN.selfSlow*PLAN.selfRate)+"万円ほど。5月から12月の忙しい月は、月"+R(PLAN.selfBusy*PLAN.selfRate)+"万円ほどです。"],[36,"ここで、1つだけ考えておきたいことがあります。"],[40,"もし事故やけがで動けなくなったら、動けない月の収入は0になります。柱が1本の家は、柱が折れると、家ごと傾きます。"],[50,"では、もしスタッフがひとりでもいたら、どうなると思いますか？"]],
+    at:{3:async function(){await tiles(w,[["ひとりの1年の売上",y.sales],["ひとりの1年の利益（税金の前）",y.profit,"o"],["1か月あたりの利益（平均）",y.profit/12,"o"]])},4:async function(){bars(w,y.ms,"ひとりの1年・月ごとの利益（灰色は、仕事が少ない1月〜4月）")},6:async function(){await tiles(w,[["けがや事故で動けない月の収入","0円","o"]])}}});
+  sikumi(w,"profit",false);fine(w,"三浦がひとりで現場に出た時の数字（年の売上800万円・約7割が残る）をもとにした、例の数字です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");A["見た数字:ひとり"]=man(y.profit);
+  var y1=year(1,100),a=R(y.profit),b=R(y1.profit),opts=["ほとんど変わらない（約"+a.toLocaleString("ja-JP")+"万円）","約"+(Math.round(b/a*10)/10)+"倍（約"+b.toLocaleString("ja-JP")+"万円）","約2倍（約"+(a*2).toLocaleString("ja-JP")+"万円）"];
+  var x=await ask("予想:スタッフ1人",opts);A["予想:スタッフ1人"]=x.l;
+  await say("「"+x.l.replace(/（.*$/,"")+"」と予想されたのですね。もしスタッフが1人でもいたら、こういう試算になります。");
+  var w2=card();head(w2,"柱を、もう1本","スタッフが1人いる場合の、1年の試算です");
+  await stage(w2,"s1b",{cue:[[0,"スタッフが、ひとりいたら。"],[3,"前提は、スタッフが1人、あなたと一緒に現場に出る形です。初年度は、研修と慣れの期間があるので、控えめの数字にしています。"],[12,"あなたの現場の分は、変わらず"+man(y1.selfP)+"。スタッフが、忙しい月は月30件、暇な月は月13件、1件17,000円の仕事をすると、年の売上は約496万円。払うお金と経費を引いて、年に約"+man(y1.staffP)+"が、上に重なります。"],[20,"合わせて、およそ"+man(y1.profit)+"。月にならすと、約"+R(y1.profit/12)+"万円です。"],[27,"そして、あなたが動けない月にも、スタッフの現場の分は入ってきます。忙しい月なら、月"+STAFFBUSY()+"万円ほどです。柱が、2本になった家です。"],[37,"では、もし計画の6割しか仕事が入らなかったら、どうなるでしょう？"]],
+    at:{3:async function(){await tiles(w2,[["あなたの現場の分の利益",y1.selfP],["スタッフ1人の分の利益",y1.staffP],["合わせた1年の利益（税金の前）",y1.profit,"o"],["1か月あたりの利益（平均）",y1.profit/12,"o"]])},4:async function(){await tiles(w2,[["あなたが動けない忙しい月に、入ってくる目安","約"+STAFFBUSY()+"万円","","スタッフ1人の現場の分"]])}}});
+  bars(w2,y1.ms,"スタッフ1人の1年・月ごとの利益");fine(w2);A["見た数字:計画どおり"]=man(y1.profit)+"（スタッフ1人）";
+  await say("スタッフ1人なら、利益は**およそ"+man(y1.profit)+"**。"+["約"+a+"万円のままという予想より、"+(b-a)+"万円多い数字です。","予想と、ぴったり同じでした。","約"+(a*2).toLocaleString("ja-JP")+"万円という予想より、"+(a*2-b)+"万円少ない数字です。"][x.i]+"あなたの現場の分に、スタッフ1人の現場の分が重なるからです。")}
+
+/* 計画の8割・6割。選ぶたびに進む */
+async function lower(q){var n=q.name,v6=q.solo,first=v6?["計画の6割だったら","計画の8割だったら"]:["計画の8割だったら","計画の6割だったら"];
+  if(!v6)await say("ただ、計画どおりにいかない年もあります。**仕事が計画より少なかったら、どうなるか。**どちらを先に見ますか？");
+  else await say("では、**計画の6割しか仕事が入らなかったら**。8割の年と、どちらを先に見ますか？");
+  var x=await ask("先に見る割合",first);A["先に見る割合"]=x.l;var p=x.l.indexOf("8割")>=0?80:60,o=140-p;
+  await say("計画の"+p/10+"割だった年を、先に見ておきたいのですね。");
+  var a=R(year(q.calc,100).profit),b=R(year(q.calc,p).profit),z=[R(a*(p-25)/100/5)*5,b,R(a*(p+12)/100/5)*5];
+  var g=await quiz("予想:利益の減り方","予想してみてください。計画どおりなら、1年の利益は"+man(a)+"です。仕事が計画の"+p/10+"割だった年、**1年の利益**は、いくらになると思いますか？",z.map(function(v){return"約"+v.toLocaleString("ja-JP")+"万円"}),"数字で、確かめます。");
+  await low(q,p);
+  await say("計画の"+p/10+"割なら、1年の利益は**"+man(b)+"**の計算です。"+diff(z[g],b,"万円"));
+  await say("理由は1つ。この試算では、仕事が減った分だけ、売上も利益も同じ割合で少なくなるからです。");
+  await say("もう一方の、**計画の"+o/10+"割だった年**も、見ておきますか？");
+  var y=await ask("もう一方の割合",["計画の"+o/10+"割の年も見る","今は見なくていい"]);A["もう一方の割合"]=y.l;
+  if(y.i===0){await say("計画の"+o/10+"割の年も、見ておきたいのですね。");var r2=await low(q,o);
+    await say("計画の"+o/10+"割なら、利益は**"+man(r2.b)+"**の計算です。"+(o===60?"6割の年まで先に見ておくと、続けるか直すかを、落ち着いて決められます。":"6割の年と計画どおりの年の、あいだの数字です。"))}
+  else await say("計画の"+o/10+"割の年は、今は見ないのですね。先へ進みます。");
+  A["見た割合"]=(y.i===0?[p,o]:[p]).map(function(v){return v/10+"割"}).join("・")}
+async function low(q,p){var n=q.solo?"スタッフ1人":"スタッフ"+q.n,a=year(q.calc,100),b=year(q.calc,p),w=card(),id=q.k+"_"+p;
+  head(w,p===80?"届かない年の、すごし方":"6割の年も、先に見ておく","あなたと"+n+"・仕事が計画の"+p/10+"割だった年の、売上と利益の目安です");
+  if(SLOT[id]&&SLOT[id].src)await stage(w,id);
+  var rows=[["計画の"+p/10+"割の年の売上（合わせて）",b.sales],["計画の"+p/10+"割の年の利益（税金の前）",b.profit,"o"],["1か月あたりの利益（平均）",b.profit/12,"o"]];
+  if(q.solo){var s0=year(0,p);rows.push(["ひとりの場合・計画の"+p/10+"割の利益",s0.profit])}
+  await tiles(w,rows);bars(w,b.ms);fine(w);A["見た数字:"+p/10+"割"]=man(b.profit)+(q.solo?"（スタッフ1人）":"");
+  await wait(900);return{a:R(a.profit),b:R(b.profit)}}
+
+/* 全額返金保証（文面は確定のもの。変えない） */
+async function gua(second){if(!GUA)return;await say(second?"日にちを選ぶ前に、**もう1つだけ大事なこと**をお伝えします。":"もし、**やることを全部やっても届かなかったら？** 私たちは、ここまでお約束しています。");var w=card("warm");
+  head(w,second?"届かなかった時の、約束":"その時は、加盟金を全額お返しします");
+  var p=el("p","",second?"一緒に決めた行動をすべて行っても、2年間の粗利の合計が加盟金に届かなければ、加盟金を全額お返しします。":"決めた行動をすべて行っても、2年間で粗利の合計が加盟金に届かなければ、加盟金を全額返金します。粗利とは、売上から、スタッフと予約サイトに払うお金を引いた残りです。");w.appendChild(p);LINES.push(p.textContent);
+  var c=el("p","cond","決めた行動をすべて行い、その記録を出していただくことが条件です。くわしい条件は、面談でお渡しします。");w.appendChild(c);LINES.push(c.textContent);w.dataset.gua=second?"2":"1";show(w);await wait(2200)}
+
+/* 人が動く時期のクイズ */
+async function sSeason(){var q=SIZE(),y2=year(2,100),a=R(y2.profit),z=[Math.round(a*.5/100)*100,Math.round(a/10)*10,Math.round(a*2/100)*100];
+  h2("もう1つだけ、予想を","人を迎える時期と、初年度の利益の話です");
+  await say("年末から3月末は、人の移動（転職）が増える時期です。");
+  var g=await quiz("予想:初年度の利益","この間に人を雇っておいて、5月からの忙しい時期を迎えたら、初年度、**お店の利益（税金を払う前）**は、どのくらいになると思いますか？ あなたと、**スタッフ2人**で1年回した場合です。"+(q.solo?"さきほどのスタッフ1人の試算（およそ"+man(year(1,100).profit)+"）の、続きです。":""),z.map(function(v){return"約"+v.toLocaleString("ja-JP")+"万円"}),"スタッフ2人・3人・5人を、順に並べます。");prog();
+  var w=card();head(w,"暇な月が、5月を決める","スタッフを迎えた初年度の、利益の目安です");
+  await stage(w,"h1",{cue:[[0,"スタッフ2人で、初年度の利益の目安は、"+man(y2.profit)+"。"],[6,"3人なら、"+man(year(3,100).profit)+"。"],[10,"5人なら、"+man(year(5,100).profit)+"。税金を払う前の、例の数字です。"],[17,"1月から4月は、仕事が少ない月。この間に人を迎えて教え、5月からの忙しい月を、仲間と迎える形です。"]]});
+  await tiles(w,[["あなたとスタッフ2人の、初年度の利益",y2.profit,"o"],["スタッフ3人なら",year(3,100).profit],["スタッフ5人なら",year(5,100).profit]]);fine(w,"あなたの現場の分（年560万円）と、スタッフ1人あたり年約112万円を合わせた、税金を払う前の例の数字です。初年度は、研修と慣れの期間があるので、スタッフの分は控えめの数字にしています。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");
+  await say("あなたとスタッフ2人の初年度は、**およそ"+man(y2.profit)+"**でした。"+diff(z[g],a,"万円"));
+  await say("理由は1つ。仕事が少ない1月から4月に、人を迎えて教える時間が取れるからです。5月には、全員が現場に出られます。"+(q.st===3||q.st===5?"さきほど選ばれた"+q.n+"の数字と、同じ計算です。":q.st>=10?q.n+"をめざす場合も、最初の年は、同じ所から始まります。":""));
+  await say("人を迎える時期が見えると、次は、**あなた自身がいつ動くか**です。")}
+
+/* 進め方 */
+async function sWay(){
+  await say("これからの進め方は、どれに近いですか？");
+  var o=OWN()?["1年以内に、店の形を変えたい","3年くらいで、少しずつ変えたい","今のままでいい","まだわからない"]:PRO()?["1年以内に、自分の店を持ちたい","3年くらいで、自分の店を持ちたい","まだわからない","スタッフから始めたい"]:["1年以内に、独立したい","3年くらいで、独立したい","まだわからない","スタッフから始めたい"];
+  var x=await pick("進め方",o);prog();
+  var R={"1年以内に、独立したい":"1年のうちに、独立したいのですね。","3年くらいで、独立したい":"3年ほどかけて、独立したいのですね。","1年以内に、店の形を変えたい":"1年のうちに、今のお店の形から切りかえたいのですね。","3年くらいで、少しずつ変えたい":"今のお客様を大事にしながら、3年ほどかけて少しずつ変えたいのですね。","今のままでいい":"今のお店の形を、続けたいのですね。","1年以内に、自分の店を持ちたい":"1年のうちに、自分のお店を持ちたいのですね。","3年くらいで、自分の店を持ちたい":"3年ほどで、自分のお店を持ちたいのですね。","まだわからない":"進め方は、まだ見えていないのですね。","スタッフから始めたい":"先に現場で働いて、仕事を身につけたいのですね。"};
+  await say(R[x.l]||"進め方は「"+x.v+"」が近いのですね。");
+  if(x.l==="スタッフから始めたい"){await routeCard(false);return"staff"}
+  var g,w;
+  if(PRO()){
+    g=await quiz("予想:リストの登録","1つ、予想してみてください。私の店では、伺ったお客様のうち、次のお知らせを受け取るリストに登録してくださる方は、**どのくらい**だと思いますか？",["約3割","約6割","約9割"],"答えは、こちらです。");
+    w=card();head(w,"腕の次は、名簿","技術がある人が、次に持つものの話です");await tiles(w,[["お知らせのリストに登録してくださる方","約9割","o","三浦の店の目安です"]]);fine(w,"三浦の店の目安です。同じ結果をお約束するものではありません。");
+    await say("私の店の目安は、**約9割**です。"+(g===2?"予想どおりでした。":"「"+["約3割","約6割"][g]+"」という予想より、多い数です。"));
+    await say("理由は1つ。入りやすい値段で始める、期待を超えるサービスをする、口コミをいただく、という順番を守っているからです。リストからのご予約には、予約サイトの手数料がかかりません。");
+    await more("b5");
+    await say(x.l==="今のままでいい"?"今のお店の形のままでも、リストは育てられます。どこから手を付けるかは、面談で、今のお店の数字を伺ってから一緒に考えます。":"どこから変えるかは、今のお客様がどこから来ているかで決まります。面談で、一緒に順番を並べます。")}
+  else{
+    g=await quiz("予想:研修の日数","1つ、予想してみてください。研修で、実際に現場で動くのは、**何日くらい**だと思いますか？",["5〜8日","約1か月","約3か月"],"答えは、こちらです。");
+    w=card();head(w,"腕より先に、月が決まる","始めるまでの日数の目安です");await tiles(w,[["研修で実際に動く日","5〜8日","o"],["オンラインの研修なども入れて","約1か月"],["一人で回せるようになるまで","1〜3か月"]]);
+    await say("実際に動くのは、**5日から8日**です。"+(g===0?"予想どおりでした。":"「"+["","約1か月","約3か月"][g]+"」という予想より、短い日数です。")+"オンラインの研修なども入れると、1か月ほどみておくと安心です。");
+    await say("理由は1つ。現場で動く日のほかに、オンラインの研修などで覚える時間があるからです。");
+    await more("b1");
+    await say(x.l==="まだわからない"?"進め方が決まっていなくても、5月からの忙しい時期から逆算すると、動く月の候補が見えてきます。面談で、一緒に逆算できます。":"5月からの忙しい時期に間に合わせるには、今のお仕事の区切りから逆算します。面談で、一緒に逆算できます。")}
+  await routeCard(false);return"main"}
+
+/* いちばんの不安（1回目の面談で、ほどく所） */
+var WLIST=[];
+var WORRY={
+ "お金のこと（始めるお金・生活費）":{v:"c1",r:"お金のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。先に加盟した先輩たちが、**いちばん多く口にした心配**は、どれだと思いますか？",o:["技術のこと","始めるお金のこと","家族のこと"],hit:1,h:["値段は、最後でいい","始めるお金が心配な人へ、払う時期の話です"],t:[["先輩たちが、いちばん多く口にした心配","始めるお金","o"]],a:"いちばん多かったのは、**始めるお金のこと**でした。",a2:"同じ所で立ち止まった人が、たくさんいます。",why:"大事なのは、いくらかかるかと同じくらい、いつ払って、いつ戻るかです。払う時期は、仕事が入る時期に合わせて考えることができます。",pull:"払う時期と入る時期は、面談で、あなたの数字で並べます。"},
+ "家族のこと":{v:"c9",r:"ご家族のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。ご家族が反対する時、いちばん多い理由は、どちらだと思いますか？",o:["応援していないから","仕事の中身が見えないから"],hit:1,h:["説得より、予告編","家族に、どう話すかの話です"],t:[["ご家族が知りたいこと","3つ","o","仕事の中身／1年の収入の試算／困った時に相談できる人"]],a:"私の答えは、**仕事の中身が見えないから**、です。",why:"ご家族が知りたいのは、仕事の中身、1年の収入の試算、困った時に相談できる人がいるか、の3つです。3つが見えると、話しやすくなります。",pull:"面談は、ご家族と一緒に聞いていただけます。"},
+ "体力のこと":{v:"c10",r:"体力のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。1年のうち、仕事が少なく、**体の負担が軽くなる時期**は、いつだと思いますか？",o:["1月〜4月","5月〜8月","9月〜12月"],hit:0,h:["休む月は、先に決まっている","体力が不安な人へ、1年の流れの話です"],t:[["仕事が少ない月","1月〜4月","o"],["忙しい月","5月〜12月"]],a:"答えは、**1月から4月**です。",why:"1月から4月は、仕事が少ない月です。準備や、次の形を考える時間に使えます。動けるうちに順番を決めておくと、体の心配は「準備」に変わります。",pull:"何年後に、どの形になっていたいか。面談で、今のお仕事と年齢から一緒に考えます。"},
+ "お客様が来るかどうか":{v:"c7",r:"お客様が来てくださるかが、いちばんの不安なのですね。",q:"1つ、予想してみてください。私の店で、約1万件のお客様リストへ1週間ご案内した時、ご予約は**何件**入ったと思いますか？",o:["約70件","約670件","約1,700件"],hit:1,h:["安くするだけでは、忘れられる","お客様が来続ける、順番の話です"],t:[["1週間のご予約","667件","o"],["1週間の売上（利益ではありません）","1,200万円"]],fine:"2026年9月、三浦の店の1社の例です。利益ではなく売上です。同じ結果をお約束するものではありません。",a:"ご予約は、**667件**でした。",why:"入りやすい値段で始める、期待を超える、口コミをいただく、次のご予約につながる。順番を守ると、リストが育つからです。リストは、始めた日から、少しずつたまります。",pull:"あなたの地域で、最初のお客様をどう集めるか。面談で、一緒に考えます。"},
+ "人を雇うこと・教えること":{v:"c8",r:"人を雇うこと、教えることが、いちばんの不安なのですね。",q:"1つ、予想してみてください。一緒に働く人を1人か2人迎えるのに、**何人とお会いする**のが目安だと思いますか？",o:["3人","10人","20人"],hit:2,h:["20人に会って、1人でいい","人を雇えるか、教えられるかの話です"],t:[["お会いする人数の目安","20人","o"],["一緒に働く人","1〜2人"]],a:"目安は、**20人**です。",why:"たくさんお会いするから、合う人に会えます。求人の出し方、面接のやり方、教える順番は、仲間と一緒に使えます。ゼロから自分で作らなくて大丈夫です。",pull:"どんな人と、どんな順番で組むと良いか。面談で、一緒に考えます。"},
+ "うまくいかなかった時のこと":{v:"d5",r:"うまくいかなかった時のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。「ここまで減ったら立ち止まる」という線は、**いくつの数字**で決まると思いますか？",o:["1つ","3つ","10個"],hit:1,h:["怖がりは、才能","慎重な人が、先に引いておく線の話です"],t:[["立ち止まる線を決める数字","3つ","o","生活費／使ってよいお金／続ける月数"]],a:"答えは、**3つ**です。",a2:"生活費、使ってよいお金、続ける月数です。",why:"線が決まっていると、良い話の中から、自分に必要な話だけが見えてきます。さきほど、計画より少なかった年の数字も、先に見ましたね。",pull:"面談では、最初に3つの数字の線を、一緒に引きます。引いた結果、今はやめておく、という答えでも大丈夫です。"},
+ "加盟すると、今の自由がなくなること":{v:"b3",r:"加盟すると、今の自由がなくなることが、いちばんの不安なのですね。",q:"1つ、予想してみてください。加盟したあと、お店の**社長**は、だれだと思いますか？",o:["本部","あなた"],hit:1,h:["加盟しても、社長はあなた","加盟は、雇われることではないという話です"],t:[["加盟したあとの、お店の社長","あなた","o"]],a:"答えは、**あなた**です。",why:"加盟とは、独立した自分のお店を持ちながら、お店の名前や、お客様を集める方法、人を育てる方法を、仲間と一緒に使うことです。野球でいえば、自分のチームを持ちながら、練習のやり方と作戦ノートを分け合う形です。",pull:"今のお店で残すものと、変えるもの。面談で、一緒に分けてみます。"}};
+async function sWorry(){
+  h2("最後に、1つだけ","不安なことを、聞かせてください");
+  var list=PRO()?["お客様が来るかどうか","人を雇うこと・教えること","お金のこと（始めるお金・生活費）","家族のこと","体力のこと","加盟すると、今の自由がなくなること","うまくいかなかった時のこと"]:["お金のこと（始めるお金・生活費）","家族のこと","体力のこと","お客様が来るかどうか","人を雇うこと・教えること","うまくいかなかった時のこと"],got=[];
+  for(var n=0;n<2;n++){
+    await say(n?"ほかにも、不安なことはありますか？":"ここまで見て、**いちばん不安なこと**は、どれに近いですか？");
+    var none=n?"ほかには、ない":"今は、不安はない",x;
+    for(;;){x=await ask("不安"+(n+1),list.concat([OWNW,none]));if(x.l!==OWNW)break;var v=await free("不安"+(n+1),"ひとことで大丈夫です");if(v){x={l:OWNW,v:v};break}}
+    if(!n)prog();
+    if(x.l===none){await say(n?"ほかには、ないのですね。":"今のところ、不安はないのですね。では、ここまでをまとめます。");break}
+    if(x.l===OWNW){got.push("【自分の言葉】"+x.v);A["不安"]=got.join("、");WLIST=got;await say("「"+x.v+"」が不安なのですね。画面でお見せするより、直接お話ししたほうがよいことなので、面談で最初に伺います。");break}
+    got.push(x.l);A["不安"]=got.join("、");WLIST=got;list=list.filter(function(k){return k!==x.l});
+    var W=WORRY[x.l];await say(n?W.r.replace("が、いちばんの不安なのですね","も、不安なのですね"):W.r);var g=await quiz("予想:"+x.l,W.q,W.o,"答えは、こちらです。");
+    var w=card();head(w,W.h[0],W.h[1]);await tiles(w,W.t);if(W.fine)fine(w,W.fine);
+    await say(W.a+(g===W.hit?"予想どおりでした。":"「"+W.o[g]+"」という予想とは、ちがう答えでした。")+(W.a2||""));await say(W.why);await more(W.v);await say(W.pull)}
+  if(!A["不安"])A["不安"]="今は、不安はない";
+  await say("もう1つだけ、お伝えします。この仕事は、ひとりで始めても、**ひとりで抱える仕事ではありません。**");
+  var c=card();head(c,"ひとりで始めて、ひとりにしない","加盟した仲間どうしの、横のつながりの話です");var ol=el("ol","three");["求人の出し方、面接のやり方、教える順番は、仲間と一緒に使える（ゼロから自分で作らなくていい）","つまずいた所と、直し方を、仲間どうしで分け合える","仲間のお店どうしで、案件を共有する仕組みがある"].forEach(function(t){ol.appendChild(el("li","",t));LINES.push("・"+t)});c.appendChild(ol);show(c);await readWait(60);
+  await say("成果は、ひとりの頑張りより、**人と人のつながり**で出す。私たちが持っているのは、つながりで成果を出すための仕組みです。")}
+
+/* あなたの物語 */
+async function sStory(){var q=SIZE();
+  h2("主役が、入れかわる","ここから先は、あなたの話です");
+  var w=card("warm story");head(w,"まだ、1ページ目","あなたの答えでできた物語です");
+  var num=[A["見た数字:計画どおり"]&&"計画どおり "+A["見た数字:計画どおり"],A["見た数字:8割"]&&"8割 "+A["見た数字:8割"],A["見た数字:6割"]&&"6割 "+A["見た数字:6割"]].filter(Boolean).join("／");
+  [["はじまり",clean("きっかけ")],["今の立場",clean("立場")],["お金の管理",clean("お金の管理")],["組織の形",clean("人数")],["見た数字（1年の利益・税金の前・例の数字）",num],["これから",clean("進め方")],["不安なこと",clean("不安")],["あなたの道の名前",route()]].forEach(function(x){if(!x[1])return;var p=el("p","");p.appendChild(el("b","",x[0]));p.appendChild(document.createTextNode(x[1]));w.appendChild(p);LINES.push("［"+x[0]+"："+x[1]+"］")});
+  w.appendChild(el("p","end","この続きを、面談で一緒に書きましょう。"));LINES.push("この続きを、面談で一緒に書きましょう。");show(w);await wait(2200)}
+
+/* 決めの動画（面談に申し込む直前。選んだ人数ごと） */
+async function sKime(){var q=SIZE(),a=year(q.calc,100,q.full),b=year(q.calc,80,q.full),c=year(q.calc,60,q.full),m=A["お金の管理"]||"",n=q.solo?"あなたとスタッフ1人":"あなたとスタッフ"+q.n;
+  var KH={"自分ひとりで":"ひとりでも、柱は2本にできる","3人":"3人の1年は、もう見えている","5人":"5人の1年は、もう見えている","10人":"10人の1年は、もう見えている","20人":"20人の年は、もう見えている"}[q.n];
+  var w=card();head(w,KH,"ここまでに見た数字を、1つにつなげます");
+  var money=m.indexOf("どんぶり")>=0?"どんぶり勘定のままでも、使っていい額の見当がつきます。":m.indexOf("ノート")===0?"ノートやエクセルの計算は、押すだけに変わります。":m.indexOf("税理士")===0?"まかせたままで、入れた日のうちに自分でも見られます。":m.indexOf("まだ独立")===0?"独立する前から、練習できます。":"どんな付け方でも、残るお金と税金用が並びます。";
+  var cue=[[0,"ここまでを、1つにつなげます。"],[3,"押すだけの売上の画面で、残るお金が、押した瞬間に見えました。"+money],[11,n+(q.full?"は":"の1年は")+"、計画どおりなら利益"+man(a.profit)+"。8割なら"+man(b.profit)+"、6割なら"+man(c.profit)+"の計算です。"],[20,"残っているのは、1つだけです。始めるのにかかるお金を、何か月で取り戻せるか。"],[27,"面談で、あなたの数字を入れて、一緒に出します。"]];
+  var id="kime_"+(q.solo?1:q.st);SLOT[id]=SLOT[id]||{src:"",place:SLOT.kime.place};
+  await stage(w,id,{cue:cue,at:{2:async function(){await tiles(w,[[n+"・計画どおりの利益",a.profit,"o"],["計画の8割の利益",b.profit],["計画の6割の利益",c.profit]])}}});
+  if(SLOT[id].src)await tiles(w,[[n+"・計画どおりの利益",a.profit,"o"],["計画の8割の利益",b.profit],["計画の6割の利益",c.profit]]);
+  fine(w,"税金を払う前の、例の数字です。始めるのにかかるお金は、引いていません。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");await wait(600)}
+
+/* 面談へ */
+async function sInvite(){var wr=clean("不安"),first=(WLIST[0]||wr).replace("【自分の言葉】","");
+  await say("面談は、オンライン（Zoom）で、約60分です。ご家族と一緒でも大丈夫です。");
+  await say("最初の面談は、**あなたの不安を、1つずつ一緒にほどく時間**です。"+(wr&&wr!=="今は、不安はない"?"「"+first.replace(/（.*$/,"")+"」から、伺います。":"数字を見て出てきた疑問から、伺います。"));
+  var x=await ask("お誘い",["空いている日にちを見る","家族と一緒に聞きたい","今は決めない","メールで相談する"]);A["お誘い"]=x.l;prog();
+  if(x.l==="メールで相談する"){await say("まずはメールで、聞いてみたいのですね。下の欄に書いていただければ、三浦からメールでお返事します。");mailf();return}
+  if(x.l==="今は決めない"){
+    await say("今日は、まだ決めずにおきたいのですね。何がわかれば、決めやすくなりますか？");
+    var y=await pick("決めやすくなること",["お金のこと","家族のこと","時期のこと","もう少し考えたい","今回は見送りたい"]);
+    await say({"お金のこと":"お金の見通しが立つと、考えやすくなるのですね。面談では、払う時期と入る時期を並べて見られます。","家族のこと":"ご家族の気持ちが、気がかりなのですね。面談は、ご家族と一緒に聞いていただくこともできます。","時期のこと":"時期が、決め手になるのですね。面談で、何月から動くかだけを考えることもできます。","もう少し考えたい":"もう少し、ご自分の中で考えたいのですね。迷っている所を整理したくなった時に、面談をお使いください。","今回は見送りたい":"今回は、見送ると決められたのですね。ここまで時間を使って見てくださって、ありがとうございました。"}[y.l]||"「"+y.v+"」がわかると、決めやすくなるのですね。面談の時に、知りたいことからお話しすることもできます。");
+    if(y.l==="今回は見送りたい"){A["お誘い"]+=" → 見送り";return ending()}
+    x=await ask("お誘い2",["空いている日にちを見る","メールで相談する","今日はここまでにする"]);A["お誘い"]+=" → "+x.l;
+    if(x.l==="メールで相談する"){await say("まずはメールで、聞いてみたいのですね。下の欄に書いていただければ、三浦からメールでお返事します。");mailf();return}
+    if(x.l==="今日はここまでにする"){await say("今日は、ここまでですね。届いたメールから、いつでも続きをご覧いただけます。");return ending()}
+    await say("日にちだけ、先に見ておきたいのですね。")}
+  else await say(x.l==="家族と一緒に聞きたい"?"ご家族も一緒に、ですね。ご家族のご都合も合わせて、日にちをお選びください。":"では、空いている日にちを並べます。");
+  await gua(true);booking()}
+function ending(){var w=card();head(w,"続きは、いつでも","面談の日にちと、メールでの相談は、下から選べます");var r=el("div","rowbtn"),a=el("button","btn main","空いている日にちを見る"),b=el("button","btn","メールで相談する");a.type=b.type="button";r.appendChild(a);r.appendChild(b);w.appendChild(r);show(w);
+  a.onclick=async function(){track("押した","おわりのあと",a.textContent);w.remove();await gua(true);booking()};b.onclick=function(){track("押した","おわりのあと",b.textContent);w.remove();mailf()};finish()}
+function finish(){A["おわり"]="はい";document.body.dataset.done="1";brief()}
+
+/* 面談の日にち選び。空きは、三浦のGoogleカレンダーの空き（予約の仕組みの ?slots=1&type=mendan）。
+   BOOK_API が空のあいだは、受付の決まりどおりの見本の日にちを並べる。予約は、まだ送らない。 */
+var WD="日月火水木金土";
+function jst(iso){var d=new Date(new Date(iso).getTime()+9*3600000);return{m:d.getUTCMonth()+1,d:d.getUTCDate(),w:WD.charAt(d.getUTCDay()),h:d.getUTCHours(),mi:d.getUTCMinutes()}}
+function hm(t){return t.h+":"+(t.mi<10?"0":"")+t.mi}
+function sampleSlots(){var out=[],now=new Date();for(var k=1;k<=14;k++){var d=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()+k)),wd=d.getUTCDay(),ts=wd===0||wd===6?[[21,0],[21,30],[22,0]]:[[[10,0],[13,30],[19,0],[21,0]],[[9,30],[15,0],[20,30]],[[11,0],[16,30],[19,30],[22,0]]][k%3];ts.forEach(function(t){out.push(new Date(d.getTime()+(t[0]-9)*3600000+t[1]*60000).toISOString())})}return out}
+var slotsP=null;function loadSlots(){if(!slotsP)slotsP=BOOK_API?fetch(BOOK_API+"?slots=1&type=mendan").then(function(r){return r.json()}).then(function(j){return{real:true,slots:j&&j.slots||[]}}):Promise.resolve({real:false,slots:sampleSlots()});return slotsP}
+function booking(){var w=card();w.dataset.booking="1";head(w,"お話しする日を選ぶ","加盟の個別面談（オンライン・約60分）の、空いている日にちです");var body=el("div");w.appendChild(body);body.appendChild(el("p","msg","空いている日にちを、調べています…"));show(w);document.body.dataset.days="面談";track("面談","日にちを開いた","");
+  loadSlots().then(function(j){body.textContent="";var slots=j.slots;if(!slots.length){body.appendChild(el("p","msg","ただいま、選べる日にちがありません。下の「メールで相談する」から、ご希望の日にちをお知らせください。"));var mb=el("button","btn","メールで相談する");mb.type="button";mb.onclick=function(){mailf()};body.appendChild(mb);finish();return}
+    var by={},order=[];slots.forEach(function(iso){var t=jst(iso),k=t.m+"/"+t.d+"（"+t.w+"）";if(!by[k]){by[k]=[];order.push(k)}by[k].push(iso)});
+    body.appendChild(el("h4","","① お話しする日を選ぶ"));var days=el("div","chips"),tw=el("div"),fw=el("div"),chosen=null;body.appendChild(days);body.appendChild(tw);body.appendChild(fw);
+    if(!j.real)body.appendChild(el("p","pt","※ 試作のため、例の日にちを並べています。公開の時は、三浦の予定の空きだけが並びます。"));
+    order.forEach(function(k){var b=el("button","",k);b.type="button";b.onclick=function(){[].forEach.call(days.children,function(x){x.setAttribute("aria-pressed",String(x===b))});chosen=null;fw.textContent="";tw.textContent="";tw.appendChild(el("h4","","② 始まる時間を選ぶ（約60分・オンライン）"));var times=el("div","chips");tw.appendChild(times);
+      by[k].forEach(function(iso){var c=el("button","",hm(jst(iso)));c.type="button";c.onclick=function(){[].forEach.call(times.children,function(x){x.setAttribute("aria-pressed",String(x===c))});chosen=iso;form(k,hm(jst(iso)))};times.appendChild(c)});show(tw)};days.appendChild(b)});
+    function fld(l,t,ac,ph){var d=el("label","fld",l),i=el("input");i.type=t;if(ac)i.autocomplete=ac;if(ph)i.placeholder=ph;d.appendChild(i);return[d,i]}
+    function form(day,time){fw.textContent="";fw.appendChild(el("h4","","③ 最後に、連絡先だけ教えてください（"+day+" "+time+"〜）"));var two=el("div","two2"),s=fld("姓","text","family-name"),g=fld("名","text","given-name"),e=fld("メールアドレス","email","email"),p=fld("携帯番号","tel","tel");two.appendChild(s[0]);two.appendChild(g[0]);fw.appendChild(two);fw.appendChild(e[0]);fw.appendChild(p[0]);
+      var ok=el("button","btn main","この日にちで話を聞く"),m=el("p","msg");ok.type="button";ok.style.marginTop="14px";fw.appendChild(ok);fw.appendChild(m);fw.appendChild(el("p","pt","ご入力いただいた情報は、面談のご連絡のためだけに使います。"));show(fw);
+      ok.onclick=function(){if(!s[1].value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e[1].value.trim())||p[1].value.replace(/\D/g,"").length<10){m.textContent="お名前・メールアドレス・携帯番号をご確認ください。";return}
+        A["面談の日時"]=day+" "+time;track("面談","日にちを選んだ",day+" "+time);m.textContent="日にちの受付は、ただいま準備中です。まだ予約は入っていません。";ok.disabled=true;finish()}}
+  }).catch(function(){body.textContent="";body.appendChild(el("p","msg","空いている日にちを読み込めませんでした。少し時間をおいて、もう一度開いてください。"));finish()})}
+function mailf(){var w=card();w.dataset.mail="1";head(w,"Zoomの前に、ひとこと","メールで相談する所です。三浦から、メールでお返事します");function F(l,t,n){var d=el("label","fld",l),i=el(t);if(n)i.type=n;d.appendChild(i);w.appendChild(d);return i}
+  var nm=F("お名前","input","text"),em=F("メールアドレス","input","email"),se=F("相談したいこと","select");["始めるお金のこと","仕事の中身","人を雇うこと","家族のこと","時期のこと","ほかのこと"].forEach(function(o){se.appendChild(el("option","",o))});var ta=F("くわしく（自由に書けます）","textarea");ta.rows=3;
+  var r=el("div","rowbtn"),b=el("button","btn main","メールで相談する"),c=el("button","btn","空いている日にちを見る"),m=el("p","msg");b.type=c.type="button";r.appendChild(b);r.appendChild(c);w.appendChild(r);w.appendChild(m);
+  b.onclick=function(){if(!nm.value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())){m.textContent="お名前とメールアドレスをご確認ください。";return}track("メール相談","押した",se.value);m.textContent="メールの受付は、ただいま準備中です。まだ送られていません。";b.disabled=true};
+  c.onclick=async function(){track("押した","メール相談のあと",c.textContent);c.remove();await gua(true);booking()};show(w);finish()}
+
+/* スタッフ面接の道（費用の話なし・三浦の予定は出さない・面接は面接の担当） */
+var IV=[
+ {k:"この仕事が気になった理由",t:"たくさんある仕事の中で、この仕事が気になったのは、なぜですか？",o:["人に喜ばれる仕事がしたい","手に職をつけたい","収入を上げたい","時間を自由に使いたい","いつか独立したい"],r:{"人に喜ばれる仕事がしたい":"目の前の人に、喜んでもらえる仕事がしたいのですね。","手に職をつけたい":"どこへ行っても使える技術を、身につけたいのですね。","収入を上げたい":"今よりも、収入を上げたいのですね。","時間を自由に使いたい":"自分の時間の使い方を、自分で決めたいのですね。","いつか独立したい":"将来は、自分の力で立ちたいのですね。"},f:"「{v}」が理由なのですね。",next:"次は、働く場所です。"},
+ {k:"地域",t:"お仕事をするなら、どのあたりがいいですか？",o:["北海道・東北","東京・神奈川・千葉・埼玉","ほかの関東・甲信越","東海・北陸","関西","中国・四国","九州・沖縄"],r:{},f:"「{v}」のあたりですね。",next:"次は、働ける日数です。"},
+ {k:"働ける日",t:"週に、どのくらい働けますか？",o:["週5日くらい","週3〜4日","週1〜2日","土日だけ"],r:{"週5日くらい":"週のほとんどを、お仕事に使えるのですね。","週3〜4日":"週の半分くらいのペースですね。","週1〜2日":"週に1日か2日、少しずつのペースですね。","土日だけ":"土曜と日曜に、働きたいのですね。"},f:"働ける日は「{v}」なのですね。",next:"次は、移動のことです。"},
+ {k:"運転と車",t:"お客様のお宅へ伺うので、運転について教えてください。",o:["運転できて、車もある","運転できるが、車はない","運転しない"],r:{"運転できて、車もある":"運転も車も、両方そろっているのですね。","運転できるが、車はない":"運転はできて、車はお持ちでないのですね。車のことは、面接で話しましょう。","運転しない":"運転は、されないのですね。移動の方法は、面接で一緒に考えます。"},f:"運転については「{v}」なのですね。",next:"最後に、面接で聞きたいことを教えてください。"},
+ {k:"面接で聞きたいこと",t:"面接で、いちばん聞きたいことは何ですか？",o:["稼ぎ方","研修","1日の流れ","独立のこと","三浦のこと"],r:{"稼ぎ方":"収入がどう決まるのかを、聞きたいのですね。面接でくわしくお話しします。","研修":"何をどう教わるのかを、聞きたいのですね。面接で、研修の流れをお話しします。","1日の流れ":"朝から夕方までの動きを、知りたいのですね。面接で、実際の1日をたどってみましょう。","独立のこと":"独立までの道すじを、聞きたいのですね。面接で、順番を追ってお話しします。","三浦のこと":"私のことを、もう少し知りたいのですね。面接の担当からも、お話しします。"},f:"「{v}」を聞きたいのですね。面接の時に、遠慮なく聞いてください。",next:""}];
+async function interview(){document.body.dataset.staff="1";
+  h2("社長修行は、現場から","スタッフから始める道の、面接の前の質問です");
+  await say("スタッフから始める道には、**面接**があります。加盟の面談とは、別のものです。面接は、面接の担当がお話しします。");
+  await say("面接の前に、かんたんな質問があります。**評価する場ではなく、お互いに合うかどうかを確かめる時間**です。答えるたびに、面接カードが埋まります。");
+  var x=await ask("面接:はじめる",["はい、お願いします","やっぱり、独立の話も聞きたい","今日はここまでにする"]);A["面接:はじめる"]=x.l;
+  if(x.i===1){await say("独立の話も、並べて聞いてみたいのですね。では、独立の道の続きをお見せします。");delete document.body.dataset.staff;A["進め方"]+="（あとで：独立の話も聞きたい）";return"main"}
+  if(x.i===2){await say("面接の質問は、また今度にされるのですね。届いたメールから、いつでもここへ戻れます。");var w0=card();head(w0,"続きは、いつでも","面接の前の質問は、下から始められます");var b0=el("button","btn main","面接の前の質問を始める");b0.type="button";w0.appendChild(b0);show(w0);finish();return new Promise(function(ok){b0.onclick=function(){w0.remove();delete document.body.dataset.done;ok(interviewQ())}})}
+  return interviewQ()}
+async function interviewQ(){
+  await more("d4");
+  await say("では、始めます。最初に、私の店であった本当の話を1つ。");
+  await say("同じ道具、同じ技術、同じ出勤日数。なのに、初月の手取りが**59万円**の人と、もう1人、ちがう金額の人がいました。税金を払ったあとの手取りです。");
+  var g=await quiz("面接:予想","もう1人の手取りは、いくらだったと思いますか？",["約55万円","約45万円","約30万円"],"答えは、こちらです。");
+  var w=card();head(w,"腕は同じ、手取りは2倍","三浦の店であった、初月の手取りの話です");await tiles(w,[["3点セットをご案内していた人の、初月の手取り",59,"o"],["ご案内していなかった人の、初月の手取り",30]]);fine(w,"三浦の店の事実です。税金を払ったあとの手取りです。同じ結果をお約束するものではありません。");
+  await say("もう1人は、**30万円**でした。約2倍の差です。"+(g===2?"予想どおりでした。":"「"+["約55万円","約45万円"][g]+"」という予想より、大きな差でした。"));
+  await say("理由は1つ。差は技術ではなく、お客様に、3点セット（防カビ・室外機・ドレン）をご案内しているかどうか、だけでした。");
+  await say("良いことだけ話して、あとで驚かせたくないので、大変なことも先にお伝えします。夏は体力を使い、件数も多くなります。1月から4月は、1日1件の日や、仕事のない日もあります。");
+  await say("私たちは、お客様にも、一緒に働く仲間にも喜ばれて、ちゃんと手元に残る働き方を大事にしています。ここから、あなたのことを聞かせてください。");
+  for(var i=0;i<IV.length;i++){var q=IV[i];await say(q.t);var x=await pick("面接:"+q.k,q.o);
+    await say((x.own?q.f.replace("{v}",x.v):q.r[x.l]||x.l+"のあたりですね。")+(q.next?q.next:""));
+    var c=card("rw"),t=el("div","row");t.appendChild(el("span","","あなたの面接カード"));t.appendChild(el("output","",(i+1)+"つ目が、埋まりました"));c.appendChild(t);var g0=el("div","goal"),gi=el("i");gi.style.width=(i+1)/IV.length*100+"%";g0.appendChild(gi);c.appendChild(g0);show(c)}
+  var w2=card("warm story");head(w2,"あなたの面接カード","面接で、最初に見るカードです");IV.forEach(function(q){var p=el("p","");p.appendChild(el("b","",q.k));p.appendChild(document.createTextNode(clean("面接:"+q.k)));w2.appendChild(p);LINES.push("［"+q.k+"："+clean("面接:"+q.k)+"］")});show(w2);
+  await say("カードの内容は、合っていますか？");var y=await ask("面接:まとめ",["はい、合っています","少しちがいます"]);A["面接:まとめ"]=y.l;
+  await say(y.i?"カードに、ちがう所があるのですね。面接の時に、直しながら話しましょう。":"では、このカードをもとに、面接でお話ししましょう。");
+  await say("たくさん答えてくださって、ありがとうございました。次は、面接の日にちです。");
+  var w3=card();w3.dataset.staffdays="1";head(w3,"面接の日にちを選ぶ","スタッフ面接（オンライン）の日にちです");w3.appendChild(el("p","msg","面接の日にちを選ぶ所は、ただいま準備中です。準備ができしだい、届いたメールからご案内します。"));show(w3);track("面接","日にちの画面まで来た","");finish();return"end"}
+
+/* ---- 1回目の面談の前に、三浦が読む1枚（画面には出さない。?brief=1 の時だけ下に出す） ---- */
+function briefData(){var slow=EV.filter(function(e){return e.type==="押した"&&e.sec>=25&&!/^予想|はじめる/.test(e.key)}).map(function(e){return e.key+"（"+e.sec+"秒）"}),
+  own=Object.keys(A).filter(function(k){return String(A[k]).indexOf("【自分の言葉】")===0}).map(function(k){return k+"："+clean(k)}),
+  vague=Object.keys(A).filter(function(k){return /まだ|わからない|決めない/.test(A[k])&&!/^予想/.test(k)}).map(function(k){return k+"："+A[k]}),
+  guess=Object.keys(A).filter(function(k){return k.indexOf("予想:")===0}).map(function(k){return k.slice(3)+"→"+A[k]}),
+  see=[];var w=clean("不安");
+  if(w&&w!=="今は、不安はない")see.push("本人が選んだ不安："+w);
+  if((A["先に見る割合"]||"").indexOf("6割")>=0&&!SIZE().solo)see.push("6割の年を先に見た（下がった時のことを気にしている見立て）");
+  if(A["もう一方の割合"]==="今は見なくていい")see.push("もう一方の割合は見なかった");
+  if(/どんぶり/.test(A["お金の管理"]||""))see.push("お金の管理はどんぶり勘定（「いくら使っていいか」の話から）");
+  if(A["人数"]==="自分ひとりで")see.push("自分ひとりを選んだ（人を雇うことへの不安の見立て。動けない月の話を見ている）");
+  if(/まだ/.test(A["立場"]||"")||/まだ/.test(A["進め方"]||""))see.push("立場か進め方が「まだ」（決める材料が足りていない見立て）");
+  if(A["決めやすくなること"])see.push("今は決めない → 決めやすくなること："+clean("決めやすくなること"));
+  if(/家族/.test(A["お誘い"]||""))see.push("家族と一緒に聞きたい");
+  return{who:TOKEN||"（リンクの文字列なし）",start:START.toLocaleString("ja-JP"),answers:Object.keys(A).filter(function(k){return k.indexOf("予想:")&&k!=="はじめる"&&k.charAt(0)!=="_"&&k!=="おわり"}).map(function(k){return[k,String(A[k])]}),guess:guess,slow:slow,own:own,vague:vague,videos:Object.keys(VID).map(function(k){return k+" "+VID[k]+"%"}),see:see,route:A["道の名前"]||""}}
+function brief(){var d=briefData(),t=["【1回目の面談の前に読む1枚】","開いた人："+d.who+"　始めた時刻："+d.start,"道の名前："+d.route,"","■ 選んだ答え"].concat(d.answers.map(function(x){return"・"+x[0]+"："+x[1]}),["","■ 予想クイズ"],d.guess.map(function(x){return"・"+x}),["","■ 迷った所（答えるまで25秒以上・自分の言葉・まだ決めていない）"],d.slow.concat(d.own,d.vague).map(function(x){return"・"+x}),["","■ 見た動画と、どこまで見たか"],d.videos.map(function(x){return"・"+x}),["","■ 不安の見立て（1回目の面談で、ほどく所）"],d.see.map(function(x){return"・"+x})).join("\n");
+  if(QS.get("brief")==="1"){var b=$("brief");b.hidden=false;b.textContent=t}return t}
+
+/* ---- 流れ ---- */
+async function go(){
+  track("開いた","",TOKEN?"リンクあり":"リンクなし");
+  if(BOOK_API)loadSlots().catch(function(){});
+  await sStart();await sReason();await sPos();await sForm();await sMoney();await sSize();await sSeason();
+  var r=await sWay();if(r==="staff"){r=await interview();if(r!=="main")return}
+  await sWorry();await sStory();await sKime();await sInvite()}
+window.KAIWA={PLAN:PLAN,A:A,EV:EV,SEEN:SEEN,VID:VID,LINES:LINES,SLOT:SLOT,CUE:CUE,brief:brief,briefData:briefData,year:year};
+go().catch(function(e){document.body.dataset.err=String(e&&e.message||e);console.error(e)});
+})();
+</script>
+</body></html>
