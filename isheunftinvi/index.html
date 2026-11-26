@@ -38,7 +38,7 @@ dl{margin:0}
 .note{font-size:12.5px;color:var(--soft);margin:14px 0 0}
 @media(max-width:760px){main{padding:16px}h1{font-size:23px}.grid{grid-template-columns:minmax(0,1fr);gap:16px}.score dd{font-size:26px}.score>div{padding:10px 12px}.bars div{font-size:10px}}
 .hint{margin:6px 0 0;font-size:13px;color:var(--soft)}
-.tb{margin-top:12px;overflow-x:auto}.tb table{border-collapse:collapse;width:100%;font-size:14px}.tb th,.tb td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}.tb th{color:var(--soft);font-weight:400}.tb td:first-child,.tb th:first-child{text-align:left}.bars.many{gap:1px}.bars.many span{display:none}.bars .y1 i{opacity:.75}
+.tb{margin-top:12px;overflow-x:auto}.tb table{border-collapse:collapse;width:100%;font-size:14px}.tb th,.tb td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}.tb th{color:var(--soft);font-weight:400}.tb td:first-child,.tb th:first-child{text-align:left}.score dd.long{font-size:30px}@media(max-width:760px){.score dd.long{font-size:19px}.score{gap:10px}.tb table{font-size:12.5px}.tb th,.tb td{padding:5px 4px}}.bars.many{gap:1px}.bars.many span{display:none}.bars .y1 i{opacity:.75}
 </style></head><body><main>
 <h1>人数でわかる、売上と利益の診断</h1>
 <div class="grid"><section aria-label="条件">
@@ -105,8 +105,8 @@ if(typeof document!=="undefined"){(function(){
     $("next").textContent=solo?"":s.staff+"人がそろった年（1年じゅう"+s.staff+"人）：売上 "+M(c.next.sales)+"／利益 "+M(c.next.profit)+"／月にならすと 約"+M(c.next.profit/12);
     $("mode").hidden=solo;$("mode").style.display=solo?"none":"";$("mode-full").textContent=s.staff+"人がそろった年の棒";var full=!solo&&sel.mode===1;if(full){ms=c.next.months;max=Math.max.apply(null,ms.concat([1]))}
     $("mode").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.v===(full?1:0)))});
-    $("sales").textContent=M(T.sales);$("salesm").textContent="月の平均 "+M(T.sales/(12*Y))+"／現場 約"+n(T.jobs)+"件";
-    $("profit").textContent=M(T.profit);$("profitm").textContent="月の平均 "+M(T.profit/(12*Y));
+    $("sales").textContent=M(T.sales);$("sales").className=M(T.sales).length>8?"long":"";$("salesm").textContent="月の平均 "+M(T.sales/(12*Y))+"／現場 約"+n(T.jobs)+"件";
+    $("profit").textContent=M(T.profit);$("profit").className=(M(T.sales).length>8||M(T.profit).length>8)?"long":"";$("profitm").textContent="月の平均 "+M(T.profit/(12*Y));
     $("bars").className="bars"+(ms.length>12?" many":"");$("bars").style.gridTemplateColumns="repeat("+ms.length+",1fr)";
     $("bars").innerHTML=ms.map(function(v,i){var m=i%12;return'<div class="'+(m<4?"off":"")+(Math.floor(i/12)%2?" y1":"")+'"><span>'+n(v)+'</span><i style="height:'+Math.max(0,v/max*76)+'px"></i><span>'+(m+1)+"月</span></div>"}).join("");
     $("yt").innerHTML=Y>1?"<table><tr><th>年</th><th>年末のスタッフ</th><th>売上</th><th>利益（税金の前）</th></tr>"+c.years.map(function(a,i){return"<tr><td>"+(i+1)+"年目</td><td>"+a.end+"人</td><td>"+M(a.sales)+"</td><td>"+M(a.profit)+"</td></tr>"}).join("")+"</table>":"";
