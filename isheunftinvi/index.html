@@ -38,13 +38,15 @@ dl{margin:0}
 .note{font-size:12.5px;color:var(--soft);margin:14px 0 0}
 @media(max-width:760px){main{padding:16px}h1{font-size:23px}.grid{grid-template-columns:minmax(0,1fr);gap:16px}.score dd{font-size:26px}.score>div{padding:10px 12px}.bars div{font-size:10px}}
 .hint{margin:6px 0 0;font-size:13px;color:var(--soft)}
+.tb{margin-top:12px;overflow-x:auto}.tb table{border-collapse:collapse;width:100%;font-size:14px}.tb th,.tb td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}.tb th{color:var(--soft);font-weight:400}.tb td:first-child,.tb th:first-child{text-align:left}.bars.many{gap:1px}.bars.many span{display:none}.bars .y1 i{opacity:.75}
 </style></head><body><main>
 <h1>人数でわかる、売上と利益の診断</h1>
 <div class="grid"><section aria-label="条件">
-<div class="field big"><div class="row"><label for="staff">年末のスタッフの人数</label><output id="o-staff"></output></div><input id="staff" type="range" min="0" max="12" step="1" value="10"><p class="hint">1月に1人から始め、月に1人ずつ増えて、この人数になったら横ばいの計算です</p></div>
+<div class="field big"><div class="row"><label for="staff">めざすスタッフの人数</label><output id="o-staff"></output></div><input id="staff" type="range" min="0" max="100" step="1" value="10"><p class="hint" id="h-staff"></p></div>
 <div class="field"><label>自分も現場に出る</label><div class="seg" id="self"><button type="button" data-v="1">出る</button><button type="button" data-v="0">出ない</button></div></div>
 <div class="field"><label>計画に対して</label><div class="seg" id="rate"><button type="button" data-v="100">計画どおり</button><button type="button" data-v="80">8割</button><button type="button" data-v="60">6割</button></div></div>
-<div class="field"><div class="row"><label for="years">続けた年数（次の年からは年末の人数のまま）</label><output id="o-years"></output></div><input id="years" type="range" min="1" max="5" step="1" value="1"></div>
+<div class="field"><div class="row"><label for="years">何年分を見るか</label><output id="o-years"></output></div><input id="years" type="range" min="1" max="5" step="1" value="1"></div>
+<div class="field"><div class="row"><label for="per">月に何人ふやすか</label><output id="o-per"></output></div><input id="per" type="range" min="1" max="10" step="1" value="1"></div>
 <details id="more"><summary>細かい条件を変える</summary>
 <div class="field"><div class="row"><label for="on">1人の月売上 5〜12月</label><output id="o-on"></output></div><input id="on" type="range" min="20" max="150" step="5" value="70"></div>
 <div class="field"><div class="row"><label for="off">1人の月売上 1〜4月</label><output id="o-off"></output></div><input id="off" type="range" min="0" max="150" step="5" value="30"></div>
@@ -58,43 +60,60 @@ dl{margin:0}
 </section>
 <section aria-live="polite" aria-label="結果">
 <dl class="score">
-<div><dt>スタッフを増やす年の売上</dt><dd id="sales"></dd><span class="sub" id="salesm"></span></div>
-<div class="main"><dt>スタッフを増やす年の利益（税金の前）</dt><dd id="profit"></dd><span class="sub" id="profitm"></span></div>
+<div><dt id="t-sales">スタッフを増やす年の売上</dt><dd id="sales"></dd><span class="sub" id="salesm"></span></div>
+<div class="main"><dt id="t-profit">スタッフを増やす年の利益（税金の前）</dt><dd id="profit"></dd><span class="sub" id="profitm"></span></div>
 </dl>
 <p class="hint" id="next"></p>
-<div class="chart"><h2>スタッフを増やす年の月ごとの利益（万円）</h2><div class="bars" id="bars"></div></div>
+<div class="seg" id="mode" style="margin-top:8px"><button type="button" data-v="0">増やす年の棒</button><button type="button" data-v="1" id="mode-full">そろった年の棒</button></div>
+<div class="chart"><h2 id="t-bars">スタッフを増やす年の月ごとの利益（万円）</h2><div class="bars" id="bars"></div></div>
+<div class="tb" id="yt"></div>
 <div class="list"><h2>育っていくお客様リスト</h2><p id="listtext"></p></div>
 </section></div>
-<p class="note">試算の目安で、同じ結果の約束ではありません。利益は、売上×利益率（スタッフの報酬とポータルサイト利用料を引いた残りの目安）から、毎月の費用と月の経費を引いた、税金の前の額です。月の経費は仮の数字です。加盟金の支払い・道具や車を買うお金・自分の生活費は引いていません。スタッフが月に1人ずつ増え、だれも辞めない計算です。キャンペーンは、約1万件のリストに7日間ご案内して売上1,200万円だった1社の実績（2026年9月）の割合をもとに計算しています。売上で、利益ではありません。予約を受けきれる人数には限りがあります。</p>
+<p class="note">試算の目安で、同じ結果の約束ではありません。利益は、売上×利益率（スタッフの報酬とポータルサイト利用料を引いた残りの目安）から、毎月の費用と月の経費を引いた、税金の前の額です。月の経費は仮の数字です。加盟金の支払い・道具や車を買うお金・自分の生活費は引いていません。スタッフが決めた人数ずつ毎月増え、だれも辞めない計算です。キャンペーンは、約1万件のリストに7日間ご案内して売上1,200万円だった1社の実績（2026年9月）の割合をもとに計算しています。売上で、利益ではありません。予約を受けきれる人数には限りがあります。</p>
 </main><script>
-function year(s,full){
+/* 月 t（1から数える）のスタッフの人数：月に per 人ずつ増え、めざす人数で止まる */
+function staffAt(s,t){return Math.min(s.staff,t*(s.per||1))}
+function span(s,from,to){
   var r=s.rate/100,months=[],sales=0,jobs=0;
-  for(var m=1;m<=12;m++){var n=full?s.staff:Math.min(m,s.staff),p=(m<=4?s.off:s.on)*r,st=p*n,me=p*s.self;
+  for(var t=from;t<=to;t++){var m=(t-1)%12+1,n=staffAt(s,t),p=(m<=4?s.off:s.on)*r,st=p*n,me=p*s.self;
     sales+=st+me;jobs+=(st+me)*10000/s.unit;
     months.push(st*s.ms/100+me*s.me/100-s.roy-s.exp)}
-  return{sales:sales,profit:months.reduce(function(a,b){return a+b},0),months:months,jobs:jobs}}
+  return{sales:sales,profit:months.reduce(function(a,b){return a+b},0),months:months,jobs:jobs,end:staffAt(s,to)}}
+function year(s,full){return full?span({staff:s.staff,per:1000,self:s.self,rate:s.rate,on:s.on,off:s.off,ms:s.ms,me:s.me,roy:s.roy,exp:s.exp,unit:s.unit},1,12):span(s,1,12)}
 function calc(s){
-  var a=year(s,false),b=year(s,true),list=(a.jobs+b.jobs*(s.years-1))*s.reg/100;
-  return{sales:a.sales,profit:a.profit,months:a.months,jobs:a.jobs,next:b,list:list,camp:list*0.1134,book:list*0.06303}}
+  var ys=[],Y=s.years||1,tot={sales:0,profit:0,jobs:0,months:[]};
+  for(var y=1;y<=Y;y++){var a=span(s,(y-1)*12+1,y*12);ys.push(a);tot.sales+=a.sales;tot.profit+=a.profit;tot.jobs+=a.jobs;tot.months=tot.months.concat(a.months)}
+  var list=tot.jobs*s.reg/100,full=year(s,true);
+  return{sales:ys[0].sales,profit:ys[0].profit,months:ys[0].months,jobs:ys[0].jobs,years:ys,total:tot,next:full,list:list,camp:list*0.1134,book:list*0.06303,reach:s.staff?Math.ceil(s.staff/(s.per||1)):0}}
 if(typeof document!=="undefined"){(function(){
-  var $=function(i){return document.getElementById(i)},sel={self:1,rate:100},
-  ids=["staff","years","on","off","ms","me","roy","exp","unit","reg"],
-  u={staff:"人",years:"年",on:"万円",off:"万円",ms:"%",me:"%",roy:"万円",exp:"万円",unit:"円",reg:"%"};
+  var $=function(i){return document.getElementById(i)},sel={self:1,rate:100,mode:0},
+  ids=["staff","years","per","on","off","ms","me","roy","exp","unit","reg"],
+  u={staff:"人",years:"年分",per:"人ずつ",on:"万円",off:"万円",ms:"%",me:"%",roy:"万円",exp:"万円",unit:"円",reg:"%"};
   sel.self=0;
   var n=function(v){return Math.round(v).toLocaleString("ja-JP")};
+  var M=function(v){v=Math.round(v);var o=Math.floor(Math.abs(v)/10000),r=Math.abs(v)%10000;return(v<0?"-":"")+(o?o+"億"+(r?n(r)+"万円":"円"):n(r)+"万円")};
   function draw(){
     var s={self:sel.self,rate:sel.rate};
     ids.forEach(function(i){s[i]=+$(i).value;$("o-"+i).textContent=(i==="unit"?n(s[i]):s[i])+u[i]});
     ["self","rate"].forEach(function(g){$(g).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.v===sel[g]))})});
-    var c=calc(s),max=Math.max.apply(null,c.months.concat([1]));
-    $("next").textContent="次の年からは年末の人数のまま：売上 "+n(c.next.sales)+"万円／利益 "+n(c.next.profit)+"万円";
-    $("sales").textContent=n(c.sales)+"万円";$("salesm").textContent="月の平均 "+n(c.sales/12)+"万円／現場 約"+n(c.jobs)+"件";
-    $("profit").textContent=n(c.profit)+"万円";$("profitm").textContent="月の平均 "+n(c.profit/12)+"万円";
-    $("bars").innerHTML=c.months.map(function(v,i){return'<div class="'+(i<4?"off":"")+'"><span>'+n(v)+'</span><i style="height:'+Math.max(0,v/max*76)+'px"></i><span>'+(i+1)+"月</span></div>"}).join("");
-    $("listtext").innerHTML=s.years+"年でリストは約<b>"+n(c.list)+"件</b>。1回のキャンペーンで約<b>"+n(c.camp)+"万円</b>の売上（約"+n(c.book)+"件の予約）";
+    var c=calc(s),Y=s.years,solo=s.staff===0,T=Y>1?c.total:c.years[0],ms=T.months,max=Math.max.apply(null,ms.concat([1]));
+    var who=solo?"ひとりの":"スタッフを増やす",span_=Y>1?Y+"年":solo?"1年":"年";
+    $("t-sales").textContent=solo?"ひとりの"+(Y>1?Y+"年":"1年")+"の売上":Y>1?"スタッフを増やす"+Y+"年の売上（合計）":"スタッフを増やす年の売上";
+    $("t-profit").textContent=(solo?"ひとりの"+(Y>1?Y+"年":"1年")+"の利益":Y>1?"スタッフを増やす"+Y+"年の利益（合計）":"スタッフを増やす年の利益")+"（税金の前）";
+    $("t-bars").textContent=(!solo&&sel.mode===1)?s.staff+"人がそろった年の月ごとの利益（万円）":(solo?"ひとりの":"")+(Y>1?Y+"年分の":solo?"1年の":"スタッフを増やす年の")+"月ごとの利益（万円）";
+    $("h-staff").textContent=solo?"スタッフは0人。自分だけが現場に出る計算です":"1月に"+Math.min(s.per,s.staff)+"人から始め、月に"+s.per+"人ずつ増えて、"+s.staff+"人になったら横ばいの計算です（"+s.staff+"人がそろうのは"+c.reach+"か月目"+(c.reach>12*Y?"。見ている"+Y+"年の中では、"+c.years[Y-1].end+"人まで":"")+"）";
+    $("next").textContent=solo?"":s.staff+"人がそろった年（1年じゅう"+s.staff+"人）：売上 "+M(c.next.sales)+"／利益 "+M(c.next.profit)+"／月にならすと 約"+M(c.next.profit/12);
+    $("mode").hidden=solo;$("mode").style.display=solo?"none":"";$("mode-full").textContent=s.staff+"人がそろった年の棒";var full=!solo&&sel.mode===1;if(full){ms=c.next.months;max=Math.max.apply(null,ms.concat([1]))}
+    $("mode").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.v===(full?1:0)))});
+    $("sales").textContent=M(T.sales);$("salesm").textContent="月の平均 "+M(T.sales/(12*Y))+"／現場 約"+n(T.jobs)+"件";
+    $("profit").textContent=M(T.profit);$("profitm").textContent="月の平均 "+M(T.profit/(12*Y));
+    $("bars").className="bars"+(ms.length>12?" many":"");$("bars").style.gridTemplateColumns="repeat("+ms.length+",1fr)";
+    $("bars").innerHTML=ms.map(function(v,i){var m=i%12;return'<div class="'+(m<4?"off":"")+(Math.floor(i/12)%2?" y1":"")+'"><span>'+n(v)+'</span><i style="height:'+Math.max(0,v/max*76)+'px"></i><span>'+(m+1)+"月</span></div>"}).join("");
+    $("yt").innerHTML=Y>1?"<table><tr><th>年</th><th>年末のスタッフ</th><th>売上</th><th>利益（税金の前）</th></tr>"+c.years.map(function(a,i){return"<tr><td>"+(i+1)+"年目</td><td>"+a.end+"人</td><td>"+M(a.sales)+"</td><td>"+M(a.profit)+"</td></tr>"}).join("")+"</table>":"";
+    $("listtext").innerHTML=s.years+"年でリストは約<b>"+n(c.list)+"件</b>。1回のキャンペーンで約<b>"+M(c.camp)+"</b>の売上（約"+n(c.book)+"件の予約）";
   }
   ids.forEach(function(i){$(i).addEventListener("input",draw)});
-  ["self","rate"].forEach(function(g){$(g).addEventListener("click",function(e){var b=e.target.closest("button");if(b){sel[g]=+b.dataset.v;draw()}})});
+  ["self","rate","mode"].forEach(function(g){$(g).addEventListener("click",function(e){var b=e.target.closest("button");if(b){sel[g]=+b.dataset.v;draw()}})});
   draw();
 })()}
 if(typeof module!=="undefined")module.exports=calc;
