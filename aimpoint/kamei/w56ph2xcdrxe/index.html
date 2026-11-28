@@ -192,6 +192,16 @@ body{overflow-wrap:anywhere}
 .more[hidden]{display:none}
 html,body,#log{overflow-anchor:none}
 #log{display:flow-root}
+
+/* 2026-11-28：前提を大きく目立たせる箱 */
+.bigpre{margin:10px 0;padding:12px 14px;border:2px solid #ff7a2a;border-radius:12px;background:rgba(255,122,42,.12);box-shadow:0 0 16px rgba(255,122,42,.3)}
+.bigpre strong{display:block;font-size:21px;line-height:1.4;color:#ffd3b3;font-weight:900}
+.bigpre p{margin:6px 0 0;font-size:16px;line-height:1.7;color:#eef3ff}.bigpre p b{color:#ffab6b}
+.bigpre.self{border-color:#7fd3ff;background:rgba(127,211,255,.1);box-shadow:0 0 16px rgba(127,211,255,.3)}.bigpre.self strong{color:#cfeaff}
+@media(max-width:620px){.bigpre strong{font-size:19px}}
+.bigpre strong{font-size:24px}
+@media(max-width:620px){.bigpre strong{font-size:21px}}
+.pretag{display:inline-block;margin:10px 0 2px;padding:4px 12px;border-radius:999px;border:1.5px solid #ff7a2a;color:#ffd3b3;font-size:14.5px;font-weight:700;background:rgba(255,122,42,.12)}
 </style></head><body>
 <header><div class="in"><div class="brand"><span>ありがとうグループ　あなた専用の資料</span></div><div class="goal" style="margin-top:8px"><i id="pg" style="width:0"></i></div><div class="pt" id="pt">質問に答えるたびに、資料が出ます</div></div></header>
 <main><div class="in" id="log" aria-live="polite"></div></main>
@@ -204,8 +214,8 @@ html,body,#log{overflow-anchor:none}
    記録は track()。LOG_API が空のあいだは、どこにも送らない。 */
 var QS=new URLSearchParams(location.search);
 var FAST=QS.get("fast")==="1";
-var LOG_API="";   /* 記録の受け口（Apps Script）。公開の時に入れる。空なら送らない */
-var BOOK_API=window.BOOK_API||"";  /* 予約の仕組み（三浦のカレンダーの空き）。公開の時に入れる。空なら見本の日にち */
+var LOG_API=window.KAIWA_LOG||"";   /* 記録の受け口（Apps Script）。公開の時に入れる。空なら送らない */
+var BOOK_API=window.KAIWA_BOOK||window.BOOK_API||"";  /* 予約の仕組み（三浦のカレンダーの空き）。公開の時に入れる。空なら見本の日にち */
 var GUA=true;     /* 全額返金保証の表示。外す時は false */
 var TOKEN=(QS.get("k")||"").replace(/[^A-Za-z0-9_-]/g,"").slice(0,40);
 
@@ -256,11 +266,12 @@ var OWNW="この中にない（自分で書く）";
 async function pick(key,o,noOwn){for(;;){var x=await ask(key,noOwn?o:o.concat([OWNW]));if(x.l!==OWNW){A[key]=x.l;return{l:x.l,v:x.l,own:false}}var v=await free(key,"ひとことで大丈夫です");if(v){A[key]="【自分の言葉】"+v;return{l:OWNW,v:v,own:true}}}}
 function card(c){var w=add(el("div","w"+(c?" "+c:"")));return w}
 function head(w,a,b){w.appendChild(el("h3","gap",a));if(b)w.appendChild(el("p","sub2",b));LINES.push("【"+a+"｜"+(b||"")+"】")}
+function big(w,a,b){var d=el("div","bigpre");d.appendChild(el("strong","",a));if(b){var p=el("p","");txt(p,b);d.appendChild(p)}w.appendChild(d);LINES.push("《"+a+"》"+(b||"").replace(/\*\*/g,""));return d}
 function fine(w,s){w.appendChild(el("p","pt",s||"しくみを見ていただくための例の数字です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。"))}
 /* 数字のタイル。数は0から増えて止まる */
-async function tiles(w,list){var g=el("div","tiles"),T=[];list.forEach(function(x){var d=el("div",x[2]||"");d.appendChild(el("span","",x[0]));var s=el("strong",typeof x[1]==="number"?(man(x[1]).length>8?"long":""):(String(x[1]).length>6?"txt":""),typeof x[1]==="number"?"0万円":x[1]);d.appendChild(s);if(x[3])d.appendChild(el("small","",x[3]));g.appendChild(d);if(typeof x[1]==="number")T.push([s,x[1]]);LINES.push("［"+x[0]+" "+(typeof x[1]==="number"?man(x[1]):x[1])+"］")});w.appendChild(g);show(w);
-  if(T.length&&!STILL)for(var k=1;k<=28;k++){var e=1-Math.pow(1-k/28,3);T.forEach(function(x){x[0].textContent=man(x[1]*e)});await wait(38)}
-  T.forEach(function(x){x[0].textContent=man(x[1])});return g}
+async function tiles(w,list){var g=el("div","tiles"),T=[],TY=[];list.forEach(function(x){var d=el("div",x[2]||"");d.appendChild(el("span","",x[0]));var Y=x[1]&&typeof x[1]==="object";var s=el("strong",Y?"":typeof x[1]==="number"?(man(x[1]).length>8?"long":""):(String(x[1]).length>6?"txt":""),Y?"0円":typeof x[1]==="number"?"0万円":x[1]);if(Y)TY.push([s,x[1].yen]);d.appendChild(s);if(x[3])d.appendChild(el("small","",x[3]));g.appendChild(d);if(typeof x[1]==="number")T.push([s,x[1]]);LINES.push("［"+x[0]+" "+(x[1]&&typeof x[1]==="object"?yenS(x[1].yen):typeof x[1]==="number"?man(x[1]):x[1])+"］")});w.appendChild(g);show(w);
+  if((T.length||TY.length)&&!STILL){await seen(g);for(var k=1;k<=28;k++){var e=1-Math.pow(1-k/28,3);T.forEach(function(x){x[0].textContent=man(x[1]*e)});TY.forEach(function(x){x[0].textContent=yenS(x[1]*e)});await wait(38)}}
+  T.forEach(function(x){x[0].textContent=man(x[1])});TY.forEach(function(x){x[0].textContent=yenS(x[1])});return g}
 function bars(w,ms,cap){var mx=Math.max.apply(null,ms.concat([1])),b=el("div","bars"),L=el("div","bars");b.style.height="96px";L.style.height="auto";ms.forEach(function(v,i){var k=el("i",i<4?"off":"");k.style.height="2px";b.appendChild(k);L.appendChild(el("span","",(i+1)+"月"));setTimeout(function(){k.style.height=Math.max(2,v/mx*92)+"px"},STILL?0:120+i*70)});w.appendChild(el("div","row",cap||"月ごとの利益（灰色は、仕事が少ない1月〜4月）"));w.appendChild(b);w.appendChild(L)}
 function nextBtn(w,label){return new Promise(function(ok){var b=el("button","btn main",label||"続きへ");b.type="button";b.dataset.next="1";b.style.marginTop="10px";w.appendChild(b);b.addEventListener("click",function(){keepH();b.remove();ok()});if(FAST)setTimeout(function(){if(b.parentNode){b.remove();ok()}},0)})}
 
@@ -272,7 +283,7 @@ CUE.fx[5]=[16.92,"税金に取っておく分も、手元に残る目安も、�
 var SLOT={
  f0:{src:"media/f0_voice.mp4?v=1127d",voice:1,asks:1,len:"約56.7秒",place:"立場のすぐ後：最初の資料（売上を入れる画面）。最後はお金の管理の問い→すぐ選択肢",cue:[[0, "独立して潰れる人、腕のせいじゃないんです。"], [2.95, "稼いだお金をいくら使っていいか、知らないだけなんです。"], [6.14, "数字が苦手なのは、当たり前です。"], [8.31, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [14.17, "たとえば、壁掛けエアコン1台。8,900円。"], [18.0, "お掃除機能付き1台。売上は23,800円。"], [22.46, "スタッフに払うお金は9,818円。"], [25.81, "予約サイトから入った仕事なので、手数料は売上の3割（30%）。7,140円です。"], [31.41, "この1件で、お店に残るお金は6,842円です。"], [35.53, "いいところは3つ。①計算はしなくていい。押すだけで、お店に残るお金が出ます。"], [41.88, "②税金用のお金と、手元に残るお金の目安を、最初から分けてくれます。"], [46.82, "③今月の目標まで、あといくらかが、棒で見えます。"], [50.46, "数字は例で、同じ結果をお約束するものではありません。"], [53.53, "では、今、お店のお金は、どうやって管理していますか？"]]},
  f1:{src:"media/f1_voice.mp4?v=1127d",voice:1,asks:1,len:"約65.1秒",place:"お金の管理＝どんぶり勘定 の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "どんぶり勘定で、と選ばれましたね。そのままで大丈夫です。"], [3.82, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [9.74, "いつもの作業を押すだけ。壁掛けエアコン1台、お掃除機能付き1台。"], [14.99, "この1件で、お店に残るお金は6,842円。スタッフに払うお金と予約サイトの手数料は、もう引いてあります。"], [23.63, "次は、ひと月。1件17,000円の仕事を30件、売上51万円の月にします。"], [31.05, "お店に残るお金は197,610円。箱が2つに分かれます。"], [36.34, "左は、税金用に取っておくお金。59,283円。使わないお金です。"], [43.21, "右は、手元に残るお金の目安。138,327円。ここから、経費や生活費を考えます。"], [50.93, "今月の目標まで、あといくらかも、棒で見えています。"], [54.2, "どんぶりの中に仕切りが入るだけで、使っていい額の見当がつきます。"], [58.29, "数字は例で、同じ結果をお約束するものではありません。"], [61.57, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
- f2:{src:"media/f2_voice.mp4?v=1127d",voice:1,asks:1,len:"約41.6秒",place:"お金の管理＝ノートやエクセル の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "ノートやエクセル、と選ばれましたね。"], [2.24, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [7.49, "壁掛け＋お掃除機能付きの1件。予約サイトから入った仕事なら、手数料は売上の3割（30%）。"], [14.0, "この1件で、お店に残るお金は6,842円。"], [18.02, "次は、一度伺ったお客様の「お客様リスト」から入った仕事。お客様リストの手数料は0%です。"], [25.13, "予約サイトの手数料がかからないので、お店に残るお金は13,982円に増えました。"], [31.4, "数式は、1つも組んでいません。押しただけです。"], [34.6, "数字は例で、同じ結果をお約束するものではありません。"], [38.11, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
+ f2:{src:"media/f2_voice.mp4?v=1127d",voice:1,asks:1,len:"約41.6秒",place:"お金の管理＝ノートやエクセル の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "ノートやエクセル、と選ばれましたね。"], [2.24, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [7.49, "壁掛け＋お掃除機能付きの1件。予約サイトから入った仕事なら、手数料は売上の3割（30%）。"], [14.0, "この1件で、お店に残るお金は6,842円。"], [18.02, "次は、前に頼んでくださったお客様からの、もう一度のご依頼。「リピーター」から入った仕事。リピーターは予約サイトを通らないので、手数料は0%です。"], [25.13, "予約サイトの手数料がかからないので、お店に残るお金は13,982円に増えました。"], [31.4, "数式は、1つも組んでいません。押しただけです。"], [34.6, "数字は例で、同じ結果をお約束するものではありません。"], [38.11, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
  f3:{src:"media/f3_voice.mp4?v=1127d",voice:1,asks:1,len:"約43.1秒",place:"お金の管理＝税理士さん・家族 の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "税理士さんやご家族にまかせている、と選ばれましたね。"], [3.43, "これは、加盟した方が自分のお店で使う、売上を入れる画面の「数字が集まる所」です。"], [9.14, "1件17,000円の仕事を30件入れた月の例。売上は510,000円。"], [15.47, "スタッフに払うお金は210,390円。"], [18.85, "予約サイトに払うお金は102,000円。"], [22.12, "お店に残るお金は197,610円。"], [25.67, "月末の報告を待たなくていい。入れた当日に、ご自分の目で見られます。"], [29.94, "下には、月ごとの表が自動で並びます。"], [32.8, "最後の確認は、今までどおり、税理士さんやご家族に。"], [36.18, "数字は例で、同じ結果をお約束するものではありません。"], [39.63, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
  f4:{src:"media/f4_voice.mp4?v=1127d",voice:1,asks:1,len:"約35.4秒",place:"お金の管理＝まだ独立していない の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "まだ独立していない、と選ばれましたね。"], [2.38, "これは、加盟した方が自分のお店で使う、売上を入れる画面です。実際に押してみます。"], [7.89, "独立する前でも、料金の例が入っているので、押せば動きます。"], [11.51, "防カビ1つ、壁掛けエアコン2台。売上は20,300円。"], [16.5, "1台減らすと、売上は11,400円。"], [20.04, "上の数字を、お店に残るお金に切りかえます。"], [23.16, "まちがえても、減らすボタンで戻せます。"], [25.36, "始めてから覚えるのではなく、さわってから始められます。"], [28.76, "数字は例で、同じ結果をお約束するものではありません。"], [32.02, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
  fx:{src:"media/fx_voice.mp4?v=1127d",voice:1,asks:1,len:"約40.4秒",place:"お金の管理＝この中にない の続き（最後は人数の問い→すぐ選択肢）",cue:[[0, "ご自分のやり方を、教えていただきましたね。"], [2.54, "これは、加盟した方が自分のお店で使う、売上を入れる画面の「数字が集まる所」です。"], [7.97, "どんな付け方をしていても、最後に見たいのは、お店に残るお金だと思います。"], [12.34, "1件17,000円の仕事を30件入れた月の例。売上・スタッフに払うお金・予約サイトに払うお金・お店に残るお金。4つの数字が、もう並んでいます。"], [23.44, "税金用に取っておくお金も、手元に残るお金の目安も、すぐ下に。"], [27.56, "今月の目標まで、あといくらかも、棒で見えます。"], [30.67, "あちこち探さなくていい。だから、続けられます。"], [33.57, "数字は例で、同じ結果をお約束するものではありません。"], [36.76, "では、仮に、人に任せるなら、何人の組織にしたいですか？"]]},
@@ -334,7 +345,7 @@ async function stage(w,id,opt){opt=opt||{};if(SEEN.indexOf(id)>=0)throw new Erro
   else{box.appendChild(side);w.appendChild(box);show(box);await seen(box);
     for(var i=0;i<cue.length;i++){bubble(side,cue[i][1]);prog(Math.round((i+1)/cue.length*100));if(opt.at&&opt.at[i])await opt.at[i]();await readWait(cue[i][1].length)}
     prog(100)}}
-function sikumi(w,kind,open){var D={form:[["売上","お客様からいただく料金です（例：壁掛けエアコン1台 8,900円）。"],["スタッフに払うお金","作業したスタッフに払うお金です。ここでは売上の約4割（41.25%。口コミなどがそろって、多めに払う場合）で計算しています。"],["予約サイトに払うお金","予約サイトとは、お客様がお店を探して予約する、インターネットのサイトです。予約サイトから来たお客様の分は、売上の30%を手数料として払います。前にご利用いただいたお客様（お店のお客様リスト）からのご予約なら、手数料は0円です。"],["お店に残るお金","売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金を引く前。お店では粗利と呼びます）。ここから、お店の経費や生活費を考えます。"],["税金用","あとで慌てないように、先に分けておくお金の目安です。ここでは、お店に残るお金の3割にしています。正しい額は、税理士さんに確かめます。"],["手元に残る目安","お店に残るお金から、税金用を分けた残りです。"]],
+function sikumi(w,kind,open){var D={form:[["売上","お客様からいただく料金です（例：壁掛けエアコン1台 8,900円）。"],["スタッフに払うお金","作業したスタッフに払うお金です。ここでは売上の約4割（41.25%。口コミなどがそろって、多めに払う場合）で計算しています。"],["予約サイトに払うお金","予約サイトとは、お客様がお店を探して予約する、インターネットのサイトです。予約サイトから来たお客様の分は、売上の30%を手数料として払います。前に頼んでくださったお客様からの、もう一度のご依頼（リピーター）なら、予約サイトを通らないので、手数料は0円です。"],["お店に残るお金","売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金を引く前。お店では粗利と呼びます）。ここから、お店の経費や生活費を考えます。"],["税金用","あとで慌てないように、先に分けておくお金の目安です。ここでは、お店に残るお金の3割にしています。正しい額は、税理士さんに確かめます。"],["手元に残る目安","お店に残るお金から、税金用を分けた残りです。"]],
  profit:[["自分の現場の分","あなたが現場に出た分です。売上は、5月から12月の忙しい月は月80万円、1月から4月の暇な月は月40万円、1年で800万円で計算しています。予約サイトに払うお金や経費を引いて、約7割（年560万円）が残る計算です。三浦がひとりで現場に出た時の数字をもとにしています。"],["スタッフの分","スタッフが現場に出た分です。スタッフ1人が、忙しい月は月30件、暇な月は月13件、1件17,000円の仕事をすると、年の売上は約496万円。スタッフに約4割、予約サイトに3割を払って、お店に残るお金は約143万円。ガソリンや材料などの経費（月に約2万6千円）を引いて、1人あたり年に約112万円が残る計算です。初年度は、研修と慣れの期間があるので、控えめの数字にしています。"],["利益","自分の現場の分と、スタッフの分を、合わせた残りです。税金は、まだ払っていません。"],["計画の8割・6割","仕事の量が計画より少なかった年です。売上も利益も、同じ割合で少なくなる計算です。"]]}[kind];
   var G=el("details","trygl"),gs=el("summary","","この計算のしくみ");G.open=!!open;G.appendChild(gs);D.forEach(function(x){var p=el("p","");p.appendChild(el("b","",x[0]));p.appendChild(document.createTextNode("："+x[1]));G.appendChild(p)});w.appendChild(G)}
 
@@ -410,10 +421,14 @@ async function sPos(){
 async function sForm(){
   h2("最初の資料です","加盟した方が自分のお店で使う、売上を入れる画面を、お見せします");
   await say("売上は、全部がお店に残るわけではありません。作業したスタッフに払うお金、お客様を紹介してくれた予約サイトに払う手数料、あとから来る税金。売上から、先に出ていくお金があります。");
+  await say("これからお見せするのは、**スタッフが現場に行った場合**の数字です。あなたは現場に出ず、お店を回す側。だから、スタッフに払うお金を引きます。");
   await say("この引き算を、自分で計算しなくていいように作ったのが、**加盟した方が自分のお店で使う「売上を入れる画面」**です。作業が終わったら、あなたやスタッフが、スマートフォンで作業の内容を押すだけ。**いくら残って、いくらまで使っていいか**が、押した瞬間に分かります。");
-  var g=await quiz("予想:1件で残るお金","先に、予想してみてください。スタッフが、壁掛けエアコン1台と、お掃除機能付きエアコン1台を洗いました。売上は**23,800円**。ここから、スタッフに払うお金（売上の約4割）と、予約サイトに払う手数料（売上の3割）が、先に出ていきます。**お店に残るお金**は、いくらだと思いますか？ お店に残るお金とは、売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金は、まだ引いていません）。",["約17,000円","約12,000円","約6,800円"],"実際の画面に、入れてみます。");
-  var w=card();head(w,"計算は、しなくていい","加盟した方が使う、売上を入れる画面です。スタッフに払うお金から税金用まで、画面が計算するので、あなたは押すだけです");await stage(w,"f0");
-  await tiles(w,[["売上",yenS(23800)],["スタッフに払うお金（約4割）",yenS(9818)],["予約サイトの手数料（3割）",yenS(7140)],["お店に残るお金（経費と税金を引く前）",yenS(6842),"o",["予想は約17,000円。1万円ほど少ない数字でした","予想は約12,000円。5,000円ほど少ない数字でした","予想と、ほぼ同じでした"][g]]]);
+  var g=await quiz("予想:1件で残るお金","先に、予想してみてください。**あなたは現場に出ず**、スタッフが、壁掛けエアコン1台と、お掃除機能付きエアコン1台を洗いました。売上は**23,800円**。ここから、スタッフに払うお金（売上の約4割）と、予約サイトに払う手数料（売上の3割）が、先に出ていきます。**お店に残るお金**は、いくらだと思いますか？ お店に残るお金とは、売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金は、まだ引いていません）。",["約17,000円","約12,000円","約6,800円"],"実際の画面に、入れてみます。");
+  var w=card();head(w,"あなたは、1歩も動いていない","スタッフが現場に行った1件で、お店にいくら残るか。計算は、画面がします（加盟した方が使う、売上を入れる画面です）");big(w,"あなたは、現場に行っていません。","現場に行ったのは、スタッフです。あなたが現場にいた時間は、0時間。だから、売上の約4割をスタッフに払います。");await stage(w,"f0");
+  await tiles(w,[["売上",{yen:23800}],["スタッフに払うお金（約4割）",{yen:9818}],["予約サイトの手数料（3割）",{yen:7140}],["あなたが現場に行かずに、お店に残るお金（経費と税金を引く前）",{yen:6842},"o",["予想は約17,000円。1万円ほど少ない数字でした","予想は約12,000円。5,000円ほど少ない数字でした","予想と、ほぼ同じでした"][g]]]);
+  await wait(900);big(w,"動いていないのに、1件で6,842円が残りました。","あなたが現場にいた時間は、0時間です。");await wait(900);
+  await tiles(w,[["同じ1件に、あなたが自分で行った場合（スタッフに払うお金は0円）",{yen:16660},"o","売上の約7割が残ります"]]);
+  big(w,"自分で行けば、16,660円。任せても、動かずに6,842円。","任せる人が増えると、どうなるか。このあと、人数の場面でお見せします。").classList.add("self");
   fine(w,"画面の数字は、しくみを見ていただくための例です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");
   await tryit(true)}
 
@@ -423,14 +438,15 @@ async function sMoney(){
   var x=await pick("お金の管理",o);prog();var g,w,id;
   if(x.l==="ノートやエクセルでつけている"){id="f2";
     await say("ご自分で、手をかけて付けていらっしゃるのですね。ノートやエクセルだと、スタッフに払う割合や、予約サイトの手数料の計算式を、自分で組みますよね。");
-    g=await quiz("予想:お客様リスト","では、予想してみてください。さきほどと同じ仕事（売上23,800円）を、一度伺ったお客様（お客様リスト）からのご予約で入れると、お店に残るお金は6,842円から、いくらになると思いますか？",["変わらない（6,842円）","約1万円","約1万4,000円"],"画面で、押してみます。");
+    g=await quiz("予想:リピーター","では、予想してみてください。さきほどと同じ仕事（売上23,800円）が、**リピーター**から入ったとします。リピーターとは、前に頼んでくださったお客様からの、もう一度のご依頼のことです。この時、お店に残るお金は6,842円から、いくらになると思いますか？",["変わらない（6,842円）","約1万円","約1万4,000円"],"画面で、押してみます。");
     w=card();head(w,"数式は、もう組まなくていい","計算式は画面の中に入っているので、あなたは押すだけ。売上を入れる画面の続きです");await stage(w,id);
-    await tiles(w,[["予約サイトからの仕事で、お店に残るお金",yenS(6842),"","手数料30%（7,140円）を払う"],["お客様リストからの仕事で、お店に残るお金",yenS(13982),"o",["予想は6,842円のまま。7,140円多い数字でした","予想は約1万円。4,000円ほど多い数字でした","予想と、ほぼ同じでした"][g]]])}
+    big(w,"あなたは、現場に行っていません。","スタッフが行った同じ1件を、予約サイトから・リピーターからで、くらべます。");
+    await tiles(w,[["予約サイトからの仕事で、お店に残るお金",{yen:6842},"","手数料30%（7,140円）を払う"],["リピーターからの仕事で、お店に残るお金",{yen:13982},"o",["予想は6,842円のまま。7,140円多い数字でした","予想は約1万円。4,000円ほど多い数字でした","予想と、ほぼ同じでした"][g]]])}
   else if(x.l==="税理士さん・家族にまかせている"){id="f3";
     await say("数字のことは、信頼できる人にまかせていらっしゃるのですね。");
     g=await quiz("予想:いつ見られるか","では、予想してみてください。売上を入れる画面で入れた数字は、**いつ**、ご自分の目で見られると思いますか？",["月末","次の日","入れた当日に"],"画面で、お見せします。");
     w=card();head(w,"月末を、待たなくていい","まかせたままで、ご自分でも入れた当日に見られる。数字が集まる画面です");await stage(w,id);
-    await tiles(w,[["ご自分の目で見られるのは","入れた当日に","o",g===2?"予想どおりでした":"予想は「"+["月末","次の日"][g]+"」。もっと早く見られます"],["1件17,000円×30件の月・売上",yenS(510000)],["お店に残るお金（経費と税金を引く前）",yenS(197610)]])}
+    await tiles(w,[["ご自分の目で見られるのは","入れた当日に","o",g===2?"予想どおりでした":"予想は「"+["月末","次の日"][g]+"」。もっと早く見られます"],["スタッフが行った30件（1件17,000円）の月・売上",{yen:510000}],["あなたが現場に行かずに、お店に残るお金（経費と税金を引く前）",{yen:197610}]])}
   else if(x.l==="まだ独立していない"){id="f4";
     await say("まだ、お店のお金を管理する前なのですね。");
     g=await quiz("予想:独立前に使えるか","では、予想してみてください。売上を入れる画面は、**独立する前の人**にも、さわれると思いますか？",["さわれる","さわれない"],"画面で、お見せします。");
@@ -438,9 +454,10 @@ async function sMoney(){
     await tiles(w,[["独立する前の人も","さわれる","o",g===0?"予想どおりでした":"予想は「さわれない」。料金の例が入っているので、押せば動きます"],["防カビ1つ＋壁掛け2台の売上",yenS(20300)]])}
   else{id=x.own?"fx":"f1";
     await say(x.own?"「"+x.v+"」という付け方なのですね。":"なんとなくの感覚で、回していらっしゃるのですね。");
-    g=await quiz("予想:使っていいお金","では、予想してみてください。1件17,000円の仕事を30件入れた月（売上51万円）。スタッフと予約サイトに払ったあと、お店に残るお金は197,610円でした。このうち、**使っていい目安**は、いくらだと思いますか？",["全部（197,610円）","約14万円","約7万円"],"画面で、お見せします。");
+    g=await quiz("予想:使っていいお金","では、予想してみてください。1件17,000円の仕事を30件入れた月（売上51万円）。**スタッフが現場に行った場合**で、スタッフと予約サイトに払ったあと、お店に残るお金は197,610円でした。このうち、**使っていい目安**は、いくらだと思いますか？",["全部（197,610円）","約14万円","約7万円"],"画面で、お見せします。");
     w=card();if(x.own)head(w,"探し物は、1枚で終わる","売上、税金用、目標が並ぶ。数字が集まる画面です");else head(w,"どんぶりは、直さなくていい","どんぶり勘定のままで、使っていい額が見える。売上を入れる画面の続きです");await stage(w,id);
-    await tiles(w,[["お店に残るお金（経費と税金を引く前）",yenS(197610)],["税金用に取っておくお金（使わない）",yenS(59283)],["手元に残るお金の目安（使っていい目安）",yenS(138327),"o",["予想は全部。59,283円少ない数字でした","予想と、ほぼ同じでした","予想は約7万円。7万円ほど多い数字でした"][g]]])}
+    big(w,"あなたは、現場に行っていません。","スタッフが行った30件（1件17,000円）の月の数字です。");
+    await tiles(w,[["お店に残るお金（経費と税金を引く前）",{yen:197610}],["税金用に取っておくお金（使わない）",{yen:59283}],["あなたが現場に行かずに、手元に残るお金の目安（使っていい目安）",{yen:138327},"o",["予想は全部。59,283円少ない数字でした","予想と、ほぼ同じでした","予想は約7万円。7万円ほど多い数字でした"][g]]])}
   fine(w,"画面の数字は、しくみを見ていただくための例です。実際の金額は、お店によって変わります。同じ結果をお約束するものではありません。");
   A._asked=true}
 
@@ -448,21 +465,23 @@ async function sMoney(){
 function yenS(v){return Math.round(v).toLocaleString("ja-JP")+"円"}
 async function tryit(inline){var MN3=[["壁掛け",8900],["お掃除機能付き",14900],["3点セット（防カビ・室外機・ドレン）",7000]],q=[1,1,0],rt=0,w=card("try");head(w,"自分で、押してみる","今の動画と同じ計算を、あなたの指で試せます（押さずに、下の質問へ進んでも大丈夫です）。押した数字は、このページの中だけで計算します");
   if(inline){var dd=el("details","trygl tryopen"),sm=el("summary","","ここを押すと開きます：自分の指で、計算を動かす");dd.appendChild(sm);w.appendChild(dd);w=dd}
-  w.appendChild(el("p","trypre","スタッフが現場に行った場合の計算です（あなたは現場に入らず、お店を回す側）。"));
+  var who=0,pre=big(w,"あなたは、現場に行っていません。","スタッフが行った仕事の計算です（あなたが現場にいた時間：0時間）。下の「自分で行く」を押すと、スタッフに払うお金が0円になり、残るお金が増えます。"),tag1=el("p","pretag",""),tag2=el("p","pretag","");
+  w.appendChild(el("div","row","だれが現場に行く？"));var wg=el("div","seg tryseg");["スタッフが行く（約4割を払う）","自分で行く（払うお金は0円）"].forEach(function(x,i){var b=el("button","",x);b.type="button";b.addEventListener("click",function(){who=i;track("押した","さわれる計算:だれが行く",x);draw(true)});wg.appendChild(b)});w.appendChild(wg);
   function receipt(rows){var box=el("div","tryex"),o={};rows.forEach(function(x){var d=el("div","trycalc"+(x[3]?" "+x[3]:"")),a=el("span","",x[1]),b=el("span","v","0円"),s=el("small","",x[2]||"");a.appendChild(s);d.appendChild(a);d.appendChild(b);box.appendChild(d);o[x[0]]={d:d,v:b,s:s}});return[box,o]}
-  var r1=receipt([["s","お客様からいただく売上",""],["p","− スタッフに払うお金","売上の約4割"],["f","− 予約サイトに払うお金","売上の30%"],["g","＝ お店に残るお金","ガソリン代などの経費を引く前","last"]]);w.appendChild(r1[0]);
+  w.appendChild(tag1);var r1=receipt([["s","お客様からいただく売上",""],["p","− スタッフに払うお金","売上の約4割"],["f","− 予約サイトに払うお金","売上の30%"],["g","＝ お店に残るお金","ガソリン代などの経費を引く前","last"]]);w.appendChild(r1[0]);
   var hint=el("p","pt","さきほどの画面と同じ、壁掛け1台とお掃除機能付き1台から始まります。下の「＋」「−」を押すと、上の引き算が動きます。");w.appendChild(hint);
-  var rg=el("div","seg tryseg");w.appendChild(el("div","row","どこから来たお客様？"));w.appendChild(el("p","pt","予約サイト＝お客様がお店を探して予約するサイト（売上の30%を手数料として払う）。お客様リスト＝前に伺ったお客様（手数料は0円）。"));["予約サイト（手数料30%）","お客様リスト（手数料0%）"].forEach(function(x,i){var b=el("button","",x);b.type="button";b.addEventListener("click",function(){rt=i;draw(true)});rg.appendChild(b)});w.appendChild(rg);
+  var rg=el("div","seg tryseg");w.appendChild(el("div","row","どこから来たお客様？"));w.appendChild(el("p","pt","予約サイト＝お客様がお店を探して予約するサイト（売上の30%を手数料として払う）。リピーター＝前に頼んでくださったお客様からの、もう一度のご依頼（予約サイトを通らないので、手数料は0円）。"));["予約サイト（手数料30%）","リピーター（手数料0%）"].forEach(function(x,i){var b=el("button","",x);b.type="button";b.addEventListener("click",function(){rt=i;draw(true)});rg.appendChild(b)});w.appendChild(rg);
   var ns=[];MN3.forEach(function(x,i){var d=el("div","tryrow"),t=el("div"),g=el("div","trybt"),a=el("button","","−"),n=el("b","","0"),c=el("button","","＋");t.appendChild(el("span","",x[0]));t.appendChild(el("small","",yen(x[1])));a.type=c.type="button";a.setAttribute("aria-label",x[0]+"を減らす");c.setAttribute("aria-label",x[0]+"を増やす");g.appendChild(a);g.appendChild(n);g.appendChild(c);d.appendChild(t);d.appendChild(g);w.appendChild(d);ns.push(n);a.addEventListener("click",function(){q[i]=Math.max(0,q[i]-1);draw(true)});c.addEventListener("click",function(){q[i]=Math.min(3,q[i]+1);draw(true)})});
   function slide(id,l,a,b,v){var d=el("div","row"),t=el("label","",l),o=el("output",""),s=el("input");s.type="range";s.min=a;s.max=b;s.value=v;s.id=id;t.htmlFor=id;d.appendChild(t);d.appendChild(o);w.appendChild(d);w.appendChild(s);s.addEventListener("input",function(){draw(false)});return[s,o]}
   w.appendChild(el("div","trym","お店の仕事を、1か月続けたら"));w.appendChild(el("p","pt","ここからは、1件あたり17,000円（お客様1件の平均の金額）で計算します。上の1件の例とは別の、平均の数字です。"));
-  var A1=slide("try-n","月に何件？",10,60,30),B1=slide("try-l","お客様リストからのご予約は？",0,100,33);
-  var r2=receipt([["S","1か月の売上","1件17,000円 × 件数"],["P","− スタッフに払うお金","売上の約4割"],["F","− 予約サイトに払うお金",""],["G","＝ お店に残るお金","ガソリン代などの経費を引く前","last"],["T","− 税金用に取っておくお金","残るお金の3割を目安に"],["K","＝ 手元に残るお金の目安","","last"]]);w.appendChild(r2[0]);
+  var A1=slide("try-n","月に何件？",10,60,30),B1=slide("try-l","リピーターからのご依頼は？",0,100,33);
+  w.appendChild(tag2);var r2=receipt([["S","1か月の売上","1件17,000円 × 件数"],["P","− スタッフに払うお金","売上の約4割"],["F","− 予約サイトに払うお金",""],["G","＝ お店に残るお金","ガソリン代などの経費を引く前","last"],["T","− 税金用に取っておくお金","残るお金の3割を目安に"],["K","＝ 手元に残るお金の目安","","last"]]);w.appendChild(r2[0]);
   sikumi(w,"form",true);fine(w,"しくみを見ていただくための例です。割合も金額も、お店によって変わります。同じ結果をお約束するものではありません。");
   var O=Object.assign({},r1[1],r2[1]),cur={},tm=0;Object.keys(O).forEach(function(k){cur[k]=0});
-  function draw(anim){var sale=MN3.reduce(function(a,x,i){return a+x[1]*q[i]},0),pay=Math.round(sale*.4125),fee=Math.round(sale*.3),n=+A1[0].value,l=Math.round(n*B1[0].value/100),U=17000,T={s:sale,p:pay,f:rt?0:fee,S:U*n,P:Math.round(U*.4125)*n,F:Math.round(U*.3)*(n-l)};T.g=T.s-T.p-T.f;T.G=T.S-T.P-T.F;T.T=Math.round(T.G*.3);T.K=T.G-T.T;
+  function draw(anim){var sale=MN3.reduce(function(a,x,i){return a+x[1]*q[i]},0),pay=who?0:Math.round(sale*.4125),fee=Math.round(sale*.3),n=+A1[0].value,l=Math.round(n*B1[0].value/100),U=17000,T={s:sale,p:pay,f:rt?0:fee,S:U*n,P:who?0:Math.round(U*.4125)*n,F:Math.round(U*.3)*(n-l)};
+    [].forEach.call(wg.children,function(b,i){b.setAttribute("aria-pressed",String(i===who))});pre.firstChild.textContent=who?"あなたが、自分で現場に行った場合です。":"あなたは、現場に行っていません。";tag1.textContent=tag2.textContent=who?"あなたが自分で行った仕事（スタッフに払うお金：0円）":"スタッフが行った仕事（あなたが現場にいた時間：0時間）";pre.classList.toggle("self",!!who);O.p.s.textContent=who?"自分で行ったので、0円":"売上の約4割";O.p.d.classList.toggle("zero",!!who&&sale>0);O.P.s.textContent=who?"自分で行ったので、0円":"売上の約4割";T.g=T.s-T.p-T.f;T.G=T.S-T.P-T.F;T.T=Math.round(T.G*.3);T.K=T.G-T.T;
     ns.forEach(function(e,i){e.textContent=q[i]});A1[1].textContent=n+"件";B1[1].textContent=l+"件";[].forEach.call(rg.children,function(b,i){b.setAttribute("aria-pressed",String(i===rt))});
-    O.f.s.textContent=rt?"お客様リストから来た方なので、0円":"売上の30%";O.f.d.classList.toggle("zero",!!rt&&sale>0);O.F.s.textContent=l?"予約サイトの"+(n-l)+"件分。お客様リストの"+l+"件は0円":"売上の30%";
+    O.f.s.textContent=rt?"リピーターなので、0円":"売上の30%";O.f.d.classList.toggle("zero",!!rt&&sale>0);O.F.s.textContent=l?"予約サイトの"+(n-l)+"件分。リピーターの"+l+"件は0円":"売上の30%";
     var F0=Object.assign({},cur),id=++tm,step=0,keys=["s","p","f","g","S","P","F","G","T","K"],max=anim&&!STILL?20:1;(function tick(){if(id!==tm)return;step++;keys.forEach(function(k,i){var u=max===1?1:Math.max(0,Math.min(1,(step-Math.min(i,3)*3)/(max-9))),e=1-Math.pow(1-u,3);cur[k]=F0[k]+(T[k]-F0[k])*e;O[k].v.textContent=yen(cur[k])});if(step<max)setTimeout(tick,30)})()}
   draw(false);if(!inline){show(w);await nextBtn(w)}}
 
@@ -484,8 +503,9 @@ async function team(q){var n=q.n,y=year(q.st,100),mon=R(y.profit/12),z=opts3(mon
   await say(E[n][1]);
   var g=await quiz("予想:月に残るお金","予想してみてください。あなたとスタッフ"+n+"で1年回した場合、計画どおりなら、**お店に残るお金は、平均してひと月にいくら**になると思いますか？ あなたの現場の分とスタッフの分を合わせて、払うお金と経費を引いた残りです（税金を払う前）。",z.map(function(v){return"約"+v+"万円"}),"数字で、確かめます。");
   var w=card();head(w,E[n][0],"あなたとスタッフ"+n+"の、1年の売上と、お店に残るお金の目安です");
+  big(w,"スタッフの分は、あなたが現場に行かずに残るお金です。","あなたの現場の分（年560万円）に、あなたが動かない分として、スタッフ1人あたり年に約112万円が重なります。");
   await stage(w,q.st===20?"e20":q.k+"_100");
-  await tiles(w,[["あなたの現場の分で、残るお金",y.selfP],["スタッフ"+n+"の分で、残るお金",y.staffP],["合わせて、1年でお店に残るお金（経費を引いたあと・税金の前）",y.profit,"o"],["ひと月あたり（平均）",y.profit/12,"o",diff(z[g],mon,"万円").replace("予想より、","予想より").replace("数字です。","数字でした").replace("でした。","でした")],["1年の売上（合わせて）",y.sales]]);bars(w,y.ms,"月ごとの、お店に残るお金（灰色は、仕事が少ない1月〜4月）");sikumi(w,"profit",false);fine(w);
+  await tiles(w,[["あなたの現場の分で、残るお金",y.selfP],["スタッフ"+n+"の分（あなたは現場に行かない）で、残るお金",y.staffP],["合わせて、1年でお店に残るお金（経費を引いたあと・税金の前）",y.profit,"o"],["ひと月あたり（平均）",y.profit/12,"o",diff(z[g],mon,"万円").replace("予想より、","予想より").replace("数字です。","数字でした").replace("でした。","でした")],["1年の売上（合わせて）",y.sales]]);bars(w,y.ms,"月ごとの、お店に残るお金（灰色は、仕事が少ない1月〜4月）");sikumi(w,"profit",false);fine(w);
   A["見た数字:計画どおり"]=man(y.profit)}
 
 async function solo(){
@@ -498,8 +518,9 @@ async function solo(){
   var x=await ask("予想:スタッフ1人",opts);A["予想:スタッフ1人"]=x.l;
   await say("「"+x.l.replace(/（.*$/,"")+"」と予想されたのですね。もしスタッフが1人でもいたら、こういう試算になります。");
   var w2=card();head(w2,"柱を、もう1本","スタッフが1人いる場合の、1年の試算です");
+  big(w2,"スタッフの分は、あなたが現場に行かずに残るお金です。","あなたの現場の分（年560万円）は変えずに、スタッフ1人の分として、年に約112万円が重なります。");
   await stage(w2,"s1b");
-  await tiles(w2,[["あなたの現場の分で、残るお金",y1.selfP],["スタッフ1人の分で、残るお金",y1.staffP],["合わせて、1年でお店に残るお金（経費を引いたあと・税金の前）",y1.profit,"o",["予想は約"+a+"万円のまま。"+(b-a)+"万円多い数字でした","予想と、ぴったり同じでした","予想は約"+(a*2).toLocaleString("ja-JP")+"万円。"+(a*2-b)+"万円少ない数字でした"][x.i]],["ひと月あたり（平均）",y1.profit/12,"o"],["あなたが動けない忙しい月に、入ってくる目安","約"+STAFFBUSY()+"万円","","スタッフ1人の現場の分"]]);
+  await tiles(w2,[["あなたの現場の分で、残るお金",y1.selfP],["スタッフ1人の分（あなたは現場に行かない）で、残るお金",y1.staffP],["合わせて、1年でお店に残るお金（経費を引いたあと・税金の前）",y1.profit,"o",["予想は約"+a+"万円のまま。"+(b-a)+"万円多い数字でした","予想と、ぴったり同じでした","予想は約"+(a*2).toLocaleString("ja-JP")+"万円。"+(a*2-b)+"万円少ない数字でした"][x.i]],["ひと月あたり（平均）",y1.profit/12,"o"],["あなたが動けない忙しい月に、入ってくる目安","約"+STAFFBUSY()+"万円","","スタッフ1人の現場の分"]]);
   bars(w2,y1.ms,"スタッフ1人の1年・月ごとに残るお金");fine(w2);A["見た数字:計画どおり"]=man(y1.profit)+"（スタッフ1人）"}
 
 /* 計画の8割・6割。選ぶたびに進む。動画の最後の問いのすぐ後に、選択肢を出す */
@@ -549,7 +570,7 @@ async function sWay(){
     g=await quiz("予想:リストの登録","1つ、予想してみてください。私の店では、伺ったお客様のうち、次のお知らせを受け取るリストに登録してくださる方は、**どのくらい**だと思いますか？",["約3割","約6割","約9割"],"答えは、こちらです。");
     w=card();head(w,"腕の次は、名簿","技術がある人が、次に持つものの話です");await tiles(w,[["お知らせのリストに登録してくださる方","約9割","o","三浦の店の目安です"]]);fine(w,"三浦の店の目安です。同じ結果をお約束するものではありません。");
     await say("私の店の目安は、**約9割**です。"+(g===2?"予想どおりでした。":"「"+["約3割","約6割"][g]+"」という予想より、多い数です。"));
-    await say("理由は1つ。入りやすい値段で始める、期待を超えるサービスをする、口コミをいただく、という順番を守っているからです。リストからのご予約には、予約サイトの手数料がかかりません。");
+    await say("理由は1つ。入りやすい値段で始める、期待を超えるサービスをする、口コミをいただく、という順番を守っているからです。お知らせを見てくださった方からの、もう一度のご依頼（リピーター）には、予約サイトの手数料がかかりません。");
     await more("b5");
     await say(x.l==="今のままでいい"?"今のお店の形のままでも、リストは育てられます。どこから手を付けるかは、面談で、今のお店の数字を伺ってから一緒に考えます。":"どこから変えるかは、今のお客様がどこから来ているかで決まります。面談で、一緒に順番を並べます。")}
   else{
@@ -567,7 +588,7 @@ var WORRY={
  "お金のこと（始めるお金・生活費）":{v:"c1",r:"お金のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。先に加盟した先輩たちが、**いちばん多く口にした心配**は、どれだと思いますか？",o:["技術のこと","始めるお金のこと","家族のこと"],hit:1,h:["値段は、最後でいい","始めるお金が心配な人へ、払う時期の話です"],t:[["先輩たちが、いちばん多く口にした心配","始めるお金","o"]],a:"いちばん多かったのは、**始めるお金のこと**でした。",a2:"同じ所で立ち止まった人が、たくさんいます。",why:"大事なのは、いくらかかるかと同じくらい、いつ払って、いつ戻るかです。払う時期は、仕事が入る時期に合わせて考えることができます。",pull:"払う時期と入る時期は、面談で、あなたの数字で並べます。"},
  "家族のこと":{v:"c9",r:"ご家族のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。ご家族が反対する時、いちばん多い理由は、どちらだと思いますか？",o:["応援していないから","仕事の中身が見えないから"],hit:1,h:["説得より、予告編","家族に、どう話すかの話です"],t:[["ご家族が知りたいこと","3つ","o","仕事の中身／1年の収入の試算／困った時に相談できる人"]],a:"私の答えは、**仕事の中身が見えないから**、です。",why:"ご家族が知りたいのは、仕事の中身、1年の収入の試算、困った時に相談できる人がいるか、の3つです。3つが見えると、話しやすくなります。",pull:"面談は、ご家族と一緒に聞いていただけます。"},
  "体力のこと":{v:"c10",r:"体力のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。1年のうち、仕事が少なく、**体の負担が軽くなる時期**は、いつだと思いますか？",o:["1月〜4月","5月〜8月","9月〜12月"],hit:0,h:["休む月は、先に決まっている","体力が不安な人へ、1年の流れの話です"],t:[["仕事が少ない月","1月〜4月","o"],["忙しい月","5月〜12月"]],a:"答えは、**1月から4月**です。",why:"1月から4月は、仕事が少ない月です。準備や、次の形を考える時間に使えます。動けるうちに順番を決めておくと、体の心配は「準備」に変わります。",pull:"何年後に、どの形になっていたいか。面談で、今のお仕事と年齢から一緒に考えます。"},
- "お客様が来るかどうか":{v:"c7",r:"お客様が来てくださるかが、いちばんの不安なのですね。",q:"1つ、予想してみてください。私の店で、約1万件のお客様リストへ1週間ご案内した時、ご予約は**何件**入ったと思いますか？",o:["約70件","約670件","約1,700件"],hit:1,h:["安くするだけでは、忘れられる","お客様が来続ける、順番の話です"],t:[["1週間のご予約","667件","o"],["1週間の売上（利益ではありません）","1,200万円"]],fine:"2026年9月、三浦の店の1社の例です。利益ではなく売上です。同じ結果をお約束するものではありません。",a:"ご予約は、**667件**でした。",why:"入りやすい値段で始める、期待を超える、口コミをいただく、次のご予約につながる。順番を守ると、リストが育つからです。リストは、始めた日から、少しずつたまります。",pull:"あなたの地域で、最初のお客様をどう集めるか。面談で、一緒に考えます。"},
+ "お客様が来るかどうか":{v:"c7",r:"お客様が来てくださるかが、いちばんの不安なのですね。",q:"1つ、予想してみてください。私の店で、お知らせを受け取ってくださっているお客様（約1万件）へ、1週間ご案内した時、ご予約は**何件**入ったと思いますか？",o:["約70件","約670件","約1,700件"],hit:1,h:["安くするだけでは、忘れられる","お客様が来続ける、順番の話です"],t:[["1週間のご予約","667件","o"],["1週間の売上（利益ではありません）","1,200万円"]],fine:"2026年9月、三浦の店の1社の例です。利益ではなく売上です。同じ結果をお約束するものではありません。",a:"ご予約は、**667件**でした。",why:"入りやすい値段で始める、期待を超える、口コミをいただく、次のご予約につながる。順番を守ると、リストが育つからです。リストは、始めた日から、少しずつたまります。",pull:"あなたの地域で、最初のお客様をどう集めるか。面談で、一緒に考えます。"},
  "人を雇うこと・教えること":{v:"c8",r:"人を雇うこと、教えることが、いちばんの不安なのですね。",q:"1つ、予想してみてください。一緒に働く人を1人か2人迎えるのに、**何人とお会いする**のが目安だと思いますか？",o:["3人","10人","20人"],hit:2,h:["20人に会って、1人でいい","人を雇えるか、教えられるかの話です"],t:[["お会いする人数の目安","20人","o"],["一緒に働く人","1〜2人"]],a:"目安は、**20人**です。",why:"たくさんお会いするから、合う人に会えます。求人の出し方、面接のやり方、教える順番は、仲間と一緒に使えます。ゼロから自分で作らなくて大丈夫です。",pull:"どんな人と、どんな順番で組むと良いか。面談で、一緒に考えます。"},
  "うまくいかなかった時のこと":{v:"d5",r:"うまくいかなかった時のことが、いちばんの不安なのですね。",q:"1つ、予想してみてください。「ここまで減ったら立ち止まる」という線は、**いくつの数字**で決まると思いますか？",o:["1つ","3つ","10個"],hit:1,h:["怖がりは、才能","慎重な人が、先に引いておく線の話です"],t:[["立ち止まる線を決める数字","3つ","o","生活費／使ってよいお金／続ける月数"]],a:"答えは、**3つ**です。",a2:"生活費、使ってよいお金、続ける月数です。",why:"線が決まっていると、良い話の中から、自分に必要な話だけが見えてきます。さきほど、計画より少なかった年の数字も、先に見ましたね。",pull:"面談では、最初に3つの数字の線を、一緒に引きます。引いた結果、今はやめておく、という答えでも大丈夫です。"},
  "加盟すると、今の自由がなくなること":{v:"b3",r:"加盟すると、今の自由がなくなることが、いちばんの不安なのですね。",q:"1つ、予想してみてください。加盟したあと、お店の**社長**は、だれだと思いますか？",o:["本部","あなた"],hit:1,h:["加盟しても、社長はあなた","加盟は、雇われることではないという話です"],t:[["加盟したあとの、お店の社長","あなた","o"]],a:"答えは、**あなた**です。",why:"加盟とは、独立した自分のお店を持ちながら、お店の名前や、お客様を集める方法、人を育てる方法を、仲間と一緒に使うことです。野球でいえば、自分のチームを持ちながら、練習のやり方と作戦ノートを分け合う形です。",pull:"今のお店で残すものと、変えるもの。面談で、一緒に分けてみます。"}};
@@ -648,12 +669,25 @@ function booking(){var w=card();w.dataset.booking="1";head(w,"お話しする日
     function form(day,time){fw.textContent="";fw.appendChild(el("h4","","③ 最後に、連絡先だけ教えてください（"+day+" "+time+"〜）"));var two=el("div","two2"),s=fld("姓","text","family-name"),g=fld("名","text","given-name"),e=fld("メールアドレス","email","email"),p=fld("携帯番号","tel","tel");two.appendChild(s[0]);two.appendChild(g[0]);fw.appendChild(two);fw.appendChild(e[0]);fw.appendChild(p[0]);
       var ok=el("button","btn main","この日にちで話を聞く"),m=el("p","msg");ok.type="button";ok.style.marginTop="14px";fw.appendChild(ok);fw.appendChild(m);fw.appendChild(el("p","pt","ご入力いただいた情報は、面談のご連絡のためだけに使います。"));show(fw);
       ok.onclick=function(){if(!s[1].value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e[1].value.trim())||p[1].value.replace(/\D/g,"").length<10){m.textContent="お名前・メールアドレス・携帯番号をご確認ください。";return}
-        A["面談の日時"]=day+" "+time;track("面談","日にちを選んだ",day+" "+time);m.textContent="日にちの受付は、ただいま準備中です。まだ予約は入っていません。";ok.disabled=true;finish()}}
+        A["面談の日時"]=day+" "+time;track("面談","日にちを選んだ",day+" "+time);
+        if(!j.real||!BOOK_API){m.textContent="日にちの受付は、ただいま準備中です。まだ予約は入っていません。";ok.disabled=true;finish();return}
+        ok.disabled=true;m.textContent="日にちを、お取りしています…";
+        var name=(s[1].value.trim()+" "+g[1].value.trim()).trim(),note=["会話型の資料から","道の名前："+(A["道の名前"]||""),"きっかけ："+clean("きっかけ"),"立場："+clean("立場"),"人数："+clean("人数"),"進め方："+clean("進め方"),"不安："+clean("不安"),(A["お誘い"]||"").indexOf("家族")>=0?"ご家族と一緒に聞きたい":""].filter(Boolean).join("／").slice(0,480);
+        fetch(BOOK_API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({type:"mendan",start:chosen,name:name,email:e[1].value.trim(),phone:p[1].value.trim(),note:note,nick:"",src:(location.pathname+(TOKEN?"?k="+TOKEN:"")).slice(0,200)})})
+          .then(function(r){return r.json()}).then(function(x){
+            if(x&&x.ok){track("面談","予約が入った",x.when||(day+" "+time));body.textContent="";var d=el("div","");d.appendChild(el("h4","","お話しする日が決まりました"));d.appendChild(el("p","msg",(x.when||(day+" "+time))+"（オンライン・約60分）"));d.appendChild(el("p","","確認のメールと、Zoomの入り方をお送りしました。当日、お話しできるのを楽しみにしています。"));body.appendChild(d);finish();return}
+            ok.disabled=false;m.textContent=x&&x.error==="taken"?"選ばれた時間は、たった今うまりました。おそれいりますが、別の時間をお選びください。":"うまく送れませんでした。入力をご確認のうえ、もう一度お試しください。"})
+          .catch(function(){ok.disabled=false;m.textContent="通信がうまくいきませんでした。もう一度お試しください。"})}}
   }).catch(function(){body.textContent="";body.appendChild(el("p","msg","空いている日にちを読み込めませんでした。少し時間をおいて、もう一度開いてください。"));finish()})}
 function mailf(){var w=card();w.dataset.mail="1";head(w,"Zoomの前に、ひとこと","メールで相談する所です。三浦から、メールでお返事します");function F(l,t,n){var d=el("label","fld",l),i=el(t);if(n)i.type=n;d.appendChild(i);w.appendChild(d);return i}
   var nm=F("お名前","input","text"),em=F("メールアドレス","input","email"),se=F("相談したいこと","select");["始めるお金のこと","仕事の中身","人を雇うこと","家族のこと","時期のこと","ほかのこと"].forEach(function(o){se.appendChild(el("option","",o))});var ta=F("くわしく（自由に書けます）","textarea");ta.rows=3;
   var r=el("div","rowbtn"),b=el("button","btn main","メールで相談する"),c=el("button","btn","空いている日にちを見る"),m=el("p","msg");b.type=c.type="button";r.appendChild(b);r.appendChild(c);w.appendChild(r);w.appendChild(m);
-  b.onclick=function(){if(!nm.value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())){m.textContent="お名前とメールアドレスをご確認ください。";return}track("メール相談","押した",se.value);m.textContent="メールの受付は、ただいま準備中です。まだ送られていません。";b.disabled=true};
+  b.onclick=function(){if(!nm.value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())){m.textContent="お名前とメールアドレスをご確認ください。";return}track("メール相談","押した",se.value);
+    if(!LOG_API){m.textContent="メールの受付は、ただいま準備中です。まだ送られていません。";b.disabled=true;return}
+    b.disabled=true;m.textContent="お送りしています…";
+    fetch(LOG_API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({kind:"soudan",k:TOKEN,sid:SID,name:nm.value.trim(),mail:em.value.trim(),topic:se.value,text:ta.value.trim().slice(0,2000)})})
+      .then(function(r){return r.json()}).then(function(x){if(x&&x.ok){m.textContent="受け付けました。三浦から、メールでお返事します。"}else{b.disabled=false;m.textContent="うまく送れませんでした。もう一度お試しください。"}})
+      .catch(function(){b.disabled=false;m.textContent="通信がうまくいきませんでした。もう一度お試しください。"})};
   c.onclick=async function(){track("押した","メール相談のあと",c.textContent);c.remove();await gua(true);booking()};show(w);finish()}
 
 /* スタッフ面接の道（費用の話なし・三浦の予定は出さない・面接は面接の担当） */
