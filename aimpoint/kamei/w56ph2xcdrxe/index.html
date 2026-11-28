@@ -172,7 +172,7 @@ input[type=range]{accent-color:#ff7a2a}
 @media(max-width:759px){.stage .bub{height:156px}.stage video{max-height:calc(100svh - 290px)}}
 
 /* 2026-11-26 夜：スマホで左右に揺れない・数字がはみ出さない */
-html,body{max-width:100%;overflow-x:hidden}
+html{max-width:100%;overflow-x:hidden}body{max-width:100%;overflow-x:clip}
 body{overflow-wrap:anywhere}
 .in{width:100%}
 .w,.tiles,.tiles div,.stage,.tryex,.b>div{min-width:0;max-width:100%}
@@ -186,6 +186,12 @@ body{overflow-wrap:anywhere}
 .trycalc.last .v,.tiles div.o strong{transform:none!important}
 
 .tryopen>summary{display:inline-block;list-style:none;padding:10px 18px;border:2px solid #ff7a2a;border-radius:999px;color:#ffd3b3;font-weight:700;box-shadow:0 0 12px rgba(255,122,42,.4)}.tryopen>summary::-webkit-details-marker{display:none}.tryopen[open]>summary{margin-bottom:10px}
+
+/* 2026-11-28：続きの印（画面は勝手に動かさない） */
+.more{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:6;font:inherit;font-size:15px;font-weight:700;min-height:44px;padding:8px 20px;border-radius:999px;border:2px solid #ff7a2a;background:rgba(4,5,13,.94);color:#ffd3b3;box-shadow:0 0 16px rgba(255,122,42,.55);cursor:pointer}
+.more[hidden]{display:none}
+html,body,#log{overflow-anchor:none}
+#log{display:flow-root}
 </style></head><body>
 <header><div class="in"><div class="brand"><span>ありがとうグループ　あなた専用の資料</span></div><div class="goal" style="margin-top:8px"><i id="pg" style="width:0"></i></div><div class="pt" id="pt">質問に答えるたびに、資料が出ます</div></div></header>
 <main><div class="in" id="log" aria-live="polite"></div></main>
@@ -209,10 +215,24 @@ function man(v){v=Math.round(v);var o=Math.floor(v/10000),r=v%10000;return o>0?o
 function yen(v){return Math.round(v).toLocaleString("ja-JP")+"円"}
 function txt(d,s){String(s).split("**").forEach(function(p,i){if(p)d.appendChild(i%2?el("b","",p):document.createTextNode(p))})}
 function add(e){log.appendChild(e);return e}
-function show(e){if(!FAST)e.scrollIntoView({block:"center",behavior:"smooth"})}
+function keepH(){if(!FAST)log.style.minHeight=Math.max(log.offsetHeight,parseFloat(log.style.minHeight)||0)+"px"}
+/* SPEED：吹き出しの出る速さの倍率（1＝1文字0.12秒・最短2.5秒。1.5なら1文字0.08秒・最短1.7秒）。ここだけ変える。
+   MOVE："none"＝新しい物が出ても画面を動かさない（下に続きがある時は「↓ 続きがあります」の印）。"nearest"＝新しい物の分だけ少し送る。 */
+var SPEED=+QS.get("speed")||1.5,MOVE=QS.get("move")==="nearest"?"nearest":"none";
+var HEAD=function(){var h=document.querySelector("header");return h?h.getBoundingClientRect().bottom:0};
+function below(){var k=log.lastElementChild;return!!k&&k.getBoundingClientRect().bottom>innerHeight+4}
+function firstUnseen(){var c=log.children;for(var i=0;i<c.length;i++){if(c[i].getBoundingClientRect().top>=innerHeight-24)return c[i]}for(i=c.length-1;i>=0;i--){if(c[i].getBoundingClientRect().bottom>innerHeight+4)return c[i]}return null}
+var chip=null;function mark(){if(FAST)return;if(!chip){chip=el("button","more","↓ 続きがあります");chip.type="button";chip.hidden=true;document.body.appendChild(chip);
+    chip.addEventListener("click",function(ev){ev.stopPropagation();var t=firstUnseen();if(!t)return;var r=t.getBoundingClientRect();
+      if(r.top>=innerHeight-24)scrollBy({top:r.top-HEAD()-12,behavior:"smooth"});else scrollBy({top:Math.min(r.bottom-innerHeight+24,innerHeight*.7),behavior:"smooth"})});
+    addEventListener("scroll",function(){chip.hidden=!below()},{passive:true});addEventListener("resize",function(){chip.hidden=!below()})}
+  chip.hidden=!below()}
+function show(e){if(FAST)return;if(MOVE==="nearest")e.scrollIntoView({block:"nearest",behavior:"smooth"});requestAnimationFrame(mark)}
+/* 見える所に来るまで待つ（動画は、見えてから流し始める） */
+function seen(e){if(FAST)return Promise.resolve();return new Promise(function(ok){var io=new IntersectionObserver(function(x){if(x.some(function(y){return y.isIntersecting&&y.intersectionRatio>=.5})){io.disconnect();ok()}},{threshold:[.5]});io.observe(e)})}
 var SKIP=null;function wait(n){return new Promise(function(ok){setTimeout(ok,FAST?0:n)})}
 /* 読む時間。画面（吹き出しのあたり）をさわると、待たずに次へ進む */
-function readWait(len){if(FAST)return Promise.resolve();return new Promise(function(ok){var t=setTimeout(fin,Math.min(15000,Math.max(2500,len*120)));function fin(){clearTimeout(t);SKIP=null;ok()}SKIP=fin})}
+function readWait(len){if(FAST)return Promise.resolve();return new Promise(function(ok){var t=setTimeout(fin,Math.min(15000,Math.max(2500,len*120))/SPEED);function fin(){clearTimeout(t);SKIP=null;ok()}SKIP=fin})}
 document.addEventListener("click",function(e){if(SKIP&&!e.target.closest("button,input,textarea,select,video,summary,a"))SKIP()});
 var STILL=FAST||matchMedia("(prefers-reduced-motion:reduce)").matches;
 
@@ -228,9 +248,9 @@ function note(s,c){var p=add(el("p",c||"note",s));return p}
 function h2(a,b){add(el("h2","",a));if(b)add(el("p","note",b));LINES.push("＝＝"+a+"｜"+(b||"")+"＝＝")}
 function me(t){var m=el("div","me");m.appendChild(el("span","",t));add(m);show(m)}
 function cls(l){return /独立したい$|店を持ちたい$|形を変えたい$|^空いている日にちを見る/.test(l)?"lg":/^スタッフから|^メールで相談/.test(l)?"sm":""}
-function ask(key,o,opt){opt=opt||{};return new Promise(function(ok){var box=el("div","ask");box.dataset.key=key;o.forEach(function(l,i){var b=el("button",cls(l),l);b.type="button";b.addEventListener("click",function(){if(box.dataset.done)return;box.dataset.done="1";b.classList.add("hit");track("押した",key,l);setTimeout(function(){box.remove();if(!opt.quiet)me(l);ok({l:l,i:i})},FAST?0:300)});box.appendChild(b)});add(box);show(box)})}
+function ask(key,o,opt){opt=opt||{};return new Promise(function(ok){var box=el("div","ask");box.dataset.key=key;o.forEach(function(l,i){var b=el("button",cls(l),l);b.type="button";b.addEventListener("click",function(){if(box.dataset.done)return;box.dataset.done="1";b.classList.add("hit");track("押した",key,l);setTimeout(function(){keepH();box.remove();if(!opt.quiet)me(l);ok({l:l,i:i})},FAST?0:300)});box.appendChild(b)});add(box);show(box)})}
 function free(key,label){return new Promise(function(ok){var d=el("div","fr"),l=el("label","",label),t=el("textarea"),r=el("div","rowbtn"),a=el("button","btn main","これで進む"),b=el("button","btn","選ぶのに戻る");t.rows=2;t.maxLength=200;t.id="t"+Math.random().toString(36).slice(2);l.htmlFor=t.id;a.type=b.type="button";d.dataset.key=key;d.appendChild(l);d.appendChild(t);r.appendChild(a);r.appendChild(b);d.appendChild(r);add(d);show(d);
-  a.addEventListener("click",function(){var v=t.value.trim();if(!v){t.focus();return}d.remove();track("書いた",key,v);me(v);ok(v)});b.addEventListener("click",function(){d.remove();ok("")})})}
+  a.addEventListener("click",function(){var v=t.value.trim();if(!v){t.focus();return}keepH();d.remove();track("書いた",key,v);me(v);ok(v)});b.addEventListener("click",function(){keepH();d.remove();ok("")})})}
 var OWNW="この中にない（自分で書く）";
 /* 選ぶ（「この中にない」付き）。返すのは {l:押した言葉, v:書いた言葉か押した言葉, own:自分で書いたか} */
 async function pick(key,o,noOwn){for(;;){var x=await ask(key,noOwn?o:o.concat([OWNW]));if(x.l!==OWNW){A[key]=x.l;return{l:x.l,v:x.l,own:false}}var v=await free(key,"ひとことで大丈夫です");if(v){A[key]="【自分の言葉】"+v;return{l:OWNW,v:v,own:true}}}}
@@ -242,7 +262,7 @@ async function tiles(w,list){var g=el("div","tiles"),T=[];list.forEach(function(
   if(T.length&&!STILL)for(var k=1;k<=28;k++){var e=1-Math.pow(1-k/28,3);T.forEach(function(x){x[0].textContent=man(x[1]*e)});await wait(38)}
   T.forEach(function(x){x[0].textContent=man(x[1])});return g}
 function bars(w,ms,cap){var mx=Math.max.apply(null,ms.concat([1])),b=el("div","bars"),L=el("div","bars");b.style.height="96px";L.style.height="auto";ms.forEach(function(v,i){var k=el("i",i<4?"off":"");k.style.height="2px";b.appendChild(k);L.appendChild(el("span","",(i+1)+"月"));setTimeout(function(){k.style.height=Math.max(2,v/mx*92)+"px"},STILL?0:120+i*70)});w.appendChild(el("div","row",cap||"月ごとの利益（灰色は、仕事が少ない1月〜4月）"));w.appendChild(b);w.appendChild(L)}
-function nextBtn(w,label){return new Promise(function(ok){var b=el("button","btn main",label||"続きへ");b.type="button";b.dataset.next="1";b.style.marginTop="10px";w.appendChild(b);b.addEventListener("click",function(){b.remove();ok()});if(FAST)setTimeout(function(){if(b.parentNode){b.remove();ok()}},0)})}
+function nextBtn(w,label){return new Promise(function(ok){var b=el("button","btn main",label||"続きへ");b.type="button";b.dataset.next="1";b.style.marginTop="10px";w.appendChild(b);b.addEventListener("click",function(){keepH();b.remove();ok()});if(FAST)setTimeout(function(){if(b.parentNode){b.remove();ok()}},0)})}
 
 /* ---- 動画の受け口 ----
    src：動画ファイル（空＝まだ無い）。voice：声入りか。end：途中で止める秒。
@@ -292,26 +312,26 @@ SLOT["k10_60"]={src:"media/k10_60.mp4?v=1127d",voice:1,asks:1,len:"約29.9秒",p
 SLOT["k20_80"]={src:"media/k20_80.mp4?v=1127d",voice:1,asks:1,len:"約31.3秒",place:"人数＝20人：計画の8割の1年（最後は、もう一方の割合の問い）",last:27.75,cue:[[0, "計画の8割、と選ばれましたね。"], [2.84, "スタッフ20人の1年で、仕事が計画の8割だった場合。"], [8.33, "前提：人数も毎月の費用も変えずに。仕事だけが2割減る形。"], [13.52, "売上は8,582万円。"], [16.44, "経費を引いたあとの、お店に残るお金は、およそ2,240万円。月にならすと約187万円。"], [24.17, "数字は例で、同じ結果をお約束するものではありません。"], [27.75, "では、もっと少ない、6割の年も、見ておきますか？"]]};
 SLOT["k20_60"]={src:"media/k20_60.mp4?v=1127d",voice:1,asks:1,len:"約30.7秒",place:"人数＝20人：計画の6割の1年（最後は、もう一方の割合の問い）",last:27.67,cue:[[0, "計画の6割、と選ばれましたね。"], [2.47, "スタッフ20人の1年で、仕事が計画の6割だった場合。"], [8.14, "前提：人数も毎月の費用も変えずに。仕事だけが4割減る形。"], [13.53, "売上は6,437万円。"], [16.4, "経費を引いたあとの、お店に残るお金は、およそ1,680万円。月にならすと約140万円。"], [24.28, "数字は例で、同じ結果をお約束するものではありません。"], [27.67, "では、8割の年も、見ておきますか？"]]};
 function hot(d,t){t.split(/([0-9][0-9,.]*(?:万[0-9,]*)?(?:円|人|割|件|台|年|月|つ|本|%|日)?)/).forEach(function(x,i){if(x)d.appendChild(i%2?el("b","",x):document.createTextNode(x))})}
-function bubble(side,t){var wide=matchMedia("(min-width:760px)").matches;if(!wide)side.textContent="";[].forEach.call(side.children,function(c){c.classList.add("dim")});var r=el("div","b"),d=el("div");r.appendChild(el("i","","三浦"));hot(d,t);r.appendChild(d);side.appendChild(r);while(side.children.length>1&&side.scrollHeight>side.clientHeight+2)side.firstChild.remove()}
+function bubble(side,t){requestAnimationFrame(mark);var wide=matchMedia("(min-width:760px)").matches;if(!wide)side.textContent="";[].forEach.call(side.children,function(c){c.classList.add("dim")});var r=el("div","b"),d=el("div");r.appendChild(el("i","","三浦"));hot(d,t);r.appendChild(d);side.appendChild(r);while(side.children.length>1&&side.scrollHeight>side.clientHeight+2)side.firstChild.remove()}
 /* 動画（あれば）＋決まった場所の吹き出し。無ければ吹き出しだけを同じ場所で順に出す */
 async function stage(w,id,opt){opt=opt||{};if(SEEN.indexOf(id)>=0)throw new Error("同じ映像が2回 "+id);SEEN.push(id);
   var s=SLOT[id]||{},cue=opt.cue||s.cue||CUE[id]||[],end=opt.end||s.end||1e9,src=s.src,box=el("div","stage "+(src?"hasvid":"novid")),side=el("div","bub");box.dataset.slot=id;
   cue=cue.filter(function(c){return c[0]<end});cue.forEach(function(c){LINES.push("〔"+id+"〕"+c[1])});
   VID[id]=0;track("動画","開始",id);var marks=[25,50,75,100];function prog(p){VID[id]=Math.max(VID[id],p);while(marks.length&&VID[id]>=marks[0]){track("動画",marks[0]+"%",id);marks.shift()}}
-  if(src){var v=el("video");v.playsInline=true;v.controls=true;v.preload="auto";v.muted=!s.voice;box.appendChild(v);box.appendChild(side);w.appendChild(box);if(!FAST)box.scrollIntoView({block:"start",behavior:"smooth"});
+  if(src){var v=el("video");v.playsInline=true;v.controls=true;v.preload="auto";v.muted=!s.voice;box.appendChild(v);box.appendChild(side);w.appendChild(box);show(box);
     var skip=el("button","btn","続きへ");skip.type="button";skip.dataset.next="1";skip.style.marginTop="8px";w.appendChild(skip);var last=-1;
-    await new Promise(function(ok){var fin=false;function done(){if(fin)return;fin=true;try{v.pause()}catch(e){}skip.remove();if(tb)tb.remove();ok()}
+    await new Promise(function(ok){var fin=false;function done(){if(fin)return;fin=true;try{v.pause()}catch(e){}keepH();skip.remove();if(tb)tb.remove();ok()}
       v.ontimeupdate=function(){var k=-1;for(var q=0;q<cue.length;q++)if(cue[q][0]<=v.currentTime+.05)k=q;if(k!==last&&k>=0){last=k;bubble(side,cue[k][1])}var dur=Math.min(end,v.duration||end);if(dur>0&&dur<1e8)prog(Math.min(100,Math.round(v.currentTime/dur*100)));if(v.currentTime>=end){prog(100);done()}};
       var tried=false;function start(){var p=v.play();if(p&&p.catch)p.catch(function(er){if(fin||er&&er.name==="AbortError")return;if(cue[0]&&last<0)bubble(side,cue[0][1]);v.muted=true;var q=v.play(),chk=function(){setTimeout(function(){if(fin)return;if(v.paused)tapBtn("▶ 動画を再生する");else if(s.voice&&v.muted)tapBtn("音を出して見る")},400)};if(q&&q.then)q.then(chk,chk);else chk()})}
       var tb=null;function tapBtn(label){if(fin)return;if(tb)tb.remove();tb=el("button","btn main",label);tb.type="button";tb.style.margin="8px 8px 0 0";w.insertBefore(tb,skip);tb.onclick=function(){v.muted=!s.voice;if(label.indexOf("音")===0)v.currentTime=0;v.play();tb.remove();tb=null}}
       v.onended=function(){prog(100);done()};
       v.onerror=function(){if(fin)return;if(!tried){tried=true;fetch(src).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){if(fin)return;v.src=URL.createObjectURL(new Blob([b],{type:"video/mp4"}));v.load();start()}).catch(function(){cue.forEach(function(c){bubble(side,c[1])});done()});return}cue.forEach(function(c){bubble(side,c[1])});done()};skip.onclick=done;
       if(FAST){cue.forEach(function(c){bubble(side,c[1])});done();return}
-      v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.src=src;start()});
+      v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.preload="auto";v.src=src;seen(v).then(function(){if(!fin)start()})});
     if(s.rest!=null){try{v.currentTime=s.rest}catch(e){}}
     /* 話した文を、あとから読み返せるように */
     var dt=el("details","trygl"),sm=el("summary","","話した内容を、もう一度読む");dt.appendChild(sm);cue.forEach(function(c){var pp=el("p","");hot(pp,c[1]);dt.appendChild(pp)});w.appendChild(dt)}
-  else{box.appendChild(side);w.appendChild(box);if(!FAST)box.scrollIntoView({block:"center",behavior:"smooth"});
+  else{box.appendChild(side);w.appendChild(box);show(box);await seen(box);
     for(var i=0;i<cue.length;i++){bubble(side,cue[i][1]);prog(Math.round((i+1)/cue.length*100));if(opt.at&&opt.at[i])await opt.at[i]();await readWait(cue[i][1].length)}
     prog(100)}}
 function sikumi(w,kind,open){var D={form:[["売上","お客様からいただく料金です（例：壁掛けエアコン1台 8,900円）。"],["スタッフに払うお金","作業したスタッフに払うお金です。ここでは売上の約4割（41.25%。口コミなどがそろって、多めに払う場合）で計算しています。"],["予約サイトに払うお金","予約サイトとは、お客様がお店を探して予約する、インターネットのサイトです。予約サイトから来たお客様の分は、売上の30%を手数料として払います。前にご利用いただいたお客様（お店のお客様リスト）からのご予約なら、手数料は0円です。"],["お店に残るお金","売上から、スタッフに払うお金と予約サイトに払うお金を引いた残りです（ガソリン代などの経費と、税金を引く前。お店では粗利と呼びます）。ここから、お店の経費や生活費を考えます。"],["税金用","あとで慌てないように、先に分けておくお金の目安です。ここでは、お店に残るお金の3割にしています。正しい額は、税理士さんに確かめます。"],["手元に残る目安","お店に残るお金から、税金用を分けた残りです。"]],
@@ -346,7 +366,7 @@ function diff(g,a,u){return g===a?"予想と、ぴったり同じでした。":g
 async function sStart(){
   await say("資料のご請求、ありがとうございます。ありがとうグループの三浦です。");
   await say("紙の資料をお送りする代わりに、**会話の形で**ご覧いただけるようにしました。");
-  note("質問に答えるたびに、資料が出ます。押すだけです。お名前はいりません。途中でやめても大丈夫です。吹き出しは、読める速さで1つずつ出ます。画面をタップすると、次の吹き出しへ早く進めます。");
+  note("質問に答えるたびに、資料が出ます。押すだけです。お名前はいりません。途中でやめても大丈夫です。吹き出しは、1つずつ下に足されます。画面は勝手に動きません。下に続きがある時は「↓ 続きがあります」を押すと進めます。");
   await ask("はじめる",["はい、始めます"]);
   await say("では、始めますね。最初に、きっかけを聞かせてください。")}
 
